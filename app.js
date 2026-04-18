@@ -163,12 +163,20 @@ async function setWelcomeText() {
   const { data } = await supabaseClient.auth.getSession();
   const user = data.session?.user;
 
-  let name = "Denise";
+ let name = "Denise";
 
-  if (user?.email) {
-    name = user.email.split("@")[0];
-    name = name.charAt(0).toUpperCase() + name.slice(1);
-  }
+const { data: profileData } = await supabaseClient
+  .from("profiles")
+  .select("full_name")
+  .eq("user_id", user.id)
+  .single();
+
+if (profileData?.full_name) {
+  name = profileData.full_name;
+} else if (user?.email) {
+  name = user.email.split("@")[0];
+  name = name.charAt(0).toUpperCase() + name.slice(1);
+}
 
   welcomeTitleEl.textContent = `${getGreeting()} ${name}`;
   welcomeTextEl.textContent = getMotivation(name);

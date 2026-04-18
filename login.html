@@ -32,22 +32,49 @@
 
     .card {
       width: 100%;
-      max-width: 460px;
+      max-width: 480px;
       background: var(--card);
       border: 1px solid var(--line);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
-      padding: 28px;
+      padding: 30px;
     }
 
     h1 {
       margin: 0 0 10px;
-      font-size: 38px;
+      font-size: 40px;
     }
 
     p {
-      margin: 0 0 22px;
+      margin: 0 0 24px;
       color: var(--muted);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      border: 1px solid var(--line);
+      background: white;
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      background: var(--dark);
+      color: white;
+      border-color: var(--dark);
+    }
+
+    .field {
+      margin-bottom: 16px;
     }
 
     .label {
@@ -63,7 +90,6 @@
       border: 1px solid var(--line);
       border-radius: 14px;
       font-size: 15px;
-      margin-bottom: 16px;
     }
 
     .btn {
@@ -76,13 +102,18 @@
       background: var(--dark);
       color: white;
       cursor: pointer;
+      margin-top: 8px;
     }
 
     .msg {
-      margin-top: 12px;
-      min-height: 18px;
+      margin-top: 14px;
+      min-height: 20px;
       font-size: 14px;
       color: var(--muted);
+    }
+
+    .hidden {
+      display: none;
     }
   </style>
 </head>
@@ -91,13 +122,27 @@
     <h1>ZorgInzicht</h1>
     <p>Meer overzicht. Minder administratie.</p>
 
-    <label class="label" for="email">E-mail</label>
-    <input class="input" id="email" type="email" placeholder="naam@voorbeeld.nl" />
+    <div class="tabs">
+      <button class="tab-btn active" id="tabLogin" type="button">Inloggen</button>
+      <button class="tab-btn" id="tabRegister" type="button">Registreren</button>
+    </div>
 
-    <label class="label" for="password">Wachtwoord</label>
-    <input class="input" id="password" type="password" placeholder="Wachtwoord" />
+    <div id="registerNameWrap" class="field hidden">
+      <label class="label" for="fullName">Naam</label>
+      <input class="input" id="fullName" type="text" placeholder="Bijvoorbeeld: Denise" />
+    </div>
 
-    <button class="btn" id="loginBtn">Inloggen</button>
+    <div class="field">
+      <label class="label" for="email">E-mail</label>
+      <input class="input" id="email" type="email" placeholder="naam@voorbeeld.nl" />
+    </div>
+
+    <div class="field">
+      <label class="label" for="password">Wachtwoord</label>
+      <input class="input" id="password" type="password" placeholder="Wachtwoord" />
+    </div>
+
+    <button class="btn" id="submitBtn">Inloggen</button>
     <div class="msg" id="msg"></div>
   </div>
 

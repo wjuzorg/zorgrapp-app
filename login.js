@@ -3,10 +3,37 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+const tabLogin = document.getElementById("tabLogin");
+const tabRegister = document.getElementById("tabRegister");
+const registerNameWrap = document.getElementById("registerNameWrap");
+const fullNameEl = document.getElementById("fullName");
 const emailEl = document.getElementById("email");
 const passwordEl = document.getElementById("password");
-const loginBtn = document.getElementById("loginBtn");
+const submitBtn = document.getElementById("submitBtn");
 const msgEl = document.getElementById("msg");
+
+let mode = "login";
+
+function setMode(newMode) {
+  mode = newMode;
+
+  if (mode === "login") {
+    tabLogin.classList.add("active");
+    tabRegister.classList.remove("active");
+    registerNameWrap.classList.add("hidden");
+    submitBtn.textContent = "Inloggen";
+  } else {
+    tabRegister.classList.add("active");
+    tabLogin.classList.remove("active");
+    registerNameWrap.classList.remove("hidden");
+    submitBtn.textContent = "Registreren";
+  }
+
+  msgEl.textContent = "";
+}
+
+tabLogin.addEventListener("click", () => setMode("login"));
+tabRegister.addEventListener("click", () => setMode("register"));
 
 async function checkExistingSession() {
   const { data } = await supabaseClient.auth.getSession();
@@ -15,23 +42,70 @@ async function checkExistingSession() {
   }
 }
 
-loginBtn.addEventListener("click", async () => {
-  msgEl.textContent = "Bezig met inloggen...";
-
+submitBtn.addEventListener("click", async () => {
   const email = emailEl.value.trim();
   const password = passwordEl.value;
+  const fullName = fullNameEl.value.trim();
 
-  const { error } = await supabaseClient.auth.signInWithPassword({
+  if (!email || !password) {
+    msgEl.textContent = "Vul e-mail en wachtwoord in.";
+    return;
+  }
+
+  if (mode === "register" && !fullName) {
+    msgEl.textContent = "Vul ook je naam in.";
+    return;
+  }
+
+  msgEl.textContent = mode === "login" ? "Bezig met inloggen..." : "Account aanmaken...";
+
+  if (mode === "login") {
+    const { error } = await supabaseClient.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) {
+      msgEl.textContent = `Fout: ${error.message}`;
+      return;
+    }
+
+    window.location.href = "./index.html";
+    return;
+  }
+
+  const { data: signUpData, error: signUpError } = await supabaseClient.auth.signUp({
     email,
     password
   });
 
-  if (error) {
-    msgEl.textContent = `Fout: ${error.message}`;
+  if (signUpError) {
+    msgEl.textContent = `Fout: ${signUpError.message}`;
     return;
   }
 
-  msgEl.textContent = "Gelukt, doorsturen...";
+  const user = signUpData.user;
+
+  if (!user) {
+    msgEl.textContent = "Gebruiker aangemaakt, maar gebruiker niet gevonden.";
+    return;
+  }
+
+  const { error: profileError } = await supabaseClient
+    .from("profiles")
+    .upsert([
+      {
+        user_id: user.id,
+        full_name: fullName
+      }
+    ]);
+
+  if (profileError) {
+    msgEl.textContent = `Profiel opgeslagen met fout: ${profileError.message}`;
+    return;
+  }
+
+  msgEl.textContent = "Account aangemaakt. Doorsturen...";
   window.location.href = "./index.html";
 });
 
