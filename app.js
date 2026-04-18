@@ -2,7 +2,16 @@ const SUPABASE_URL = "https://bqqoxawgjxxvolljkqnp.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxcW94YXdnanh4dm9sbGprcW5wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODc0OTMsImV4cCI6MjA5MjA2MzQ5M30.WLTELxD32HFtyV1pbsB-60nF_k4Zq7DSvaR87-kj2es";
 
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+async function requireLogin() {
+  const { data } = await supabaseClient.auth.getSession();
 
+  if (!data.session) {
+    window.location.href = "./login.html";
+    return null;
+  }
+
+  return data.session.user;
+}
 const todayCountEl = document.getElementById("todayCount");
 const signalCountEl = document.getElementById("signalCount");
 const invoiceTotalEl = document.getElementById("invoiceTotal");
@@ -139,4 +148,12 @@ async function loadDashboard() {
   }
 }
 
-loadDashboard();
+async function startApp() {
+  const user = await requireLogin();
+
+  if (!user) return;
+
+  loadDashboard();
+}
+
+startApp();
