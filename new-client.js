@@ -3,6 +3,17 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+async function requireLogin() {
+  const { data } = await supabaseClient.auth.getSession();
+
+  if (!data.session) {
+    window.location.href = "./login.html";
+    return null;
+  }
+
+  return data.session.user;
+}
+
 let selectedClientId = null;
 
 const searchClientInput = document.getElementById("searchClient");
@@ -113,7 +124,8 @@ function fillForm(client) {
   document.getElementById("funding_type").value = client.funding_type || "";
   document.getElementById("emergency_contact").value = client.emergency_contact || "";
 
-  document.getElementById("invoice_delivery_method").value = client.invoice_delivery_method || "nog_niet_afgesproken";
+  document.getElementById("invoice_delivery_method").value =
+    client.invoice_delivery_method || "nog_niet_afgesproken";
   document.getElementById("invoice_email").value = client.invoice_email || "";
   document.getElementById("invoice_same_as_client_address").value =
     String(client.invoice_same_as_client_address ?? true);
@@ -206,10 +218,11 @@ function generateUuid() {
   return crypto.randomUUID();
 }
 
-async function checkTimeSlot(date, time) {
+async function checkTimeSlot(date, time, userId) {
   const { data, error } = await supabaseClient
     .from("Appointments")
     .select("id")
+    .eq("owner_id", userId)
     .eq("appointment_date", date)
     .eq("appointment_time", time)
     .limit(1);
@@ -222,6 +235,9 @@ async function checkTimeSlot(date, time) {
 }
 
 saveClientBtn.addEventListener("click", async () => {
+  const user = await requireLogin();
+  if (!user) return;
+
   showSaveMessage("Opslaan...");
 
   const full_name = document.getElementById("full_name").value.trim();
@@ -262,6 +278,7 @@ saveClientBtn.addEventListener("click", async () => {
   }
 
   const clientPayload = {
+    owner_id: user.id,
     full_name,
     phone,
     address,
@@ -318,14 +335,18 @@ saveClientBtn.addEventListener("click", async () => {
     const appointmentsToInsert = [];
 
     for (const date of allDates) {
-      const isTaken = await checkTimeSlot(date, appointment_time);
+      const isTaken = await checkTimeSlot(date, appointment_time, user.id);
 
       if (isTaken) {
-        showSaveMessage(`Tijdslot al bezet op ${date} om ${appointment_time}. Kies een andere tijd of pas de reeks aan.`, true);
+        showSaveMessage(
+          `Tijdslot al bezet op ${date} om ${appointment_time}. Kies een andere tijd of pas de reeks aan.`,
+          true
+        );
         return;
       }
 
       appointmentsToInsert.push({
+        owner_id: user.id,
         client_id: clientId,
         client_name: full_name,
         appointment_date: date,
