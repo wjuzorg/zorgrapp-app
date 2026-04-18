@@ -14,9 +14,10 @@ const btnNewClient = document.getElementById("btnNewClient");
 
 if (btnNewClient) {
   btnNewClient.addEventListener("click", () => {
-    alert("Hier komt straks: nieuwe cliënt of afspraak toevoegen.");
+    window.location.href = "./new-client.html";
   });
 }
+
 
 function formatDutchDate(date) {
   return new Intl.DateTimeFormat("nl-NL", {
