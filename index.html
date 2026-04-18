@@ -15,7 +15,17 @@
       <h1>ZorgInzicht</h1>
       <p>Meer overzicht. Minder administratie.</p>
     </div>
-    <div class="userbox" id="btnUserProfile">Denise</div>
+    <div class="profile-menu-wrap">
+  <button class="userbox profile-trigger" id="btnUserProfile" type="button">
+    Denise
+  </button>
+
+  <div class="profile-dropdown hidden" id="profileDropdown">
+    <button type="button" class="profile-item" id="menuProfile">Mijn profiel</button>
+    <button type="button" class="profile-item" id="menuPassword">Wachtwoord wijzigen</button>
+    <button type="button" class="profile-item danger" id="menuLogout">Uitloggen</button>
+  </div>
+</div>
   </header>
 
   <section class="welcome">
