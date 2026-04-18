@@ -4,176 +4,506 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ZorgInzicht - Cliënt toevoegen</title>
-  <link rel="stylesheet" href="./app.css" />
+  <style>
+    :root {
+      --bg: #f7f8fa;
+      --card: #ffffff;
+      --text: #1e2430;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --soft: #f3f4f6;
+      --green: #16a34a;
+      --dark: #111827;
+      --orange: #f59e0b;
+      --shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 24px 16px 60px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .topbar h1 {
+      margin: 0;
+      font-size: 42px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .topbar p {
+      margin: 10px 0 0;
+      font-size: 16px;
+      color: var(--muted);
+    }
+
+    .userbox {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 12px 18px;
+      font-weight: 700;
+      box-shadow: var(--shadow);
+    }
+
+    .page-link {
+      display: inline-block;
+      margin-top: 14px;
+      font-size: 14px;
+      color: var(--muted);
+      text-decoration: none;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 22px;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .search-title {
+      margin: 0 0 12px;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .search-row {
+      display: grid;
+      grid-template-columns: 1fr 130px;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .input,
+    .select,
+    .textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 15px;
+      color: var(--text);
+      background: white;
+      outline: none;
+      transition: 0.15s ease;
+    }
+
+    .input:focus,
+    .select:focus,
+    .textarea:focus {
+      border-color: #cbd5e1;
+      box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.12);
+    }
+
+    .btn {
+      border: none;
+      border-radius: 14px;
+      padding: 14px 18px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-dark {
+      background: var(--dark);
+      color: white;
+    }
+
+    .btn-outline {
+      background: white;
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+
+    .form-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+      position: sticky;
+      top: 0;
+      background: var(--card);
+      padding-bottom: 10px;
+      z-index: 10;
+    }
+
+    .form-title-wrap h2 {
+      margin: 0;
+      font-size: 34px;
+      line-height: 1.1;
+    }
+
+    .form-title-wrap p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .save-wrap {
+      min-width: 180px;
+      text-align: right;
+    }
+
+    .save-message {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      min-height: 18px;
+    }
+
+    .section {
+      padding: 18px 0 8px;
+      border-top: 1px solid var(--line);
+    }
+
+    .section:first-of-type {
+      border-top: none;
+      padding-top: 0;
+    }
+
+    .section h3 {
+      margin: 0 0 16px;
+      font-size: 22px;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    .label {
+      display: block;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .helper {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .results {
+      margin-top: 14px;
+      display: none;
+      gap: 10px;
+    }
+
+    .results.active {
+      display: grid;
+    }
+
+    .result-card {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px 16px;
+      background: #fbfbfc;
+      cursor: pointer;
+      transition: 0.15s ease;
+    }
+
+    .result-card:hover {
+      border-color: #d1d5db;
+      background: white;
+    }
+
+    .result-name {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .result-meta {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .inline-note {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 720px) {
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .form-header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .save-wrap {
+        text-align: left;
+        min-width: auto;
+      }
+
+      .search-row {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar h1 {
+        font-size: 34px;
+      }
+
+      .form-title-wrap h2 {
+        font-size: 30px;
+      }
+    }
+  </style>
 </head>
 <body>
+  <div class="container">
 
-<div class="container">
+    <header class="topbar">
+      <div>
+        <h1>ZorgInzicht</h1>
+        <p>Meer overzicht. Minder administratie.</p>
+        <a class="page-link" href="./index.html">← Terug naar dashboard</a>
+      </div>
+      <div class="userbox">Denise</div>
+    </header>
 
-  <header class="topbar">
-    <div>
-      <h1>ZorgInzicht</h1>
-      <p>Meer overzicht. Minder administratie.</p>
-    </div>
-    <div class="userbox">Denise</div>
-  </header>
+    <section class="card">
+      <div class="search-title">Zoek cliënt op naam om aan te passen</div>
 
-  <section class="form-card">
-    <div class="search-topbar">
-      <label for="searchClient" class="form-label">Zoek cliënt op naam om aan te passen</label>
       <div class="search-row">
-        <input type="text" id="searchClient" class="form-input" placeholder="Bijvoorbeeld: Jansen">
+        <input
+          type="text"
+          id="searchClient"
+          class="input"
+          placeholder="Bijvoorbeeld: Jansen"
+        />
         <button type="button" class="btn btn-outline" id="searchClientBtn">Zoeken</button>
       </div>
-      <div id="searchResultMessage" class="helper-text"></div>
-    </div>
-  </section>
 
-  <section class="form-card">
-    <h2 class="form-title">Cliënt toevoegen</h2>
+      <div id="searchInfo" class="helper"></div>
 
-    <form id="clientForm" class="client-form">
+      <div id="searchResults" class="results"></div>
+    </section>
 
-      <div class="form-section">
-        <h3>Basisgegevens</h3>
+    <section class="card">
+      <div class="form-header">
+        <div class="form-title-wrap">
+          <h2>Cliënt toevoegen</h2>
+          <p>Voeg een nieuwe cliënt toe of werk bestaande gegevens bij.</p>
+        </div>
 
-        <label class="form-label">Naam</label>
-        <input type="text" id="full_name" class="form-input" required>
-
-        <label class="form-label">Telefoonnummer</label>
-        <input type="text" id="phone" class="form-input">
-
-        <label class="form-label">Adres</label>
-        <input type="text" id="address" class="form-input">
-
-        <div class="form-grid-2">
-          <div>
-            <label class="form-label">Postcode</label>
-            <input type="text" id="postal_code" class="form-input">
-          </div>
-          <div>
-            <label class="form-label">Plaats</label>
-            <input type="text" id="city" class="form-input">
-          </div>
+        <div class="save-wrap">
+          <button type="button" class="btn btn-dark" id="saveClientBtn">Opslaan</button>
+          <div id="saveMessage" class="save-message"></div>
         </div>
       </div>
 
-      <div class="form-section">
-  <h3>Afspraak</h3>
+      <form id="clientForm">
 
-  <label class="form-label">Datum afspraak</label>
-  <input type="date" id="appointment_date" class="form-input">
+        <div class="section">
+          <h3>Basisgegevens</h3>
 
-  <label class="form-label">Tijd</label>
-  <input type="time" id="appointment_time" class="form-input" step="900">
-
-  <label class="form-label">Diensttype</label>
-  <input type="text" id="service_type" class="form-input" placeholder="Bijvoorbeeld: begeleiding, verpleegkundige handeling, thuiszorg">
-
-  <label class="form-label">Duur</label>
-  <select id="duration_minutes" class="form-input">
-    <option value="">Kies een duur</option>
-    <option value="15">15 minuten</option>
-    <option value="30">30 minuten</option>
-    <option value="45">45 minuten</option>
-    <option value="60">60 minuten</option>
-    <option value="90">90 minuten</option>
-    <option value="120">120 minuten</option>
-  </select>
-
-  <label class="form-label">Herhaling</label>
-  <select id="recurrence_type" class="form-input">
-    <option value="geen">Geen herhaling</option>
-    <option value="wekelijks">Wekelijks</option>
-    <option value="tweewekelijks">Tweewekelijks</option>
-    <option value="maandelijks">Maandelijks</option>
-  </select>
-
-  <div id="recurrenceEndBlock" style="display:none;">
-    <label class="form-label">Herhalen tot en met</label>
-    <input type="date" id="recurrence_end_date" class="form-input">
-  </div>
-</div>
-
-      <div class="form-section">
-        <h3>Factuur en contact</h3>
-
-        <label class="form-label">E-mail cliënt</label>
-        <input type="email" id="client_email" class="form-input" placeholder="Als deze bekend is">
-
-        <label class="form-label">Factuur e-mail</label>
-        <input type="email" id="invoice_email" class="form-input" placeholder="Als factuur per mail gewenst is">
-
-        <label class="form-label">IBAN</label>
-        <input type="text" id="iban" class="form-input">
-        <div class="helper-text">Mag ook later worden ingevuld.</div>
-
-        <label class="form-label">Manier van betalen</label>
-        <select id="funding_type" class="form-input">
-          <option value="">Kies een optie</option>
-          <option value="particulier">Particulier</option>
-          <option value="pgb">PGB</option>
-          <option value="wmo">Wmo</option>
-          <option value="onbekend">Onbekend / later bespreken</option>
-        </select>
-      </div>
-
-      <div class="form-section">
-        <h3>Mantelzorger / contactpersoon</h3>
-
-        <label class="form-label">Mantelzorger / contactpersoon</label>
-        <input type="text" id="emergency_contact" class="form-input">
-        <div class="helper-text">Kan later worden aangepast.</div>
-      </div>
-
-      <div class="form-section">
-        <h3>Factuurvoorkeur</h3>
-
-        <label class="form-label">Factuur ontvangen via</label>
-        <select id="invoice_delivery_method" class="form-input">
-          <option value="nog_niet_afgesproken">Nog niet afgesproken</option>
-          <option value="email">Per e-mail</option>
-          <option value="address">Per adres</option>
-        </select>
-
-        <div id="invoiceAddressBlock" style="display:none;">
-          <div class="checkbox-row">
-            <input type="checkbox" id="invoice_same_as_client_address" checked>
-            <label for="invoice_same_as_client_address">Factuuradres is hetzelfde als cliëntadres</label>
+          <div class="field">
+            <label class="label" for="full_name">Naam</label>
+            <input type="text" id="full_name" class="input" />
           </div>
 
-          <div id="customInvoiceAddressFields" style="display:none;">
-            <label class="form-label">Factuuradres</label>
-            <input type="text" id="invoice_address" class="form-input">
+          <div class="field">
+            <label class="label" for="phone">Telefoonnummer</label>
+            <input type="text" id="phone" class="input" />
+          </div>
 
-            <div class="form-grid-2">
-              <div>
-                <label class="form-label">Factuur postcode</label>
-                <input type="text" id="invoice_postal_code" class="form-input">
-              </div>
-              <div>
-                <label class="form-label">Factuur plaats</label>
-                <input type="text" id="invoice_city" class="form-input">
-              </div>
+          <div class="field">
+            <label class="label" for="address">Adres</label>
+            <input type="text" id="address" class="input" />
+          </div>
+
+          <div class="field">
+            <label class="label" for="postal_code">Postcode</label>
+            <input type="text" id="postal_code" class="input" />
+          </div>
+
+          <div class="field">
+            <label class="label" for="city">Plaats</label>
+            <input type="text" id="city" class="input" />
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>Afspraak</h3>
+
+          <div class="field">
+            <label class="label" for="appointment_date">Datum afspraak</label>
+            <input type="date" id="appointment_date" class="input" />
+          </div>
+
+          <div class="field">
+            <label class="label" for="appointment_time">Tijd</label>
+            <input type="time" id="appointment_time" class="input" step="900" />
+            <div class="helper">De app controleert straks automatisch of dit tijdstip al bezet is.</div>
+          </div>
+
+          <div class="field">
+            <label class="label" for="service_type">Diensttype</label>
+            <input
+              type="text"
+              id="service_type"
+              class="input"
+              placeholder="Bijvoorbeeld: begeleiding, steunkousen, thuiszorg"
+            />
+          </div>
+
+          <div class="field">
+            <label class="label" for="duration_minutes">Duur</label>
+            <select id="duration_minutes" class="select">
+              <option value="">Kies een duur</option>
+              <option value="15">15 minuten</option>
+              <option value="30">30 minuten</option>
+              <option value="45">45 minuten</option>
+              <option value="60">60 minuten</option>
+              <option value="90">90 minuten</option>
+              <option value="120">120 minuten</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label class="label" for="recurrence_type">Herhaling</label>
+            <select id="recurrence_type" class="select">
+              <option value="geen">Geen herhaling</option>
+              <option value="wekelijks">Wekelijks</option>
+              <option value="tweewekelijks">Tweewekelijks</option>
+              <option value="maandelijks">Maandelijks</option>
+            </select>
+          </div>
+
+          <div class="field hidden" id="recurrenceEndWrap">
+            <label class="label" for="recurrence_end_date">Herhalen tot en met</label>
+            <input type="date" id="recurrence_end_date" class="input" />
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>Factuur en contact</h3>
+
+          <div class="field">
+            <label class="label" for="client_email">E-mail cliënt</label>
+            <input
+              type="email"
+              id="client_email"
+              class="input"
+              placeholder="Als deze bekend is"
+            />
+          </div>
+
+          <div class="field">
+            <label class="label" for="iban">IBAN</label>
+            <input type="text" id="iban" class="input" />
+            <div class="helper">Mag ook later worden ingevuld.</div>
+          </div>
+
+          <div class="field">
+            <label class="label" for="funding_type">Manier van betalen</label>
+            <select id="funding_type" class="select">
+              <option value="">Kies een optie</option>
+              <option value="particulier">Particulier</option>
+              <option value="pgb">PGB</option>
+              <option value="wmo">Wmo</option>
+              <option value="onbekend">Onbekend / later bespreken</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>Mantelzorger / contactpersoon</h3>
+
+          <div class="field">
+            <label class="label" for="emergency_contact">Mantelzorger / contactpersoon</label>
+            <input type="text" id="emergency_contact" class="input" />
+            <div class="helper">Kan later worden aangepast.</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>Factuurvoorkeur</h3>
+
+          <div class="field">
+            <label class="label" for="invoice_delivery_method">Factuur ontvangen via</label>
+            <select id="invoice_delivery_method" class="select">
+              <option value="nog_niet_afgesproken">Nog niet afgesproken</option>
+              <option value="email">Per e-mail</option>
+              <option value="address">Per adres</option>
+            </select>
+          </div>
+
+          <div class="field hidden" id="invoiceEmailWrap">
+            <label class="label" for="invoice_email">Factuur e-mail</label>
+            <input
+              type="email"
+              id="invoice_email"
+              class="input"
+              placeholder="Bijvoorbeeld: dochter@voorbeeld.nl"
+            />
+          </div>
+
+          <div class="field hidden" id="invoiceAddressModeWrap">
+            <label class="label" for="invoice_same_as_client_address">Factuuradres</label>
+            <select id="invoice_same_as_client_address" class="select">
+              <option value="true">Zelfde als cliëntadres</option>
+              <option value="false">Ander factuuradres invullen</option>
+            </select>
+          </div>
+
+          <div id="invoiceAddressFields" class="hidden">
+            <div class="field">
+              <label class="label" for="invoice_address">Factuuradres</label>
+              <input type="text" id="invoice_address" class="input" />
+            </div>
+
+            <div class="field">
+              <label class="label" for="invoice_postal_code">Factuur postcode</label>
+              <input type="text" id="invoice_postal_code" class="input" />
+            </div>
+
+            <div class="field">
+              <label class="label" for="invoice_city">Factuur plaats</label>
+              <input type="text" id="invoice_city" class="input" />
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="form-section">
-        <h3>Notities</h3>
-        <textarea id="notes" class="form-textarea" rows="4" placeholder="Bijzonderheden of afspraken..."></textarea>
-      </div>
+      </form>
+    </section>
+  </div>
 
-      <div id="saveMessage" class="helper-text" style="margin-bottom:14px;"></div>
-
-      <button type="submit" class="btn btn-primary full-width">Opslaan</button>
-    </form>
-  </section>
-
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./new-client.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./new-client.js"></script>
 </body>
 </html>

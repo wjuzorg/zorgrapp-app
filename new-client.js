@@ -5,46 +5,99 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_
 
 let selectedClientId = null;
 
-const clientForm = document.getElementById("clientForm");
-const saveMessage = document.getElementById("saveMessage");
 const searchClientInput = document.getElementById("searchClient");
 const searchClientBtn = document.getElementById("searchClientBtn");
-const searchResultMessage = document.getElementById("searchResultMessage");
-const invoiceDeliveryMethod = document.getElementById("invoice_delivery_method");
-const invoiceAddressBlock = document.getElementById("invoiceAddressBlock");
-const invoiceSameAsClientAddress = document.getElementById("invoice_same_as_client_address");
-const customInvoiceAddressFields = document.getElementById("customInvoiceAddressFields");
+const searchInfo = document.getElementById("searchInfo");
+const searchResults = document.getElementById("searchResults");
+
 const recurrenceTypeEl = document.getElementById("recurrence_type");
-const recurrenceEndBlock = document.getElementById("recurrenceEndBlock");
+const recurrenceEndWrap = document.getElementById("recurrenceEndWrap");
 
-function toggleInvoiceFields() {
-  const method = invoiceDeliveryMethod.value;
+const invoiceDeliveryMethodEl = document.getElementById("invoice_delivery_method");
+const invoiceEmailWrap = document.getElementById("invoiceEmailWrap");
+const invoiceAddressModeWrap = document.getElementById("invoiceAddressModeWrap");
+const invoiceAddressFields = document.getElementById("invoiceAddressFields");
+const invoiceSameAsClientAddressEl = document.getElementById("invoice_same_as_client_address");
 
-  if (method === "address") {
-    invoiceAddressBlock.style.display = "block";
+const saveClientBtn = document.getElementById("saveClientBtn");
+const saveMessage = document.getElementById("saveMessage");
 
-    if (invoiceSameAsClientAddress.checked) {
-      customInvoiceAddressFields.style.display = "none";
-    } else {
-      customInvoiceAddressFields.style.display = "block";
-    }
-  } else {
-    invoiceAddressBlock.style.display = "none";
-    customInvoiceAddressFields.style.display = "none";
-  }
+function showSaveMessage(text, isError = false) {
+  saveMessage.textContent = text;
+  saveMessage.style.color = isError ? "#b91c1c" : "#6b7280";
 }
 
 function toggleRecurrenceFields() {
-  if (recurrenceTypeEl.value === "geen") {
-    recurrenceEndBlock.style.display = "none";
-  } else {
-    recurrenceEndBlock.style.display = "block";
+  recurrenceEndWrap.classList.toggle("hidden", recurrenceTypeEl.value === "geen");
+}
+
+function toggleInvoiceFields() {
+  const method = invoiceDeliveryMethodEl.value;
+
+  invoiceEmailWrap.classList.add("hidden");
+  invoiceAddressModeWrap.classList.add("hidden");
+  invoiceAddressFields.classList.add("hidden");
+
+  if (method === "email") {
+    invoiceEmailWrap.classList.remove("hidden");
+  }
+
+  if (method === "address") {
+    invoiceAddressModeWrap.classList.remove("hidden");
+
+    if (invoiceSameAsClientAddressEl.value === "false") {
+      invoiceAddressFields.classList.remove("hidden");
+    }
   }
 }
 
-invoiceDeliveryMethod.addEventListener("change", toggleInvoiceFields);
-invoiceSameAsClientAddress.addEventListener("change", toggleInvoiceFields);
 recurrenceTypeEl.addEventListener("change", toggleRecurrenceFields);
+invoiceDeliveryMethodEl.addEventListener("change", toggleInvoiceFields);
+invoiceSameAsClientAddressEl.addEventListener("change", toggleInvoiceFields);
+
+function renderSearchResults(clients) {
+  if (!clients.length) {
+    searchResults.classList.remove("active");
+    searchResults.innerHTML = "";
+    searchInfo.textContent = "Geen cliënten gevonden. Je kunt hieronder een nieuwe cliënt toevoegen.";
+    return;
+  }
+
+  searchInfo.textContent = `${clients.length} resultaat/resultaten gevonden. Kies de juiste cliënt.`;
+  searchResults.classList.add("active");
+
+  searchResults.innerHTML = clients.map(client => `
+    <div class="result-card" data-id="${client.id}">
+      <div class="result-name">${client.full_name || "-"}</div>
+      <div class="result-meta">
+        ${client.address || "Geen adres"}${client.city ? ` - ${client.city}` : ""}
+        <br>
+        ${client.phone || "Geen telefoonnummer"}
+      </div>
+    </div>
+  `).join("");
+
+  document.querySelectorAll(".result-card").forEach(card => {
+    card.addEventListener("click", async () => {
+      const id = card.dataset.id;
+
+      const { data, error } = await supabaseClient
+        .from("Clients")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (error) {
+        searchInfo.textContent = `Fout bij laden cliënt: ${error.message}`;
+        return;
+      }
+
+      fillForm(data);
+      searchInfo.textContent = `Cliënt geladen: ${data.full_name}`;
+      searchResults.classList.remove("active");
+    });
+  });
+}
 
 function fillForm(client) {
   selectedClientId = client.id;
@@ -54,55 +107,51 @@ function fillForm(client) {
   document.getElementById("address").value = client.address || "";
   document.getElementById("postal_code").value = client.postal_code || "";
   document.getElementById("city").value = client.city || "";
+
   document.getElementById("client_email").value = client.client_email || "";
-  document.getElementById("invoice_email").value = client.invoice_email || "";
   document.getElementById("iban").value = client.iban || "";
   document.getElementById("funding_type").value = client.funding_type || "";
   document.getElementById("emergency_contact").value = client.emergency_contact || "";
+
   document.getElementById("invoice_delivery_method").value = client.invoice_delivery_method || "nog_niet_afgesproken";
-  document.getElementById("invoice_same_as_client_address").checked = client.invoice_same_as_client_address ?? true;
+  document.getElementById("invoice_email").value = client.invoice_email || "";
+  document.getElementById("invoice_same_as_client_address").value =
+    String(client.invoice_same_as_client_address ?? true);
   document.getElementById("invoice_address").value = client.invoice_address || "";
   document.getElementById("invoice_postal_code").value = client.invoice_postal_code || "";
   document.getElementById("invoice_city").value = client.invoice_city || "";
-  document.getElementById("notes").value = client.notes || "";
 
   toggleInvoiceFields();
 }
 
 searchClientBtn.addEventListener("click", async () => {
-  const searchValue = searchClientInput.value.trim();
+  const q = searchClientInput.value.trim();
 
-  if (!searchValue) {
-    searchResultMessage.textContent = "Vul eerst een naam in.";
+  if (!q) {
+    searchInfo.textContent = "Vul eerst een naam in.";
+    searchResults.classList.remove("active");
+    searchResults.innerHTML = "";
     return;
   }
 
-  searchResultMessage.textContent = "Zoeken...";
+  searchInfo.textContent = "Zoeken...";
+  searchResults.classList.remove("active");
+  searchResults.innerHTML = "";
 
   const { data, error } = await supabaseClient
     .from("Clients")
-    .select("*")
-    .ilike("full_name", `%${searchValue}%`)
-    .limit(1);
+    .select("id, full_name, address, city, phone")
+    .ilike("full_name", `%${q}%`)
+    .order("full_name", { ascending: true })
+    .limit(10);
 
   if (error) {
-    searchResultMessage.textContent = `Fout bij zoeken: ${error.message}`;
+    searchInfo.textContent = `Fout bij zoeken: ${error.message}`;
     return;
   }
 
-  if (!data || data.length === 0) {
-    selectedClientId = null;
-    searchResultMessage.textContent = "Geen cliënt gevonden. Je kunt hieronder een nieuwe cliënt toevoegen.";
-    return;
-  }
-
-  fillForm(data[0]);
-  searchResultMessage.textContent = `Cliënt gevonden: ${data[0].full_name}`;
+  renderSearchResults(data || []);
 });
-
-function generateUuid() {
-  return crypto.randomUUID();
-}
 
 function addDays(dateString, days) {
   const d = new Date(dateString);
@@ -115,7 +164,6 @@ function addMonths(dateString, months) {
   const originalDay = d.getDate();
   d.setMonth(d.getMonth() + months);
 
-  // corrigeert maandverschuiving zoals 31e -> volgende maand
   if (d.getDate() < originalDay) {
     d.setDate(0);
   }
@@ -145,15 +193,17 @@ function buildRecurringDates(startDate, recurrenceType, endDate) {
       break;
     }
 
-    if (nextDate > endDate) {
-      break;
-    }
+    if (nextDate > endDate) break;
 
     dates.push(nextDate);
     current = nextDate;
   }
 
   return dates;
+}
+
+function generateUuid() {
+  return crypto.randomUUID();
 }
 
 async function checkTimeSlot(date, time) {
@@ -171,10 +221,8 @@ async function checkTimeSlot(date, time) {
   return data && data.length > 0;
 }
 
-clientForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  saveMessage.textContent = "Opslaan...";
+saveClientBtn.addEventListener("click", async () => {
+  showSaveMessage("Opslaan...");
 
   const full_name = document.getElementById("full_name").value.trim();
   const phone = document.getElementById("phone").value.trim();
@@ -188,31 +236,28 @@ clientForm.addEventListener("submit", async (e) => {
   const duration_minutes = document.getElementById("duration_minutes").value
     ? Number(document.getElementById("duration_minutes").value)
     : null;
-
   const recurrence_type = document.getElementById("recurrence_type").value;
   const recurrence_end_date = document.getElementById("recurrence_end_date").value;
 
   const client_email = document.getElementById("client_email").value.trim();
-  const invoice_email = document.getElementById("invoice_email").value.trim();
   const iban = document.getElementById("iban").value.trim();
   const funding_type = document.getElementById("funding_type").value;
   const emergency_contact = document.getElementById("emergency_contact").value.trim();
 
   const invoice_delivery_method = document.getElementById("invoice_delivery_method").value;
-  const invoice_same_as_client_address = document.getElementById("invoice_same_as_client_address").checked;
+  const invoice_email = document.getElementById("invoice_email").value.trim();
+  const invoice_same_as_client_address = invoiceSameAsClientAddressEl.value === "true";
   const invoice_address = document.getElementById("invoice_address").value.trim();
   const invoice_postal_code = document.getElementById("invoice_postal_code").value.trim();
   const invoice_city = document.getElementById("invoice_city").value.trim();
 
-  const notes = document.getElementById("notes").value.trim();
-
   if (!full_name) {
-    saveMessage.textContent = "Naam is verplicht.";
+    showSaveMessage("Naam is verplicht.", true);
     return;
   }
 
   if (recurrence_type !== "geen" && !recurrence_end_date) {
-    saveMessage.textContent = "Kies een einddatum voor de herhaling.";
+    showSaveMessage("Kies een einddatum voor de herhaling.", true);
     return;
   }
 
@@ -223,16 +268,15 @@ clientForm.addEventListener("submit", async (e) => {
     postal_code,
     city,
     client_email,
-    invoice_email,
     iban,
     funding_type,
     emergency_contact,
     invoice_delivery_method,
+    invoice_email,
     invoice_same_as_client_address,
     invoice_address,
     invoice_postal_code,
-    invoice_city,
-    notes
+    invoice_city
   };
 
   let clientId = selectedClientId;
@@ -244,7 +288,7 @@ clientForm.addEventListener("submit", async (e) => {
       .eq("id", clientId);
 
     if (updateError) {
-      saveMessage.textContent = `Fout bij bijwerken cliënt: ${updateError.message}`;
+      showSaveMessage(`Fout bij bijwerken cliënt: ${updateError.message}`, true);
       return;
     }
   } else {
@@ -255,7 +299,7 @@ clientForm.addEventListener("submit", async (e) => {
       .single();
 
     if (insertError) {
-      saveMessage.textContent = `Fout bij opslaan cliënt: ${insertError.message}`;
+      showSaveMessage(`Fout bij opslaan cliënt: ${insertError.message}`, true);
       return;
     }
 
@@ -277,7 +321,7 @@ clientForm.addEventListener("submit", async (e) => {
       const isTaken = await checkTimeSlot(date, appointment_time);
 
       if (isTaken) {
-        saveMessage.textContent = `Tijdslot al bezet op ${date} om ${appointment_time}. Kies een andere tijd of pas de reeks aan.`;
+        showSaveMessage(`Tijdslot al bezet op ${date} om ${appointment_time}. Kies een andere tijd of pas de reeks aan.`, true);
         return;
       }
 
@@ -302,13 +346,13 @@ clientForm.addEventListener("submit", async (e) => {
       .insert(appointmentsToInsert);
 
     if (appointmentError) {
-      saveMessage.textContent = `Cliënt opgeslagen, maar afspraak niet: ${appointmentError.message}`;
+      showSaveMessage(`Cliënt opgeslagen, maar afspraak niet: ${appointmentError.message}`, true);
       return;
     }
   }
 
-  saveMessage.textContent = "Cliënt en afspraak succesvol opgeslagen.";
+  showSaveMessage("Cliënt succesvol opgeslagen.");
 });
 
-toggleInvoiceFields();
 toggleRecurrenceFields();
+toggleInvoiceFields();
