@@ -85,40 +85,6 @@ function renderAppointments(items) {
     return;
   }
 
-  appointmentsListEl.innerHTML = items.map(item => {
-    const filled = isAppointmentFilled(item);
-
-    return `
-      <article class="appointment-card">
-        <div class="appointment-top">
-          <div>
-            <div class="appointment-time">${item.appointment_time || "-"}</div>
-            <h4 class="appointment-name">${item.client_name || "Onbekende cliënt"}</h4>
-            <div class="appointment-service">${item.service_type || "Geen diensttype"}</div>
-          </div>
-          ${getStatusLabel(item)}
-        </div>
-
-        <div class="card-note">
-          ${item.signal_notes ? `Signaal: ${item.signal_notes}` : "Nog geen signalering toegevoegd."}
-        </div>
-
-        <div class="card-actions">
-          <button class="btn btn-secondary">Invullen</button>
-          <button class="btn btn-outline">Cliëntenkaart</button>
-          <button class="btn btn-finish ${filled ? "enabled" : ""}">
-            Afronden
-          </button>
-        </div>
-      </article>
-    `;
-  }).join("");
-}
-
-async function loadDashboard() {
-  const today = getTodayString();
-  todayDateLabelEl.textContent = formatDutchDate(new Date());
-
   function getGreeting() {
   const hour = new Date().getHours();
 
@@ -163,6 +129,42 @@ async function setWelcomeText() {
   }
 }
 
+  appointmentsListEl.innerHTML = items.map(item => {
+    const filled = isAppointmentFilled(item);
+
+    return `
+      <article class="appointment-card">
+        <div class="appointment-top">
+          <div>
+            <div class="appointment-time">${item.appointment_time || "-"}</div>
+            <h4 class="appointment-name">${item.client_name || "Onbekende cliënt"}</h4>
+            <div class="appointment-service">${item.service_type || "Geen diensttype"}</div>
+          </div>
+          ${getStatusLabel(item)}
+        </div>
+
+        <div class="card-note">
+          ${item.signal_notes ? `Signaal: ${item.signal_notes}` : "Nog geen signalering toegevoegd."}
+        </div>
+
+        <div class="card-actions">
+          <button class="btn btn-secondary">Invullen</button>
+          <button class="btn btn-outline">Cliëntenkaart</button>
+          <button class="btn btn-finish ${filled ? "enabled" : ""}">
+            Afronden
+          </button>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+async function loadDashboard() {
+  const today = getTodayString();
+  todayDateLabelEl.textContent = formatDutchDate(new Date());
+
+  
+
   appointmentsListEl.innerHTML = `
     <div class="empty-state">Afspraken laden...</div>
   `;
@@ -190,8 +192,6 @@ async function setWelcomeText() {
     todayCountEl.textContent = todayAppointments.length;
     signalCountEl.textContent = "0";
     invoiceTotalEl.textContent = "€0";
-
-    welcomeTextEl.textContent = `${todayAppointments.length} afspraken vandaag.`;
 
     renderAppointments(todayAppointments);
   } catch (err) {
