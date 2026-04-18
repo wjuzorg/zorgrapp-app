@@ -119,8 +119,49 @@ async function loadDashboard() {
   const today = getTodayString();
   todayDateLabelEl.textContent = formatDutchDate(new Date());
 
-  welcomeTitleEl.textContent = "Goedemorgen";
-  welcomeTextEl.textContent = "Bezig met laden...";
+  function getGreeting() {
+  const hour = new Date().getHours();
+
+  if (hour >= 5 && hour < 12) return "Goedemorgen";
+  if (hour >= 12 && hour < 17) return "Goedemiddag";
+  if (hour >= 17 && hour < 22) return "Goedenavond";
+  return "Goedenacht";
+}
+
+function getMotivation(name) {
+  const messages = [
+    `Vandaag breng jij weer rust en overzicht.`,
+    `${name}, jij maakt vandaag echt verschil.`,
+    `Een goede dag begint met structuur. Jij regelt dat.`,
+    `${name}, mensen rekenen vandaag op jouw rust.`,
+    `Jij helpt niet alleen praktisch, maar ook menselijk.`,
+    `${name}, vandaag weer een kans om iemand blij te maken.`,
+    `Kleine hulp bestaat niet. Jij bewijst dat elke dag.`,
+    `${name}, jouw aanwezigheid geeft vertrouwen.`
+  ];
+
+  const day = new Date().getDate();
+  return messages[day % messages.length];
+}
+
+async function setWelcomeText() {
+  const { data } = await supabaseClient.auth.getSession();
+  const user = data.session?.user;
+
+  let name = "Denise";
+
+  if (user?.email) {
+    name = user.email.split("@")[0];
+    name = name.charAt(0).toUpperCase() + name.slice(1);
+  }
+
+  welcomeTitleEl.textContent = `${getGreeting()} ${name}`;
+  welcomeTextEl.textContent = getMotivation(name);
+
+  if (btnUserProfile) {
+    btnUserProfile.textContent = name;
+  }
+}
 
   appointmentsListEl.innerHTML = `
     <div class="empty-state">Afspraken laden...</div>
@@ -166,10 +207,10 @@ async function loadDashboard() {
 
 async function startApp() {
   const user = await requireLogin();
-
   if (!user) return;
 
-  loadDashboard();
+  await setWelcomeText();
+  await loadDashboard();
 }
 
 startApp();
