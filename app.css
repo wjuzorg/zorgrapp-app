@@ -237,42 +237,16 @@ body {
   color: var(--muted);
 }
 
-@media (max-width: 900px) {
-  .stats {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .topbar {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+.empty-state {
+  background: var(--card);
+  border: 1px dashed #cbd5e1;
+  border-radius: var(--radius);
+  padding: 24px;
+  text-align: center;
+  color: var(--muted);
 }
 
-@media (max-width: 560px) {
-  .container {
-    padding: 18px 14px 32px;
-  }
-
-  .topbar h1 {
-    font-size: 34px;
-  }
-
-  .stats {
-    grid-template-columns: 1fr;
-  }
-
-  .appointment-name {
-    font-size: 22px;
-  }
-
-  .card-actions {
-    flex-direction: column;
-  }
-
-  .btn {
-    width: 100%;
-  }
- .profile-menu-wrap {
+.profile-menu-wrap {
   position: relative;
   display: inline-block;
 }
@@ -337,4 +311,40 @@ body {
 .profile-card-item.danger {
   color: #b91c1c;
 }
+
+@media (max-width: 900px) {
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 560px) {
+  .container {
+    padding: 18px 14px 32px;
+  }
+
+  .topbar h1 {
+    font-size: 34px;
+  }
+
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .appointment-name {
+    font-size: 22px;
+  }
+
+  .card-actions {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+  }
 }
