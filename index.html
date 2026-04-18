@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZorgInzicht</title>
+  <link rel="stylesheet" href="./app.css">
+</head>
+<body>
+
+<div class="container">
+
+  <header class="topbar">
+    <div>
+      <h1>ZorgInzicht</h1>
+      <p>Meer overzicht. Minder administratie.</p>
+    </div>
+    <div class="userbox">Denise</div>
+  </header>
+
+  <section class="welcome">
+    <h2 id="welcomeTitle">Goedemorgen</h2>
+    <p id="welcomeText">Laden...</p>
+  </section>
+
+  <section class="stats">
+    <div class="card dark" id="btnNewClient">
+      <h3>Nieuwe cliënt</h3>
+      <span>+</span>
+    </div>
+
+    <div class="card">
+      <h3>Afspraken vandaag</h3>
+      <span id="todayCount">0</span>
+    </div>
+
+    <div class="card orange">
+      <h3>Actiesignalen</h3>
+      <span id="signalCount">0</span>
+    </div>
+
+    <div class="card blue">
+      <h3>Facturen</h3>
+      <span id="invoiceTotal">€0</span>
+    </div>
+  </section>
+
+  <section class="today">
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:18px;">
+      <h2 style="margin:0;">Vandaag</h2>
+      <div class="userbox" id="todayDateLabel">Vandaag</div>
+    </div>
+
+    <div id="appointmentsList" class="empty-state">
+      Afspraken laden...
+    </div>
+  </section>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./app.js"></script>
+</body>
+</html>
