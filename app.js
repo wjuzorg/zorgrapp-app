@@ -26,6 +26,8 @@ const menuProfile = document.getElementById("menuProfile");
 const menuPassword = document.getElementById("menuPassword");
 const menuLogout = document.getElementById("menuLogout");
 const profileEmail = document.getElementById("profileEmail");
+const weekRangeLabelEl = document.getElementById("weekRangeLabel");
+const weekdayCards = document.querySelectorAll(".weekday-card");
 
 if (btnNewClient) {
   btnNewClient.addEventListener("click", () => {
@@ -259,13 +261,14 @@ async function loadDashboard() {
     }
 
     const appointments = data || [];
-    const todayAppointments = appointments.filter(item => item.appointment_date === today);
+const todayAppointments = appointments.filter(item => item.appointment_date === today);
 
-    todayCountEl.textContent = todayAppointments.length;
-    signalCountEl.textContent = "0";
-    invoiceTotalEl.textContent = "€0";
+todayCountEl.textContent = todayAppointments.length;
+signalCountEl.textContent = "0";
+invoiceTotalEl.textContent = "€0";
 
-    renderAppointments(todayAppointments);
+renderWeekPlanning(appointments);
+renderAppointments(todayAppointments);
   } catch (err) {
     console.error("Algemene fout:", err);
     appointmentsListEl.innerHTML = `
@@ -274,6 +277,68 @@ async function loadDashboard() {
       </div>
     `;
   }
+}
+
+function toDateString(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function getStartOfWeek(date) {
+  const d = new Date(date);
+  const day = d.getDay(); // 0 zondag
+  const diff = day === 0 ? -6 : 1 - day; // maandag als start
+  d.setDate(d.getDate() + diff);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+function formatShortDate(date) {
+  return new Intl.DateTimeFormat("nl-NL", {
+    day: "numeric",
+    month: "short"
+  }).format(date);
+}
+
+function renderWeekPlanning(appointments) {
+  const today = new Date();
+  const startOfWeek = getStartOfWeek(today);
+  const weekDates = [];
+
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(startOfWeek);
+    d.setDate(startOfWeek.getDate() + i);
+    weekDates.push(d);
+  }
+
+  const endOfWeek = weekDates[6];
+  weekRangeLabelEl.textContent = `${formatShortDate(startOfWeek)} – ${formatShortDate(endOfWeek)}`;
+
+  weekdayCards.forEach((card, index) => {
+    const dateObj = weekDates[index];
+    const dateString = toDateString(dateObj);
+
+    const count = appointments.filter(item => item.appointment_date === dateString).length;
+
+    const dateEl = card.querySelector(".weekday-date");
+    const countEl = card.querySelector(".weekday-count");
+
+    dateEl.textContent = formatShortDate(dateObj);
+    countEl.textContent = count;
+
+    card.classList.toggle("active", dateString === getTodayString());
+
+    card.onclick = () => {
+      const dayAppointments = appointments.filter(item => item.appointment_date === dateString);
+      todayDateLabelEl.textContent = formatDutchDate(dateObj);
+      renderAppointments(dayAppointments);
+
+      weekdayCards.forEach(btn => btn.classList.remove("active"));
+      card.classList.add("active");
+    };
+  });
 }
 
 async function startApp() {
