@@ -236,8 +236,6 @@ async function checkTimeSlot(date, time, userId) {
 
 saveClientBtn.addEventListener("click", async () => {
   try {
-    alert("Opslaan knop werkt");
-console.log("Opslaan knop werkt");
     const user = await requireLogin();
     if (!user) return;
 

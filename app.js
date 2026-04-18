@@ -20,13 +20,29 @@ const welcomeTitleEl = document.getElementById("welcomeTitle");
 const welcomeTextEl = document.getElementById("welcomeText");
 const todayDateLabelEl = document.getElementById("todayDateLabel");
 const btnNewClient = document.getElementById("btnNewClient");
-
+const btnUserProfile = document.getElementById("btnUserProfile");
 if (btnNewClient) {
   btnNewClient.addEventListener("click", () => {
     window.location.href = "./new-client.html";
   });
 }
+if (btnUserProfile) {
+  btnUserProfile.addEventListener("click", async () => {
+    const { data } = await supabaseClient.auth.getSession();
+    const user = data.session?.user;
 
+    if (!user) {
+      window.location.href = "./login.html";
+      return;
+    }
+
+    alert(
+      "Ingelogd als:\n\n" +
+      user.email +
+      "\n\nHier komt straks jouw profielpagina."
+    );
+  });
+}
 
 function formatDutchDate(date) {
   return new Intl.DateTimeFormat("nl-NL", {
