@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZorgInzicht - Cliënt toevoegen</title>
+  <link rel="stylesheet" href="./app.css" />
+</head>
+<body>
+
+<div class="container">
+
+  <header class="topbar">
+    <div>
+      <h1>ZorgInzicht</h1>
+      <p>Meer overzicht. Minder administratie.</p>
+    </div>
+    <div class="userbox">Denise</div>
+  </header>
+
+  <section class="form-card">
+    <div class="search-topbar">
+      <label for="searchClient" class="form-label">Zoek cliënt op naam om aan te passen</label>
+      <div class="search-row">
+        <input type="text" id="searchClient" class="form-input" placeholder="Bijvoorbeeld: Jansen">
+        <button type="button" class="btn btn-outline" id="searchClientBtn">Zoeken</button>
+      </div>
+      <div id="searchResultMessage" class="helper-text"></div>
+    </div>
+  </section>
+
+  <section class="form-card">
+    <h2 class="form-title">Cliënt toevoegen</h2>
+
+    <form id="clientForm" class="client-form">
+
+      <div class="form-section">
+        <h3>Basisgegevens</h3>
+
+        <label class="form-label">Naam</label>
+        <input type="text" id="full_name" class="form-input" required>
+
+        <label class="form-label">Telefoonnummer</label>
+        <input type="text" id="phone" class="form-input">
+
+        <label class="form-label">Adres</label>
+        <input type="text" id="address" class="form-input">
+
+        <div class="form-grid-2">
+          <div>
+            <label class="form-label">Postcode</label>
+            <input type="text" id="postal_code" class="form-input">
+          </div>
+          <div>
+            <label class="form-label">Plaats</label>
+            <input type="text" id="city" class="form-input">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>Eerste afspraak</h3>
+
+        <div class="form-grid-2">
+          <div>
+            <label class="form-label">Datum eerste afspraak</label>
+            <input type="date" id="appointment_date" class="form-input">
+          </div>
+          <div>
+            <label class="form-label">Tijd</label>
+            <input type="time" id="appointment_time" class="form-input" step="900">
+          </div>
+        </div>
+
+        <label class="form-label">Diensttype</label>
+        <input type="text" id="service_type" class="form-input" placeholder="Bijvoorbeeld: begeleiding, verpleegkundige handeling, thuiszorg">
+      </div>
+
+      <div class="form-section">
+        <h3>Factuur en contact</h3>
+
+        <label class="form-label">E-mail cliënt</label>
+        <input type="email" id="client_email" class="form-input" placeholder="Als deze bekend is">
+
+        <label class="form-label">Factuur e-mail</label>
+        <input type="email" id="invoice_email" class="form-input" placeholder="Als factuur per mail gewenst is">
+
+        <label class="form-label">IBAN</label>
+        <input type="text" id="iban" class="form-input">
+        <div class="helper-text">Mag ook later worden ingevuld.</div>
+
+        <label class="form-label">Manier van betalen</label>
+        <select id="funding_type" class="form-input">
+          <option value="">Kies een optie</option>
+          <option value="particulier">Particulier</option>
+          <option value="pgb">PGB</option>
+          <option value="wmo">Wmo</option>
+          <option value="onbekend">Onbekend / later bespreken</option>
+        </select>
+      </div>
+
+      <div class="form-section">
+        <h3>Mantelzorger / contactpersoon</h3>
+
+        <label class="form-label">Mantelzorger / contactpersoon</label>
+        <input type="text" id="emergency_contact" class="form-input">
+        <div class="helper-text">Kan later worden aangepast.</div>
+      </div>
+
+      <div class="form-section">
+        <h3>Factuurvoorkeur</h3>
+
+        <label class="form-label">Factuur ontvangen via</label>
+        <select id="invoice_delivery_method" class="form-input">
+          <option value="nog_niet_afgesproken">Nog niet afgesproken</option>
+          <option value="email">Per e-mail</option>
+          <option value="address">Per adres</option>
+        </select>
+
+        <div id="invoiceAddressBlock" style="display:none;">
+          <div class="checkbox-row">
+            <input type="checkbox" id="invoice_same_as_client_address" checked>
+            <label for="invoice_same_as_client_address">Factuuradres is hetzelfde als cliëntadres</label>
+          </div>
+
+          <div id="customInvoiceAddressFields" style="display:none;">
+            <label class="form-label">Factuuradres</label>
+            <input type="text" id="invoice_address" class="form-input">
+
+            <div class="form-grid-2">
+              <div>
+                <label class="form-label">Factuur postcode</label>
+                <input type="text" id="invoice_postal_code" class="form-input">
+              </div>
+              <div>
+                <label class="form-label">Factuur plaats</label>
+                <input type="text" id="invoice_city" class="form-input">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>Notities</h3>
+        <textarea id="notes" class="form-textarea" rows="4" placeholder="Bijzonderheden of afspraken..."></textarea>
+      </div>
+
+      <div id="saveMessage" class="helper-text" style="margin-bottom:14px;"></div>
+
+      <button type="submit" class="btn btn-primary full-width">Opslaan</button>
+    </form>
+  </section>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./new-client.js"></script>
+</body>
+</html>
