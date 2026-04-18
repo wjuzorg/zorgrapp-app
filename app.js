@@ -2,16 +2,16 @@ const SUPABASE_URL = "https://bqqoxawgjxxvolljkqnp.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxcW94YXdnanh4dm9sbGprcW5wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODc0OTMsImV4cCI6MjA5MjA2MzQ5M30.WLTELxD32HFtyV1pbsB-60nF_k4Zq7DSvaR87-kj2es";
 
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 async function requireLogin() {
   const { data } = await supabaseClient.auth.getSession();
-
   if (!data.session) {
     window.location.href = "./login.html";
     return null;
   }
-
   return data.session.user;
 }
+
 const todayCountEl = document.getElementById("todayCount");
 const signalCountEl = document.getElementById("signalCount");
 const invoiceTotalEl = document.getElementById("invoiceTotal");
@@ -21,11 +21,13 @@ const welcomeTextEl = document.getElementById("welcomeText");
 const todayDateLabelEl = document.getElementById("todayDateLabel");
 const btnNewClient = document.getElementById("btnNewClient");
 const btnUserProfile = document.getElementById("btnUserProfile");
+
 if (btnNewClient) {
   btnNewClient.addEventListener("click", () => {
     window.location.href = "./new-client.html";
   });
 }
+
 if (btnUserProfile) {
   btnUserProfile.addEventListener("click", async () => {
     const { data } = await supabaseClient.auth.getSession();
@@ -75,19 +77,8 @@ function getStatusLabel(item) {
   return `<span class="status-chip status-open">Nog invullen</span>`;
 }
 
-function renderAppointments(items) {
-  if (!items.length) {
-    appointmentsListEl.innerHTML = `
-      <div class="empty-state">
-        Nog geen afspraken voor vandaag.
-      </div>
-    `;
-    return;
-  }
-
-  function getGreeting() {
+function getGreeting() {
   const hour = new Date().getHours();
-
   if (hour >= 5 && hour < 12) return "Goedemorgen";
   if (hour >= 12 && hour < 17) return "Goedemiddag";
   if (hour >= 17 && hour < 22) return "Goedenavond";
@@ -95,19 +86,46 @@ function renderAppointments(items) {
 }
 
 function getMotivation(name) {
-  const messages = [
-    `Vandaag breng jij weer rust en overzicht.`,
+  const dayOfWeek = new Date().getDay();
+  const dayOfMonth = new Date().getDate();
+
+  const mondayMessages = [
+    `${name}, nieuwe week. Jij brengt vandaag weer rust en overzicht.`,
+    `Goed begin van de week, ${name}. Vandaag zet jij de toon.`,
+  ];
+
+  const wednesdayMessages = [
+    `${name}, midden in de week en alles netjes onder controle.`,
+    `Woensdagkracht, ${name}. Jij houdt het overzicht scherp.`,
+  ];
+
+  const fridayMessages = [
+    `Bijna weekend, ${name}. Nog even knallen en dan mooi afronden.`,
+    `${name}, laatste rechte lijn van de week. Jij hebt dit.`,
+  ];
+
+  const complimentMessages = [
     `${name}, jij maakt vandaag echt verschil.`,
-    `Een goede dag begint met structuur. Jij regelt dat.`,
+    `Kleine hulp bestaat niet. Jij bewijst dat elke dag.`,
     `${name}, mensen rekenen vandaag op jouw rust.`,
     `Jij helpt niet alleen praktisch, maar ook menselijk.`,
     `${name}, vandaag weer een kans om iemand blij te maken.`,
-    `Kleine hulp bestaat niet. Jij bewijst dat elke dag.`,
-    `${name}, jouw aanwezigheid geeft vertrouwen.`
+    `${name}, jouw aanwezigheid geeft vertrouwen.`,
   ];
 
-  const day = new Date().getDate();
-  return messages[day % messages.length];
+  if (dayOfWeek === 1) {
+    return mondayMessages[dayOfMonth % mondayMessages.length];
+  }
+
+  if (dayOfWeek === 3) {
+    return wednesdayMessages[dayOfMonth % wednesdayMessages.length];
+  }
+
+  if (dayOfWeek === 5) {
+    return fridayMessages[dayOfMonth % fridayMessages.length];
+  }
+
+  return complimentMessages[dayOfMonth % complimentMessages.length];
 }
 
 async function setWelcomeText() {
@@ -128,6 +146,16 @@ async function setWelcomeText() {
     btnUserProfile.textContent = name;
   }
 }
+
+function renderAppointments(items) {
+  if (!items.length) {
+    appointmentsListEl.innerHTML = `
+      <div class="empty-state">
+        Nog geen afspraken voor vandaag.
+      </div>
+    `;
+    return;
+  }
 
   appointmentsListEl.innerHTML = items.map(item => {
     const filled = isAppointmentFilled(item);
@@ -163,21 +191,22 @@ async function loadDashboard() {
   const today = getTodayString();
   todayDateLabelEl.textContent = formatDutchDate(new Date());
 
-  
-
   appointmentsListEl.innerHTML = `
     <div class="empty-state">Afspraken laden...</div>
   `;
 
   try {
+    const { data: sessionData } = await supabaseClient.auth.getSession();
+    const currentUser = sessionData.session?.user;
+
     const { data, error } = await supabaseClient
       .from("Appointments")
       .select("*")
+      .eq("owner_id", currentUser.id)
       .order("appointment_time", { ascending: true });
 
     if (error) {
       console.error("Supabase fout:", error);
-      welcomeTextEl.textContent = "Er ging iets mis bij het ophalen.";
       appointmentsListEl.innerHTML = `
         <div class="empty-state">
           Fout uit Supabase: ${error.message}
@@ -196,7 +225,6 @@ async function loadDashboard() {
     renderAppointments(todayAppointments);
   } catch (err) {
     console.error("Algemene fout:", err);
-    welcomeTextEl.textContent = "Er ging iets fout in de app.";
     appointmentsListEl.innerHTML = `
       <div class="empty-state">
         Algemene fout: ${err.message}
