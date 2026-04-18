@@ -272,4 +272,49 @@ body {
   .btn {
     width: 100%;
   }
+  .profile-menu-wrap {
+  position: relative;
+}
+
+.profile-trigger {
+  cursor: pointer;
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  min-width: 220px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 8px;
+  z-index: 30;
+}
+
+.profile-dropdown.hidden {
+  display: none;
+}
+
+.profile-item {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.profile-item:hover {
+  background: #f3f4f6;
+}
+
+.profile-item.danger {
+  color: #b91c1c;
+}
 }

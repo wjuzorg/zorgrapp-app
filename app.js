@@ -21,6 +21,10 @@ const welcomeTextEl = document.getElementById("welcomeText");
 const todayDateLabelEl = document.getElementById("todayDateLabel");
 const btnNewClient = document.getElementById("btnNewClient");
 const btnUserProfile = document.getElementById("btnUserProfile");
+const profileDropdown = document.getElementById("profileDropdown");
+const menuProfile = document.getElementById("menuProfile");
+const menuPassword = document.getElementById("menuPassword");
+const menuLogout = document.getElementById("menuLogout");
 
 if (btnNewClient) {
   btnNewClient.addEventListener("click", () => {
@@ -29,22 +33,48 @@ if (btnNewClient) {
 }
 
 if (btnUserProfile) {
-  btnUserProfile.addEventListener("click", async () => {
-    const { data } = await supabaseClient.auth.getSession();
-    const user = data.session?.user;
-
-    if (!user) {
-      window.location.href = "./login.html";
-      return;
-    }
-
-    alert(
-      "Ingelogd als:\n\n" +
-      user.email +
-      "\n\nHier komt straks jouw profielpagina."
-    );
+  btnUserProfile.addEventListener("click", (e) => {
+    e.stopPropagation();
+    profileDropdown?.classList.toggle("hidden");
   });
 }
+
+document.addEventListener("click", () => {
+  profileDropdown?.classList.add("hidden");
+});
+
+profileDropdown?.addEventListener("click", (e) => {
+  e.stopPropagation();
+});
+
+menuProfile?.addEventListener("click", async () => {
+  const { data } = await supabaseClient.auth.getSession();
+  const user = data.session?.user;
+
+  profileDropdown?.classList.add("hidden");
+
+  if (!user) {
+    window.location.href = "./login.html";
+    return;
+  }
+
+  alert(
+    "Mijn profiel\n\n" +
+    "E-mail: " + user.email + "\n\n" +
+    "Hier komt straks een nette profielpagina."
+  );
+});
+
+menuPassword?.addEventListener("click", () => {
+  profileDropdown?.classList.add("hidden");
+  alert("Hier komt straks: wachtwoord wijzigen.");
+});
+
+menuLogout?.addEventListener("click", async () => {
+  profileDropdown?.classList.add("hidden");
+  await supabaseClient.auth.signOut();
+  window.location.href = "./login.html";
+});
 
 function formatDutchDate(date) {
   return new Intl.DateTimeFormat("nl-NL", {
