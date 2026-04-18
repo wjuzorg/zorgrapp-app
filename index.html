@@ -15,15 +15,18 @@
       <h1>ZorgInzicht</h1>
       <p>Meer overzicht. Minder administratie.</p>
     </div>
-    <div class="profile-menu-wrap">
+   <div class="profile-menu-wrap">
   <button class="userbox profile-trigger" id="btnUserProfile" type="button">
     Denise
   </button>
 
-  <div class="profile-dropdown hidden" id="profileDropdown">
-    <button type="button" class="profile-item" id="menuProfile">Mijn profiel</button>
-    <button type="button" class="profile-item" id="menuPassword">Wachtwoord wijzigen</button>
-    <button type="button" class="profile-item danger" id="menuLogout">Uitloggen</button>
+  <div class="profile-card hidden" id="profileDropdown">
+    <div class="profile-card-label">Ingelogd als</div>
+    <div class="profile-card-email" id="profileEmail">test1@zorginzicht.nl</div>
+
+    <button type="button" class="profile-card-item" id="menuProfile">Mijn profiel</button>
+    <button type="button" class="profile-card-item" id="menuPassword">Wachtwoord wijzigen</button>
+    <button type="button" class="profile-card-item danger" id="menuLogout">Uitloggen</button>
   </div>
 </div>
   </header>

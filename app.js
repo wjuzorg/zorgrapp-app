@@ -25,6 +25,7 @@ const profileDropdown = document.getElementById("profileDropdown");
 const menuProfile = document.getElementById("menuProfile");
 const menuPassword = document.getElementById("menuPassword");
 const menuLogout = document.getElementById("menuLogout");
+const profileEmail = document.getElementById("profileEmail");
 
 if (btnNewClient) {
   btnNewClient.addEventListener("click", () => {
@@ -173,8 +174,12 @@ async function setWelcomeText() {
   welcomeTextEl.textContent = getMotivation(name);
 
   if (btnUserProfile) {
-    btnUserProfile.textContent = name;
-  }
+  btnUserProfile.textContent = name;
+}
+
+if (profileEmail && user?.email) {
+  profileEmail.textContent = user.email;
+}
 }
 
 function renderAppointments(items) {

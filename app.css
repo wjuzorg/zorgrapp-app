@@ -272,7 +272,7 @@ body {
   .btn {
     width: 100%;
   }
-  .profile-menu-wrap {
+ .profile-menu-wrap {
   position: relative;
 }
 
@@ -280,29 +280,47 @@ body {
   cursor: pointer;
 }
 
-.profile-dropdown {
+.profile-card {
   position: absolute;
-  top: calc(100% + 10px);
+  top: calc(100% + 12px);
   right: 0;
-  min-width: 220px;
+  width: 260px;
   background: #ffffff;
   border: 1px solid var(--line);
-  border-radius: 16px;
-  box-shadow: var(--shadow);
-  padding: 8px;
-  z-index: 30;
+  border-radius: 18px;
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12);
+  padding: 14px;
+  z-index: 40;
 }
 
-.profile-dropdown.hidden {
+.profile-card.hidden {
   display: none;
 }
 
-.profile-item {
+.profile-card-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.profile-card-email {
+  font-size: 14px;
+  color: var(--text);
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+  word-break: break-word;
+}
+
+.profile-card-item {
   width: 100%;
   border: none;
   background: transparent;
   text-align: left;
-  padding: 12px 14px;
+  padding: 12px 10px;
   border-radius: 12px;
   font-size: 14px;
   font-weight: 600;
@@ -310,11 +328,11 @@ body {
   cursor: pointer;
 }
 
-.profile-item:hover {
+.profile-card-item:hover {
   background: #f3f4f6;
 }
 
-.profile-item.danger {
+.profile-card-item.danger {
   color: #b91c1c;
 }
 }
