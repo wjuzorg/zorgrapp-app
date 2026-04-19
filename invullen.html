@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZorgInzicht - Invullen</title>
+  <link rel="stylesheet" href="./app.css" />
+</head>
+<body>
+  <div class="container">
+    <header class="topbar">
+      <div>
+        <h1>ZorgInzicht</h1>
+        <p>Meer overzicht. Minder administratie.</p>
+        <a class="page-link" href="./index.html">← Terug naar dashboard</a>
+      </div>
+      <div class="userbox">Invullen</div>
+    </header>
+
+    <section class="form-card">
+      <div class="form-header">
+        <div class="form-title-wrap">
+          <h2>Afspraak invullen</h2>
+          <p>Werk de afspraak bij en sla signalen veilig op.</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Afspraakgegevens</h3>
+
+        <div class="info-card">
+          <div class="info-row"><strong>Naam:</strong> <span id="infoClientName">Laden...</span></div>
+          <div class="info-row"><strong>Tijd:</strong> <span id="infoTime">-</span></div>
+          <div class="info-row"><strong>Dienst:</strong> <span id="infoServiceType">-</span></div>
+        </div>
+      </div>
+
+      <form id="fillForm">
+        <div class="section">
+          <h3>Wat heb je gedaan?</h3>
+
+          <label class="form-label" for="work_done">Werkzaamheden</label>
+          <textarea id="work_done" class="form-textarea" rows="5" placeholder="Bijvoorbeeld: boodschappen gedaan, samen koffie gedronken, medicatie opgehaald..."></textarea>
+
+          <label class="form-label" for="worked_minutes">Hoeveel minuten gewerkt?</label>
+          <select id="worked_minutes" class="form-input">
+            <option value="">Kies een tijd</option>
+            <option value="15">15 minuten</option>
+            <option value="30">30 minuten</option>
+            <option value="45">45 minuten</option>
+            <option value="60">60 minuten</option>
+            <option value="90">90 minuten</option>
+            <option value="120">120 minuten</option>
+          </select>
+        </div>
+
+        <div class="section">
+          <h3>Hoe gaat het?</h3>
+
+          <label class="form-label" for="person_status">Hoe gaat het met de persoon?</label>
+          <select id="person_status" class="form-input">
+            <option value="">Kies een optie</option>
+            <option value="goed">Goed</option>
+            <option value="redelijk">Redelijk</option>
+            <option value="zorgelijk">Zorgelijk</option>
+          </select>
+
+          <label class="form-label" for="house_status">Hoe is het huis?</label>
+          <select id="house_status" class="form-input">
+            <option value="">Kies een optie</option>
+            <option value="netjes">Netjes</option>
+            <option value="rommelig">Rommelig</option>
+            <option value="zorgelijk">Zorgelijk</option>
+          </select>
+        </div>
+
+        <div class="section">
+          <h3>Interne signaleringen</h3>
+
+          <div class="checkbox-list">
+            <label><input type="checkbox" value="vergeetachtig"> Vergeetachtig</label>
+            <label><input type="checkbox" value="somber"> Somber</label>
+            <label><input type="checkbox" value="eenzaam"> Eenzaam</label>
+            <label><input type="checkbox" value="slechter_ter_been"> Slechter ter been</label>
+            <label><input type="checkbox" value="huis_vervuilt"> Huis vervuilt</label>
+            <label><input type="checkbox" value="mantelzorger_belast"> Mantelzorger overbelast</label>
+            <label><input type="checkbox" value="niet_open_gedaan"> Niet open gedaan</label>
+          </div>
+
+          <label class="form-label" for="signal_notes">Extra notitie signalering</label>
+          <textarea id="signal_notes" class="form-textarea" rows="4" placeholder="Extra observaties of bijzonderheden..."></textarea>
+        </div>
+
+        <div class="section">
+          <h3>Betaling</h3>
+
+          <label class="form-label" for="payment_type">Betalingsvorm</label>
+          <select id="payment_type" class="form-input">
+            <option value="">Kies een optie</option>
+            <option value="particulier">Particulier</option>
+            <option value="pgb">PGB</option>
+            <option value="wmo">Wmo</option>
+            <option value="onbekend">Onbekend / later bespreken</option>
+          </select>
+        </div>
+
+        <div id="saveMessage" class="helper-text" style="margin: 12px 0 16px;"></div>
+
+        <div class="action-stack">
+          <button type="button" class="btn btn-outline" id="deleteAppointmentBtn">Afspraak verwijderen</button>
+          <button type="button" class="btn btn-secondary" id="saveDraftBtn">Opslaan concept</button>
+          <button type="submit" class="btn btn-primary" id="finishBtn">Afronden</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./invullen.js"></script>
+</body>
+</html>

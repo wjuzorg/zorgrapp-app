@@ -236,7 +236,7 @@ function renderAppointments(items) {
         </div>
 
         <div class="card-actions">
-          <button class="btn btn-secondary">Invullen</button>
+          <button class="btn btn-secondary" onclick="window.location.href='./invullen.html?id=${item.id}'">Invullen</button>
           <button class="btn btn-outline">Cliëntenkaart</button>
           <button class="btn btn-finish ${filled ? "enabled" : ""}">
             Afronden
