@@ -362,24 +362,40 @@ async function loadDashboard() {
 
     const signalCountByClient = {};
 
-    appointments.forEach(item => {
-      const hasSignals =
-        (item.internal_signals && String(item.internal_signals).trim() !== "") ||
-        (item.signal_notes && String(item.signal_notes).trim() !== "") ||
-        (item.person_status === "zorgelijk") ||
-        (item.house_status === "zorgelijk");
+appointments.forEach(item => {
+  const clientKey = item.client_id || item.client_name;
+  if (!clientKey) return;
 
-      const clientKey = item.client_id || item.client_name;
+  let signalPoints = 0;
 
-      if (hasSignals && clientKey) {
-        signalCountByClient[clientKey] =
-          (signalCountByClient[clientKey] || 0) + 1;
-      }
-    });
+  if (item.person_status === "zorgelijk") {
+    signalPoints += 1;
+  }
 
-    const activeSignalClients = Object.values(signalCountByClient)
-      .filter(count => count >= 3)
-      .length;
+  if (item.house_status === "zorgelijk") {
+    signalPoints += 1;
+  }
+
+  if (item.internal_signals && String(item.internal_signals).trim() !== "") {
+    const signalsArray = String(item.internal_signals)
+      .split(",")
+      .map(s => s.trim())
+      .filter(Boolean);
+
+    signalPoints += signalsArray.length;
+  }
+
+  if (item.signal_notes && String(item.signal_notes).trim() !== "") {
+    signalPoints += 1;
+  }
+
+  signalCountByClient[clientKey] =
+    (signalCountByClient[clientKey] || 0) + signalPoints;
+});
+
+const activeSignalClients = Object.values(signalCountByClient)
+  .filter(count => count >= 3)
+  .length;
 
     signalCountEl.textContent = String(activeSignalClients);
     invoiceTotalEl.textContent = "€0";
