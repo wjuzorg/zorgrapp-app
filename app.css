@@ -513,10 +513,9 @@ body {
     font-size: 24px;
   }
 
-  .userbox {
-    padding: 10px 14px;
-    font-size: 14px;
-  }
+ .userbox {
+  display: none;
+}
 
   .compact-weekbar {
     padding: 12px;
