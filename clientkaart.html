@@ -46,51 +46,52 @@
         </div>
       </div>
 
-      <div class="section">
-        <h3>Contactpersoon</h3>
+     <div class="section">
+  <h3>Contactpersoon</h3>
 
-        <div class="info-grid">
-          <div class="info-box">
-            <span class="info-label">Mantelzorger / contact</span>
-            <strong id="clientEmergencyContact">-</strong>
-          </div>
+  <div class="info-grid">
+    <div class="info-box">
+      <span class="info-label">Mantelzorger / contact</span>
+      <strong id="clientEmergencyContact">-</strong>
+    </div>
 
+    <div class="info-box">
+      <span class="info-label">E-mail cliënt</span>
+      <strong id="clientEmail">-</strong>
+    </div>
 
-          <div class="info-box">
-            <span class="info-label">E-mail cliënt</span>
-            <strong id="clientEmail">-</strong>
-          </div>
+    <div class="info-box">
+      <span class="info-label">IBAN</span>
+      <strong id="clientIban">-</strong>
+    </div>
+  </div>
 
-          <div class="info-box">
-            <span class="info-label">IBAN</span>
-            <strong id="clientIban">-</strong>
-          </div>
+  <div class="contact-notes-layout">
+    <div class="contact-note-entry">
+      <label class="form-label" for="contactNote">Nieuwe notitie contactpersoon</label>
 
-                   
-<div class="contact-note-block">
-  <label class="form-label" for="contactNote">Nieuwe notitie contactpersoon</label>
+      <textarea
+        id="contactNote"
+        class="form-textarea"
+        rows="4"
+        placeholder="Bijvoorbeeld: buurvrouw 2 deuren verderop..."
+      ></textarea>
 
-  <textarea
-    id="contactNote"
-    class="form-textarea"
-    rows="4"
-    placeholder="Bijvoorbeeld: buurvrouw 2 deuren verderop..."
-  ></textarea>
+      <div id="contactNoteMessage" class="helper-text"></div>
 
-  <div id="contactNoteMessage" class="helper-text"></div>
+      <button type="button" class="btn btn-secondary" id="saveContactNoteBtn">
+        Notitie opslaan
+      </button>
+    </div>
 
-  <button type="button" class="btn btn-secondary" id="saveContactNoteBtn">
-    Notitie opslaan
-  </button>
-
-  <div class="saved-notes-block">
-    <h4>Opgeslagen notities</h4>
-    <div id="contactNotesList" class="saved-notes-list">
-      Nog geen notities opgeslagen.
+    <div class="contact-note-log-card">
+      <h4>Opgeslagen notities</h4>
+      <div id="contactNotesList" class="saved-notes-list scroll-box">
+        Nog geen notities opgeslagen.
+      </div>
     </div>
   </div>
 </div>
-      </div>
 
       <div class="section">
         <h3>Overzicht</h3>
