@@ -12,6 +12,9 @@ async function requireLogin() {
   return data.session.user;
 }
 
+let currentWeekOffset = 0;
+let allAppointmentsCache = [];
+
 const todayCountEl = document.getElementById("todayCount");
 const signalCountEl = document.getElementById("signalCount");
 const invoiceTotalEl = document.getElementById("invoiceTotal");
