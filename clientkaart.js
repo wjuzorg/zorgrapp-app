@@ -172,10 +172,10 @@ async function saveContactNote() {
   const contactNoteEl = document.getElementById("contactNote");
   const note = contactNoteEl?.value.trim() || "";
 
-  if (!note) {
-    showContactNoteMessage("Vul eerst een notitie in.", true);
-    return;
-  }
+  if (note.includes("\n---\n")) {
+  showContactNoteMessage("Plak hier alleen een nieuwe notitie in, niet het hele logboek.", true);
+  return;
+}
 
   showContactNoteMessage("Opslaan...");
 
@@ -200,8 +200,10 @@ async function saveContactNote() {
   }));
 
   if (contactNoteEl) {
-    contactNoteEl.value = "";
-  }
+  contactNoteEl.value = "";
+}
+
+renderContactNotes(currentClient.contact_note || "");
 
   renderContactNotes(updatedNoteValue);
   showContactNoteMessage("Notitie opgeslagen.");
