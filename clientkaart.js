@@ -277,8 +277,6 @@ async function loadClientCard() {
   const clientPhoneEl = document.getElementById("clientPhone");
   const clientAddressEl = document.getElementById("clientAddress");
   const clientPaymentEl = document.getElementById("clientPayment");
-  const clientEmailEl = document.getElementById("clientEmail");
-  const clientIbanEl = document.getElementById("clientIban");
 
   const clientEmergencyContactEl = document.getElementById("clientEmergencyContact");
   const clientEmergencyContactEmailEl = document.getElementById("clientEmergencyContactEmail");
@@ -306,9 +304,13 @@ async function loadClientCard() {
     [currentClient.address, currentClient.postal_code, currentClient.city]
       .filter(Boolean)
       .join(", ") || "-";
-  clientPaymentEl.textContent = currentClient.funding_type || "-";
-  clientEmailEl.textContent = currentClient.client_email || "-";
-  clientIbanEl.textContent = currentClient.iban || "-";
+
+  const paymentText = [
+    currentClient.funding_type || "",
+    currentClient.iban ? `IBAN: ${currentClient.iban}` : ""
+  ].filter(Boolean).join(" • ");
+
+  clientPaymentEl.textContent = paymentText || "-";
 
   clientEmergencyContactEl.textContent = currentClient.emergency_contact || "-";
   clientEmergencyContactEmailEl.textContent = currentClient.emergency_contact_email || "-";

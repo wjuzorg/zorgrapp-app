@@ -27,10 +27,9 @@
 
       <div class="section">
         <h3>Basisgegevens</h3>
-
         <div class="info-grid">
           <div class="info-box">
-            <span class="info-label">Telefoon</span>
+            <span class="info-label">Telefoon cliënt</span>
             <strong id="clientPhone">-</strong>
           </div>
 
@@ -40,83 +39,60 @@
           </div>
 
           <div class="info-box">
-            <span class="info-label">Betaling</span>
+            <span class="info-label">Betaling / IBAN</span>
             <strong id="clientPayment">-</strong>
           </div>
         </div>
       </div>
 
-    
-<div class="section">
-  <h3>Contactpersoon</h3>
+      <div class="section">
+        <h3>Contactpersoon</h3>
+        <div class="info-grid">
+          <div class="info-box">
+            <span class="info-label">Mantelzorger / contact</span>
+            <strong id="clientEmergencyContact">-</strong>
+          </div>
 
-  <div class="info-grid">
-    <div class="info-box">
-      <span class="info-label">Mantelzorger / contact</span>
-      <strong id="clientEmergencyContact">-</strong>
-    </div>
+          <div class="info-box">
+            <span class="info-label">E-mail mantelzorger / contact</span>
+            <strong id="clientEmergencyContactEmail">-</strong>
+          </div>
 
-    <div class="info-box">
-      <span class="info-label">E-mail mantelzorger / contact</span>
-      <strong id="clientEmergencyContactEmail">-</strong>
-    </div>
+          <div class="info-box">
+            <span class="info-label">Telefoon mantelzorger / contact</span>
+            <strong id="clientEmergencyContactPhone">-</strong>
+          </div>
+        </div>
 
-    <div class="info-box">
-      <span class="info-label">Telefoon mantelzorger / contact</span>
-      <strong id="clientEmergencyContactPhone">-</strong>
-    </div>
-  </div>
+        <div class="contact-notes-layout">
+          <div class="contact-note-entry">
+            <label class="form-label" for="contactNote">Nieuwe notitie contactpersoon</label>
 
-  <div class="contact-notes-layout">
-    <div class="contact-note-entry">
-      <label class="form-label" for="contactNote">Nieuwe notitie contactpersoon</label>
+            <textarea
+              id="contactNote"
+              class="form-textarea"
+              rows="4"
+              placeholder="Bijvoorbeeld: buurvrouw 2 deuren verderop..."
+            ></textarea>
 
-      <textarea
-        id="contactNote"
-        class="form-textarea"
-        rows="4"
-        placeholder="Bijvoorbeeld: buurvrouw 2 deuren verderop..."
-      ></textarea>
+            <div id="contactNoteMessage" class="helper-text"></div>
 
-      <div id="contactNoteMessage" class="helper-text"></div>
+            <button type="button" class="btn btn-secondary" id="saveContactNoteBtn">
+              Notitie opslaan
+            </button>
+          </div>
 
-      <button type="button" class="btn btn-secondary" id="saveContactNoteBtn">
-        Notitie opslaan
-      </button>
-    </div>
-
-    <div class="contact-note-log-card">
-      <h4>Opgeslagen notities</h4>
-      <div id="contactNotesList" class="saved-notes-list scroll-box">
-        Nog geen notities opgeslagen.
+          <div class="contact-note-log-card">
+            <h4>Opgeslagen notities</h4>
+            <div id="contactNotesList" class="saved-notes-list scroll-box">
+              Nog geen notities opgeslagen.
+            </div>
+          </div>
+        </div>
       </div>
-
-      <div class="field">
-  <label class="label" for="emergency_contact_email">E-mail mantelzorger / contact</label>
-  <input
-    type="email"
-    id="emergency_contact_email"
-    class="input"
-    placeholder="Bijvoorbeeld: dochter@email.nl"
-  />
-</div>
-
-<div class="field">
-  <label class="label" for="emergency_contact_phone">Telefoon mantelzorger / contact</label>
-  <input
-    type="tel"
-    id="emergency_contact_phone"
-    class="input"
-    placeholder="Bijvoorbeeld: 06 12345678"
-  />
-</div>
-    </div>
-  </div>
-</div>
 
       <div class="section">
         <h3>Overzicht</h3>
-
         <div class="info-grid">
           <div class="info-box">
             <span class="info-label">Aantal afspraken</span>
@@ -137,7 +113,6 @@
 
       <div class="section">
         <h3>Signalen</h3>
-
         <div class="info-grid">
           <div class="info-box">
             <span class="info-label">Signalen totaal</span>
@@ -158,7 +133,6 @@
 
       <div class="section">
         <h3>Snelle acties</h3>
-
         <div class="action-stack">
           <a id="callClientBtn" class="btn btn-secondary" href="#">Bel cliënt</a>
           <a id="newAppointmentBtn" class="btn btn-outline" href="./new-client.html">Nieuwe afspraak</a>
