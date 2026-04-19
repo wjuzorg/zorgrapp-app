@@ -28,6 +28,8 @@ const menuLogout = document.getElementById("menuLogout");
 const profileEmail = document.getElementById("profileEmail");
 const weekRangeLabelEl = document.getElementById("weekRangeLabel");
 const weekdayCards = document.querySelectorAll(".weekday-card");
+const prevWeekBtn = document.getElementById("prevWeekBtn");
+const nextWeekBtn = document.getElementById("nextWeekBtn");
 
 if (btnNewClient) {
   btnNewClient.addEventListener("click", () => {
@@ -48,6 +50,16 @@ document.addEventListener("click", () => {
 
 profileDropdown?.addEventListener("click", (e) => {
   e.stopPropagation();
+});
+
+prevWeekBtn?.addEventListener("click", () => {
+  currentWeekOffset -= 1;
+  renderWeekPlanning(allAppointmentsCache);
+});
+
+nextWeekBtn?.addEventListener("click", () => {
+  currentWeekOffset += 1;
+  renderWeekPlanning(allAppointmentsCache);
 });
 
 menuProfile?.addEventListener("click", async () => {
@@ -261,14 +273,16 @@ async function loadDashboard() {
     }
 
     const appointments = data || [];
+allAppointmentsCache = appointments;
+
 const todayAppointments = appointments.filter(item => item.appointment_date === today);
 
 todayCountEl.textContent = todayAppointments.length;
 signalCountEl.textContent = "0";
 invoiceTotalEl.textContent = "€0";
 
-renderWeekPlanning(appointments);
 renderAppointments(todayAppointments);
+renderWeekPlanning(appointments);
   } catch (err) {
     console.error("Algemene fout:", err);
     appointmentsListEl.innerHTML = `
@@ -286,11 +300,11 @@ function toDateString(date) {
   return `${year}-${month}-${day}`;
 }
 
-function getStartOfWeek(date) {
+function getStartOfWeek(date, offset = 0) {
   const d = new Date(date);
-  const day = d.getDay(); // 0 zondag
-  const diff = day === 0 ? -6 : 1 - day; // maandag als start
-  d.setDate(d.getDate() + diff);
+  const day = d.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff + (offset * 7));
   d.setHours(0, 0, 0, 0);
   return d;
 }
@@ -304,7 +318,7 @@ function formatShortDate(date) {
 
 function renderWeekPlanning(appointments) {
   const today = new Date();
-  const startOfWeek = getStartOfWeek(today);
+  const startOfWeek = getStartOfWeek(today, currentWeekOffset);
   const weekDates = [];
 
   for (let i = 0; i < 7; i++) {
@@ -321,14 +335,10 @@ function renderWeekPlanning(appointments) {
     const dateString = toDateString(dateObj);
 
     const count = appointments.filter(item => item.appointment_date === dateString).length;
-
-    const dateEl = card.querySelector(".weekday-date");
     const countEl = card.querySelector(".weekday-count");
 
-    dateEl.textContent = formatShortDate(dateObj);
     countEl.textContent = count;
-
-    card.classList.toggle("active", dateString === getTodayString());
+    card.classList.toggle("active", dateString === getTodayString() && currentWeekOffset === 0);
 
     card.onclick = () => {
       const dayAppointments = appointments.filter(item => item.appointment_date === dateString);

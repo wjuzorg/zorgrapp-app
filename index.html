@@ -58,62 +58,60 @@
     </div>
   </section>
 
-  <section class="weekbar">
-  <div class="weekbar-header">
-    <h3>Weekplanning</h3>
-    <span id="weekRangeLabel">Week laden...</span>
-  </div>
-
-  <div class="weekdays" id="weekdaysRow">
-    <button class="weekday-card" data-day="0">
-      <div class="weekday-name">Ma</div>
-      <div class="weekday-date">--</div>
-      <div class="weekday-count">0</div>
-    </button>
-
-    <button class="weekday-card" data-day="1">
-      <div class="weekday-name">Di</div>
-      <div class="weekday-date">--</div>
-      <div class="weekday-count">0</div>
-    </button>
-
-    <button class="weekday-card" data-day="2">
-      <div class="weekday-name">Wo</div>
-      <div class="weekday-date">--</div>
-      <div class="weekday-count">0</div>
-    </button>
-
-    <button class="weekday-card" data-day="3">
-      <div class="weekday-name">Do</div>
-      <div class="weekday-date">--</div>
-      <div class="weekday-count">0</div>
-    </button>
-
-    <button class="weekday-card" data-day="4">
-      <div class="weekday-name">Vr</div>
-      <div class="weekday-date">--</div>
-      <div class="weekday-count">0</div>
-    </button>
-
-    <button class="weekday-card" data-day="5">
-      <div class="weekday-name">Za</div>
-      <div class="weekday-date">--</div>
-      <div class="weekday-count">0</div>
-    </button>
-
-    <button class="weekday-card" data-day="6">
-      <div class="weekday-name">Zo</div>
-      <div class="weekday-date">--</div>
-      <div class="weekday-count">0</div>
-    </button>
-  </div>
-</section>
-
   <section class="today">
     <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:18px;">
       <h2 style="margin:0;">Vandaag</h2>
       <div class="userbox" id="todayDateLabel">Vandaag</div>
     </div>
+
+<section class="weekbar compact-weekbar">
+  <div class="weekbar-header compact-weekbar-header">
+    <h3>Weekplanning</h3>
+
+    <div class="week-nav">
+      <button class="week-nav-btn" id="prevWeekBtn" type="button">‹</button>
+      <span id="weekRangeLabel">Week laden...</span>
+      <button class="week-nav-btn" id="nextWeekBtn" type="button">›</button>
+    </div>
+  </div>
+
+  <div class="weekdays compact-weekdays" id="weekdaysRow">
+    <button class="weekday-card compact-day" data-day="0">
+      <div class="weekday-name">Ma</div>
+      <div class="weekday-count">0</div>
+    </button>
+
+    <button class="weekday-card compact-day" data-day="1">
+      <div class="weekday-name">Di</div>
+      <div class="weekday-count">0</div>
+    </button>
+
+    <button class="weekday-card compact-day" data-day="2">
+      <div class="weekday-name">Wo</div>
+      <div class="weekday-count">0</div>
+    </button>
+
+    <button class="weekday-card compact-day" data-day="3">
+      <div class="weekday-name">Do</div>
+      <div class="weekday-count">0</div>
+    </button>
+
+    <button class="weekday-card compact-day" data-day="4">
+      <div class="weekday-name">Vr</div>
+      <div class="weekday-count">0</div>
+    </button>
+
+    <button class="weekday-card compact-day" data-day="5">
+      <div class="weekday-name">Za</div>
+      <div class="weekday-count">0</div>
+    </button>
+
+    <button class="weekday-card compact-day" data-day="6">
+      <div class="weekday-name">Zo</div>
+      <div class="weekday-count">0</div>
+    </button>
+  </div>
+</section>
 
     <div id="appointmentsList" class="empty-state">
       Afspraken laden...
