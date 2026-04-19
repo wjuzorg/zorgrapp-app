@@ -21,17 +21,28 @@
       <div class="form-header">
         <div class="form-title-wrap">
           <h2>Afspraak invullen</h2>
-          <p>Werk de afspraak bij en sla signalen veilig op.</p>
+          <p>Werk de afspraak netjes bij en sla interne signalen veilig op.</p>
         </div>
       </div>
 
       <div class="section">
         <h3>Afspraakgegevens</h3>
 
-        <div class="info-card">
-          <div class="info-row"><strong>Naam:</strong> <span id="infoClientName">Laden...</span></div>
-          <div class="info-row"><strong>Tijd:</strong> <span id="infoTime">-</span></div>
-          <div class="info-row"><strong>Dienst:</strong> <span id="infoServiceType">-</span></div>
+        <div class="info-grid">
+          <div class="info-box">
+            <span class="info-label">Naam</span>
+            <strong id="infoClientName">Laden...</strong>
+          </div>
+
+          <div class="info-box">
+            <span class="info-label">Tijd</span>
+            <strong id="infoTime">-</strong>
+          </div>
+
+          <div class="info-box">
+            <span class="info-label">Dienst</span>
+            <strong id="infoServiceType">-</strong>
+          </div>
         </div>
       </div>
 
@@ -40,7 +51,12 @@
           <h3>Wat heb je gedaan?</h3>
 
           <label class="form-label" for="work_done">Werkzaamheden</label>
-          <textarea id="work_done" class="form-textarea" rows="5" placeholder="Bijvoorbeeld: boodschappen gedaan, samen koffie gedronken, medicatie opgehaald..."></textarea>
+          <textarea
+            id="work_done"
+            class="form-textarea"
+            rows="5"
+            placeholder="Bijvoorbeeld: boodschappen gedaan, samen koffie gedronken, medicatie opgehaald..."
+          ></textarea>
 
           <label class="form-label" for="worked_minutes">Hoeveel minuten gewerkt?</label>
           <select id="worked_minutes" class="form-input">
@@ -57,38 +73,49 @@
         <div class="section">
           <h3>Hoe gaat het?</h3>
 
-          <label class="form-label" for="person_status">Hoe gaat het met de persoon?</label>
-          <select id="person_status" class="form-input">
-            <option value="">Kies een optie</option>
-            <option value="goed">Goed</option>
-            <option value="redelijk">Redelijk</option>
-            <option value="zorgelijk">Zorgelijk</option>
-          </select>
+          <div class="form-grid-two">
+            <div>
+              <label class="form-label" for="person_status">Hoe gaat het met de persoon?</label>
+              <select id="person_status" class="form-input">
+                <option value="">Kies een optie</option>
+                <option value="goed">Goed</option>
+                <option value="redelijk">Redelijk</option>
+                <option value="zorgelijk">Zorgelijk</option>
+              </select>
+            </div>
 
-          <label class="form-label" for="house_status">Hoe is het huis?</label>
-          <select id="house_status" class="form-input">
-            <option value="">Kies een optie</option>
-            <option value="netjes">Netjes</option>
-            <option value="rommelig">Rommelig</option>
-            <option value="zorgelijk">Zorgelijk</option>
-          </select>
+            <div>
+              <label class="form-label" for="house_status">Hoe is het huis?</label>
+              <select id="house_status" class="form-input">
+                <option value="">Kies een optie</option>
+                <option value="netjes">Netjes</option>
+                <option value="rommelig">Rommelig</option>
+                <option value="zorgelijk">Zorgelijk</option>
+              </select>
+            </div>
+          </div>
         </div>
 
         <div class="section">
           <h3>Interne signaleringen</h3>
 
-          <div class="checkbox-list">
-            <label><input type="checkbox" value="vergeetachtig"> Vergeetachtig</label>
-            <label><input type="checkbox" value="somber"> Somber</label>
-            <label><input type="checkbox" value="eenzaam"> Eenzaam</label>
-            <label><input type="checkbox" value="slechter_ter_been"> Slechter ter been</label>
-            <label><input type="checkbox" value="huis_vervuilt"> Huis vervuilt</label>
-            <label><input type="checkbox" value="mantelzorger_belast"> Mantelzorger overbelast</label>
-            <label><input type="checkbox" value="niet_open_gedaan"> Niet open gedaan</label>
+          <div class="signal-grid">
+            <label class="signal-chip"><input type="checkbox" value="vergeetachtig"> Vergeetachtig</label>
+            <label class="signal-chip"><input type="checkbox" value="somber"> Somber</label>
+            <label class="signal-chip"><input type="checkbox" value="eenzaam"> Eenzaam</label>
+            <label class="signal-chip"><input type="checkbox" value="slechter_ter_been"> Slechter ter been</label>
+            <label class="signal-chip"><input type="checkbox" value="huis_vervuilt"> Huis vervuilt</label>
+            <label class="signal-chip"><input type="checkbox" value="mantelzorger_belast"> Mantelzorger overbelast</label>
+            <label class="signal-chip"><input type="checkbox" value="niet_open_gedaan"> Niet open gedaan</label>
           </div>
 
           <label class="form-label" for="signal_notes">Extra notitie signalering</label>
-          <textarea id="signal_notes" class="form-textarea" rows="4" placeholder="Extra observaties of bijzonderheden..."></textarea>
+          <textarea
+            id="signal_notes"
+            class="form-textarea"
+            rows="4"
+            placeholder="Extra observaties of bijzonderheden..."
+          ></textarea>
         </div>
 
         <div class="section">
@@ -104,12 +131,18 @@
           </select>
         </div>
 
-        <div id="saveMessage" class="helper-text" style="margin: 12px 0 16px;"></div>
+        <div id="saveMessage" class="helper-text" style="margin: 12px 0 18px;"></div>
 
         <div class="action-stack">
-          <button type="button" class="btn btn-outline" id="deleteAppointmentBtn">Afspraak verwijderen</button>
-          <button type="button" class="btn btn-secondary" id="saveDraftBtn">Opslaan concept</button>
-          <button type="submit" class="btn btn-primary" id="finishBtn">Afronden</button>
+          <button type="button" class="btn btn-outline danger-outline" id="deleteAppointmentBtn">
+            Afspraak verwijderen
+          </button>
+          <button type="button" class="btn btn-secondary" id="saveDraftBtn">
+            Opslaan concept
+          </button>
+          <button type="submit" class="btn btn-primary" id="finishBtn">
+            Afronden
+          </button>
         </div>
       </form>
     </section>
