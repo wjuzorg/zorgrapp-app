@@ -291,6 +291,8 @@ appointments.forEach(item => {
     (item.person_status && item.person_status === "zorgelijk") ||
     (item.house_status && item.house_status === "zorgelijk");
 
+const clientKey = item.client_id || item.client_name;
+
   if (hasSignals && item.client_id) {
     signalCountByClient[item.client_id] = (signalCountByClient[item.client_id] || 0) + 1;
   }
