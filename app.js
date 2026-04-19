@@ -272,9 +272,10 @@ function renderAppointments(items) {
           <button class="btn btn-secondary" onclick="window.location.href='./invullen.html?id=${item.id}'">
             Invullen
           </button>
-          <button class="btn btn-outline">
-            Cliëntenkaart
-          </button>
+          <button class="btn btn-outline"
+onclick="window.location.href='./clientkaart.html?id=${item.client_id}'">
+Cliëntenkaart
+</button>
           <button class="btn btn-finish ${filled ? "enabled" : ""}">
             Afronden
           </button>
