@@ -91,22 +91,14 @@ submitBtn.addEventListener("click", async () => {
     return;
   }
 
-  const { error: profileError } = await supabaseClient
-    .from("profiles")
-    .upsert([
-      {
-        user_id: user.id,
-        full_name: fullName
-      }
-    ]);
-
-  if (profileError) {
-    msgEl.textContent = `Profiel opgeslagen met fout: ${profileError.message}`;
-    return;
+  const { data, error } = await supabaseClient.auth.signUp({
+  email: email,
+  password: password,
+  options: {
+    data: {
+      full_name: fullName
+    }
   }
-
-  msgEl.textContent = "Account aangemaakt. Doorsturen...";
-  window.location.href = "./index.html";
 });
 
 checkExistingSession();
