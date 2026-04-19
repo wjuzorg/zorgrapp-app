@@ -529,6 +529,11 @@ body {
   font-size: 20px;
 }
 
+/* extra ruimte voor Wat heb je gedaan */
+.section-work {
+  margin-top: 34px;
+}
+
 .form-label {
   display: block;
   margin: 0 0 8px;
