@@ -3,6 +3,10 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+let currentUser = null;
+let currentClient = null;
+let matchingClients = [];
+
 async function requireLogin() {
   const { data } = await supabaseClient.auth.getSession();
   if (!data.session) {
@@ -110,9 +114,40 @@ function setAlertStatus(signalTotal, alertBoxEl, alertStatusEl) {
   alertStatusEl.textContent = "Normaal";
 }
 
+function showContactNoteMessage(text, isError = false) {
+  const el = document.getElementById("contactNoteMessage");
+  if (!el) return;
+  el.textContent = text;
+  el.style.color = isError ? "#b91c1c" : "#6b7280";
+}
+
+async function saveContactNote() {
+  if (!currentUser || !matchingClients.length) return;
+
+  const contactNoteEl = document.getElementById("contactNote");
+  const note = contactNoteEl?.value.trim() || "";
+
+  showContactNoteMessage("Opslaan...");
+
+  const clientIds = matchingClients.map(client => client.id);
+
+  const { error } = await supabaseClient
+    .from("Clients")
+    .update({ contact_note: note })
+    .in("id", clientIds)
+    .eq("owner_id", currentUser.id);
+
+  if (error) {
+    showContactNoteMessage(`Opslaan mislukt: ${error.message}`, true);
+    return;
+  }
+
+  showContactNoteMessage("Notitie opgeslagen.");
+}
+
 async function loadClientCard() {
-  const user = await requireLogin();
-  if (!user) return;
+  currentUser = await requireLogin();
+  if (!currentUser) return;
 
   const clientId = getClientIdFromUrl();
   if (!clientId) {
@@ -120,40 +155,42 @@ async function loadClientCard() {
     return;
   }
 
-  const { data: currentClient, error: clientError } = await supabaseClient
+  const { data: selectedClient, error: clientError } = await supabaseClient
     .from("Clients")
     .select("*")
     .eq("id", clientId)
-    .eq("owner_id", user.id)
+    .eq("owner_id", currentUser.id)
     .single();
 
-  if (clientError || !currentClient) {
+  if (clientError || !selectedClient) {
     alert(`Cliënt niet gevonden: ${clientError?.message || "onbekend"}`);
     return;
   }
 
-  const normalizedClientName = normalizeName(currentClient.full_name);
+  const normalizedClientName = normalizeName(selectedClient.full_name);
 
   const { data: allClients, error: allClientsError } = await supabaseClient
     .from("Clients")
     .select("*")
-    .eq("owner_id", user.id);
+    .eq("owner_id", currentUser.id);
 
   if (allClientsError) {
     alert(`Cliënten laden mislukt: ${allClientsError.message}`);
     return;
   }
 
-  const matchingClients = (allClients || []).filter(client =>
+  matchingClients = (allClients || []).filter(client =>
     normalizeName(client.full_name) === normalizedClientName
   );
+
+  currentClient = matchingClients[0] || selectedClient;
 
   const matchingClientIds = matchingClients.map(client => client.id);
 
   const { data: allAppointments, error: appointmentError } = await supabaseClient
     .from("Appointments")
     .select("*")
-    .eq("owner_id", user.id)
+    .eq("owner_id", currentUser.id)
     .neq("status", "verwijderd")
     .order("appointment_date", { ascending: false })
     .order("appointment_time", { ascending: false });
@@ -169,8 +206,6 @@ async function loadClientCard() {
     return sameClientId || sameClientName;
   });
 
-  const preferredClient = matchingClients[0] || currentClient;
-
   const clientNameEl = document.getElementById("clientName");
   const clientPhoneEl = document.getElementById("clientPhone");
   const clientAddressEl = document.getElementById("clientAddress");
@@ -178,6 +213,7 @@ async function loadClientCard() {
   const clientEmergencyContactEl = document.getElementById("clientEmergencyContact");
   const clientEmailEl = document.getElementById("clientEmail");
   const clientIbanEl = document.getElementById("clientIban");
+  const contactNoteEl = document.getElementById("contactNote");
 
   const totalAppointmentsEl = document.getElementById("totalAppointments");
   const lastVisitEl = document.getElementById("lastVisit");
@@ -190,26 +226,31 @@ async function loadClientCard() {
 
   const callClientBtn = document.getElementById("callClientBtn");
   const newAppointmentBtn = document.getElementById("newAppointmentBtn");
+  const saveContactNoteBtn = document.getElementById("saveContactNoteBtn");
 
-  clientNameEl.textContent = preferredClient.full_name || "Onbekende cliënt";
-  clientPhoneEl.textContent = preferredClient.phone || "-";
+  clientNameEl.textContent = currentClient.full_name || "Onbekende cliënt";
+  clientPhoneEl.textContent = currentClient.phone || "-";
   clientAddressEl.textContent =
-    [preferredClient.address, preferredClient.postal_code, preferredClient.city]
+    [currentClient.address, currentClient.postal_code, currentClient.city]
       .filter(Boolean)
       .join(", ") || "-";
-  clientPaymentEl.textContent = preferredClient.funding_type || "-";
-  clientEmergencyContactEl.textContent = preferredClient.emergency_contact || "-";
-  clientEmailEl.textContent = preferredClient.client_email || "-";
-  clientIbanEl.textContent = preferredClient.iban || "-";
+  clientPaymentEl.textContent = currentClient.funding_type || "-";
+  clientEmergencyContactEl.textContent = currentClient.emergency_contact || "-";
+  clientEmailEl.textContent = currentClient.client_email || "-";
+  clientIbanEl.textContent = currentClient.iban || "-";
 
-  if (preferredClient.phone) {
-    callClientBtn.href = `tel:${preferredClient.phone}`;
+  if (contactNoteEl) {
+    contactNoteEl.value = currentClient.contact_note || "";
+  }
+
+  if (currentClient.phone) {
+    callClientBtn.href = `tel:${currentClient.phone}`;
   } else {
     callClientBtn.href = "#";
   }
 
   if (newAppointmentBtn) {
-    newAppointmentBtn.href = `./new-client.html?client_id=${preferredClient.id}`;
+    newAppointmentBtn.href = `./new-client.html?client_id=${currentClient.id}`;
   }
 
   totalAppointmentsEl.textContent = String(appointmentList.length);
@@ -230,8 +271,9 @@ async function loadClientCard() {
   signalTotalEl.textContent = String(signalTotal);
 
   lastSignalEl.textContent = getLatestSignalText(appointmentList);
-
   setAlertStatus(signalTotal, alertBoxEl, alertStatusEl);
+
+  saveContactNoteBtn?.addEventListener("click", saveContactNote);
 }
 
 loadClientCard();
