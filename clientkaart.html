@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZorgInzicht - Cliëntenkaart</title>
+  <link rel="stylesheet" href="./app.css" />
+</head>
+<body>
+  <div class="container">
+    <header class="topbar">
+      <div>
+        <h1>ZorgInzicht</h1>
+        <p>Meer overzicht. Minder administratie.</p>
+        <a class="page-link" href="./index.html">← Terug naar dashboard</a>
+      </div>
+      <div class="userbox">Cliëntenkaart</div>
+    </header>
+
+    <section class="form-card">
+      <div class="form-header">
+        <div class="form-title-wrap">
+          <h2 id="clientName">Cliënt laden...</h2>
+          <p id="clientSubtitle">Overzicht van afspraken, signalen en contactgegevens.</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Basisgegevens</h3>
+
+        <div class="info-grid">
+          <div class="info-box">
+            <span class="info-label">Telefoon</span>
+            <strong id="clientPhone">-</strong>
+          </div>
+
+          <div class="info-box">
+            <span class="info-label">Adres</span>
+            <strong id="clientAddress">-</strong>
+          </div>
+
+          <div class="info-box">
+            <span class="info-label">Betaling</span>
+            <strong id="clientPayment">-</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Contactpersoon</h3>
+
+        <div class="info-grid">
+          <div class="info-box">
+            <span class="info-label">Mantelzorger / contact</span>
+            <strong id="clientEmergencyContact">-</strong>
+          </div>
+
+          <div class="info-box">
+            <span class="info-label">E-mail cliënt</span>
+            <strong id="clientEmail">-</strong>
+          </div>
+
+          <div class="info-box">
+            <span class="info-label">IBAN</span>
+            <strong id="clientIban">-</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Overzicht</h3>
+
+        <div class="info-grid">
+          <div class="info-box">
+            <span class="info-label">Aantal afspraken</span>
+            <strong id="totalAppointments">0</strong>
+          </div>
+
+          <div class="info-box">
+            <span class="info-label">Laatste bezoek</span>
+            <strong id="lastVisit">-</strong>
+          </div>
+
+          <div class="info-box">
+            <span class="info-label">Minuten deze maand</span>
+            <strong id="minutesThisMonth">0</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Signalen</h3>
+
+        <div class="info-grid">
+          <div class="info-box">
+            <span class="info-label">Signalen totaal</span>
+            <strong id="signalTotal">0</strong>
+          </div>
+
+          <div class="info-box">
+            <span class="info-label">Laatste signaal</span>
+            <strong id="lastSignal">-</strong>
+          </div>
+
+          <div class="info-box" id="alertBox">
+            <span class="info-label">Actiestatus</span>
+            <strong id="alertStatus">Normaal</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Snelle acties</h3>
+
+        <div class="action-stack">
+          <a id="callClientBtn" class="btn btn-secondary" href="#">Bel cliënt</a>
+          <a id="newAppointmentBtn" class="btn btn-outline" href="./new-client.html">Nieuwe afspraak</a>
+          <a id="backToDashboardBtn" class="btn btn-primary" href="./index.html">Terug naar dashboard</a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./clientkaart.js"></script>
+</body>
+</html>
