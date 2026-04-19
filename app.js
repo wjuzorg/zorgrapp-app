@@ -281,7 +281,24 @@ allAppointmentsCache = appointments;
 const todayAppointments = appointments.filter(item => item.appointment_date === today);
 
 todayCountEl.textContent = todayAppointments.length;
-signalCountEl.textContent = "0";
+
+const signalCountByClient = {};
+
+appointments.forEach(item => {
+  const hasSignals =
+    (item.internal_signals && String(item.internal_signals).trim() !== "") ||
+    (item.signal_notes && String(item.signal_notes).trim() !== "") ||
+    (item.person_status && item.person_status === "zorgelijk") ||
+    (item.house_status && item.house_status === "zorgelijk");
+
+  if (hasSignals && item.client_id) {
+    signalCountByClient[item.client_id] = (signalCountByClient[item.client_id] || 0) + 1;
+  }
+});
+
+const activeSignalClients = Object.values(signalCountByClient).filter(count => count >= 3).length;
+
+signalCountEl.textContent = String(activeSignalClients);
 invoiceTotalEl.textContent = "€0";
 
 renderAppointments(todayAppointments);
