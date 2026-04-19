@@ -839,4 +839,18 @@ body {
     padding: 10px 12px;
     font-size: 13px;
   }
+
+  .contact-note-block {
+  margin-top: 22px;
+  max-width: 640px;
+}
+
+.contact-note-block .form-textarea {
+  margin-bottom: 12px;
+}
+
+.contact-note-block .btn {
+  width: auto;
+  min-width: 220px;
+}
 }
