@@ -853,4 +853,40 @@ body {
   width: auto;
   min-width: 220px;
 }
+
+.saved-notes-block {
+  margin-top: 22px;
+}
+
+.saved-notes-block h4 {
+  margin: 0 0 12px;
+  font-size: 16px;
+}
+
+.saved-notes-list {
+  display: grid;
+  gap: 10px;
+}
+
+.saved-note-card {
+  background: #f9fafb;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 14px 16px;
+}
+
+.saved-note-date {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.saved-note-text {
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
 }
