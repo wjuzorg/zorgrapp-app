@@ -451,168 +451,8 @@ body {
   display: none;
 }
 
-@media (max-width: 900px) {
-  .weekdays {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-@media (max-width: 560px) {
-  .container {
-    padding: 16px 14px 28px;
-  }
-
-  .topbar {
-    margin-bottom: 22px;
-  }
-
-  .topbar h1 {
-    font-size: 34px;
-  }
-
-  .topbar p {
-    margin-top: 12px;
-    font-size: 15px;
-  }
-
-  .welcome {
-    padding: 20px;
-    margin-bottom: 16px;
-  }
-
-  .welcome h2 {
-    font-size: 24px;
-    line-height: 1.15;
-  }
-
-  .welcome p {
-    font-size: 14px;
-    line-height: 1.4;
-  }
-
-  .stats {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    margin-bottom: 18px;
-  }
-
-  .card {
-    min-height: 108px;
-    padding: 16px;
-  }
-
-  .card h3 {
-    font-size: 16px;
-    line-height: 1.2;
-  }
-
-  .card span {
-    font-size: 28px;
-  }
-
-  .today h2 {
-    font-size: 24px;
-  }
-
- .userbox {
-  display: none;
-}
-
-  .compact-weekbar {
-    padding: 12px;
-    margin-top: 10px;
-    margin-bottom: 14px;
-  }
-
-  .compact-weekbar-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-    margin-bottom: 10px;
-  }
-
-  .compact-weekbar-header h3 {
-    font-size: 16px;
-  }
-
-  .week-nav {
-    width: 100%;
-    justify-content: space-between;
-    gap: 8px;
-  }
-
-  .week-nav-btn {
-    width: 30px;
-    height: 30px;
-    border-radius: 10px;
-    font-size: 17px;
-  }
-
-  .weekRangeLabel,
-  #weekRangeLabel {
-    font-size: 13px;
-  }
-
-  .compact-weekdays {
-    grid-template-columns: repeat(7, 1fr);
-    gap: 6px;
-  }
-
-  .compact-day {
-    padding: 8px 2px;
-    border-radius: 12px;
-    min-height: auto;
-  }
-
-  .compact-day .weekday-name {
-    font-size: 11px;
-    margin-bottom: 4px;
-  }
-
-  .compact-day .weekday-count {
-    font-size: 15px;
-    line-height: 1;
-  }
-
-  .appointment-card {
-    padding: 16px;
-    border-radius: 18px;
-  }
-
-  .appointment-top {
-    margin-bottom: 10px;
-  }
-
-  .appointment-time {
-    font-size: 14px;
-    margin-bottom: 6px;
-  }
-
-  .appointment-name {
-    font-size: 20px;
-  }
-
-  .appointment-service {
-    font-size: 14px;
-  }
-
-  .card-note {
-    font-size: 13px;
-    margin-top: 10px;
-    padding-top: 10px;
-  }
-
-  .card-actions {
-    gap: 10px;
-    margin-top: 14px;
-  }
-
-  .btn {
-    width: 100%;
-    padding: 12px 14px;
-    font-size: 14px;
-  }
-
-  .info-card {
+/* Invullen / formulieren */
+.info-card {
   background: #f9fafb;
   border: 1px solid var(--line);
   border-radius: 16px;
@@ -643,22 +483,6 @@ body {
   color: var(--text);
 }
 
-.action-stack {
-  display: grid;
-  gap: 10px;
-}
-
-.page-link {
-  display: inline-block;
-  margin-top: 12px;
-  color: var(--muted);
-  font-size: 14px;
-  text-decoration: none;
-}
-
-.page-link:hover {
-  text-decoration: underline;
-}
 .form-card {
   background: var(--card);
   border: 1px solid var(--line);
@@ -793,8 +617,9 @@ body {
 }
 
 .danger-outline {
-  border-color: #ef4444;
+  border: 1px solid #ef4444;
   color: #b91c1c;
+  background: #fff;
 }
 
 .danger-outline:hover {
@@ -815,6 +640,10 @@ body {
 }
 
 @media (max-width: 900px) {
+  .weekdays {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
   .info-grid,
   .form-grid-two,
   .signal-grid {
@@ -823,6 +652,161 @@ body {
 }
 
 @media (max-width: 560px) {
+  .container {
+    padding: 16px 14px 28px;
+  }
+
+  .topbar {
+    margin-bottom: 22px;
+  }
+
+  .topbar h1 {
+    font-size: 34px;
+  }
+
+  .topbar p {
+    margin-top: 12px;
+    font-size: 15px;
+  }
+
+  .welcome {
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .welcome h2 {
+    font-size: 24px;
+    line-height: 1.15;
+  }
+
+  .welcome p {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  .card {
+    min-height: 108px;
+    padding: 16px;
+  }
+
+  .card h3 {
+    font-size: 16px;
+    line-height: 1.2;
+  }
+
+  .card span {
+    font-size: 28px;
+  }
+
+  .today h2 {
+    font-size: 24px;
+  }
+
+  .userbox {
+    display: none;
+  }
+
+  .compact-weekbar {
+    padding: 12px;
+    margin-top: 10px;
+    margin-bottom: 14px;
+  }
+
+  .compact-weekbar-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .compact-weekbar-header h3 {
+    font-size: 16px;
+  }
+
+  .week-nav {
+    width: 100%;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .week-nav-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    font-size: 17px;
+  }
+
+  .weekRangeLabel,
+  #weekRangeLabel {
+    font-size: 13px;
+  }
+
+  .compact-weekdays {
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+  }
+
+  .compact-day {
+    padding: 8px 2px;
+    border-radius: 12px;
+    min-height: auto;
+  }
+
+  .compact-day .weekday-name {
+    font-size: 11px;
+    margin-bottom: 4px;
+  }
+
+  .compact-day .weekday-count {
+    font-size: 15px;
+    line-height: 1;
+  }
+
+  .appointment-card {
+    padding: 16px;
+    border-radius: 18px;
+  }
+
+  .appointment-top {
+    margin-bottom: 10px;
+  }
+
+  .appointment-time {
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .appointment-name {
+    font-size: 20px;
+  }
+
+  .appointment-service {
+    font-size: 14px;
+  }
+
+  .card-note {
+    font-size: 13px;
+    margin-top: 10px;
+    padding-top: 10px;
+  }
+
+  .card-actions {
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .btn {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 14px;
+  }
+
   .form-card {
     padding: 18px;
     border-radius: 22px;
@@ -844,5 +828,4 @@ body {
     padding: 10px 12px;
     font-size: 13px;
   }
-}
 }
