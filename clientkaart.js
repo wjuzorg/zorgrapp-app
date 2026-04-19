@@ -33,6 +33,10 @@ function getCurrentMonthPrefix() {
   return `${year}-${month}`;
 }
 
+function normalizeName(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
 function countSignalPoints(appointments) {
   let total = 0;
 
@@ -56,6 +60,56 @@ function countSignalPoints(appointments) {
   return total;
 }
 
+function getLatestSignalText(appointments) {
+  const latestSignalAppointment = appointments.find(item =>
+    (item.signal_notes && String(item.signal_notes).trim() !== "") ||
+    (item.internal_signals && String(item.internal_signals).trim() !== "") ||
+    item.person_status === "zorgelijk" ||
+    item.house_status === "zorgelijk"
+  );
+
+  if (!latestSignalAppointment) return "-";
+
+  if (latestSignalAppointment.signal_notes && String(latestSignalAppointment.signal_notes).trim() !== "") {
+    return latestSignalAppointment.signal_notes;
+  }
+
+  if (latestSignalAppointment.internal_signals && String(latestSignalAppointment.internal_signals).trim() !== "") {
+    return latestSignalAppointment.internal_signals;
+  }
+
+  if (latestSignalAppointment.person_status === "zorgelijk") {
+    return "Persoon is zorgelijk";
+  }
+
+  if (latestSignalAppointment.house_status === "zorgelijk") {
+    return "Huis is zorgelijk";
+  }
+
+  return "-";
+}
+
+function setAlertStatus(signalTotal, alertBoxEl, alertStatusEl) {
+  alertBoxEl.style.background = "#f9fafb";
+  alertBoxEl.style.borderColor = "#e5e7eb";
+
+  if (signalTotal >= 3) {
+    alertStatusEl.textContent = "Actiesignaal actief";
+    alertBoxEl.style.background = "#fef2f2";
+    alertBoxEl.style.borderColor = "#fecaca";
+    return;
+  }
+
+  if (signalTotal >= 2) {
+    alertStatusEl.textContent = "Let op";
+    alertBoxEl.style.background = "#fff7ed";
+    alertBoxEl.style.borderColor = "#fed7aa";
+    return;
+  }
+
+  alertStatusEl.textContent = "Normaal";
+}
+
 async function loadClientCard() {
   const user = await requireLogin();
   if (!user) return;
@@ -66,22 +120,39 @@ async function loadClientCard() {
     return;
   }
 
-  const { data: client, error: clientError } = await supabaseClient
+  const { data: currentClient, error: clientError } = await supabaseClient
     .from("Clients")
     .select("*")
     .eq("id", clientId)
     .eq("owner_id", user.id)
     .single();
 
-  if (clientError || !client) {
+  if (clientError || !currentClient) {
     alert(`Cliënt niet gevonden: ${clientError?.message || "onbekend"}`);
     return;
   }
 
-  const { data: appointments, error: appointmentError } = await supabaseClient
+  const normalizedClientName = normalizeName(currentClient.full_name);
+
+  const { data: allClients, error: allClientsError } = await supabaseClient
+    .from("Clients")
+    .select("*")
+    .eq("owner_id", user.id);
+
+  if (allClientsError) {
+    alert(`Cliënten laden mislukt: ${allClientsError.message}`);
+    return;
+  }
+
+  const matchingClients = (allClients || []).filter(client =>
+    normalizeName(client.full_name) === normalizedClientName
+  );
+
+  const matchingClientIds = matchingClients.map(client => client.id);
+
+  const { data: allAppointments, error: appointmentError } = await supabaseClient
     .from("Appointments")
     .select("*")
-    .eq("client_id", clientId)
     .eq("owner_id", user.id)
     .neq("status", "verwijderd")
     .order("appointment_date", { ascending: false })
@@ -92,7 +163,13 @@ async function loadClientCard() {
     return;
   }
 
-  const appointmentList = appointments || [];
+  const appointmentList = (allAppointments || []).filter(item => {
+    const sameClientId = item.client_id && matchingClientIds.includes(item.client_id);
+    const sameClientName = normalizeName(item.client_name) === normalizedClientName;
+    return sameClientId || sameClientName;
+  });
+
+  const preferredClient = matchingClients[0] || currentClient;
 
   const clientNameEl = document.getElementById("clientName");
   const clientPhoneEl = document.getElementById("clientPhone");
@@ -112,52 +189,49 @@ async function loadClientCard() {
   const alertBoxEl = document.getElementById("alertBox");
 
   const callClientBtn = document.getElementById("callClientBtn");
+  const newAppointmentBtn = document.getElementById("newAppointmentBtn");
 
-  clientNameEl.textContent = client.full_name || "Onbekende cliënt";
-  clientPhoneEl.textContent = client.phone || "-";
-  clientAddressEl.textContent = [client.address, client.postal_code, client.city].filter(Boolean).join(", ") || "-";
-  clientPaymentEl.textContent = client.funding_type || "-";
-  clientEmergencyContactEl.textContent = client.emergency_contact || "-";
-  clientEmailEl.textContent = client.client_email || "-";
-  clientIbanEl.textContent = client.iban || "-";
+  clientNameEl.textContent = preferredClient.full_name || "Onbekende cliënt";
+  clientPhoneEl.textContent = preferredClient.phone || "-";
+  clientAddressEl.textContent =
+    [preferredClient.address, preferredClient.postal_code, preferredClient.city]
+      .filter(Boolean)
+      .join(", ") || "-";
+  clientPaymentEl.textContent = preferredClient.funding_type || "-";
+  clientEmergencyContactEl.textContent = preferredClient.emergency_contact || "-";
+  clientEmailEl.textContent = preferredClient.client_email || "-";
+  clientIbanEl.textContent = preferredClient.iban || "-";
 
-  if (client.phone) {
-    callClientBtn.href = `tel:${client.phone}`;
+  if (preferredClient.phone) {
+    callClientBtn.href = `tel:${preferredClient.phone}`;
   } else {
     callClientBtn.href = "#";
+  }
+
+  if (newAppointmentBtn) {
+    newAppointmentBtn.href = `./new-client.html?client_id=${preferredClient.id}`;
   }
 
   totalAppointmentsEl.textContent = String(appointmentList.length);
 
   const lastAppointment = appointmentList[0];
-  lastVisitEl.textContent = lastAppointment?.appointment_date ? formatDate(lastAppointment.appointment_date) : "-";
+  lastVisitEl.textContent = lastAppointment?.appointment_date
+    ? formatDate(lastAppointment.appointment_date)
+    : "-";
 
   const monthPrefix = getCurrentMonthPrefix();
   const minutesThisMonth = appointmentList
     .filter(item => item.appointment_date && item.appointment_date.startsWith(monthPrefix))
-    .reduce((sum, item) => sum + (Number(item.worked_minutes || item.duration_minutes || 0)), 0);
+    .reduce((sum, item) => sum + Number(item.worked_minutes || item.duration_minutes || 0), 0);
 
   minutesThisMonthEl.textContent = String(minutesThisMonth);
 
   const signalTotal = countSignalPoints(appointmentList);
   signalTotalEl.textContent = String(signalTotal);
 
-  const latestSignalAppointment = appointmentList.find(item =>
-    (item.signal_notes && String(item.signal_notes).trim() !== "") ||
-    (item.internal_signals && String(item.internal_signals).trim() !== "") ||
-    item.person_status === "zorgelijk" ||
-    item.house_status === "zorgelijk"
-  );
+  lastSignalEl.textContent = getLatestSignalText(appointmentList);
 
-  lastSignalEl.textContent = latestSignalAppointment?.signal_notes || latestSignalAppointment?.internal_signals || "-";
-
-  if (signalTotal >= 3) {
-    alertStatusEl.textContent = "Actiesignaal actief";
-    alertBoxEl.style.background = "#fef2f2";
-    alertBoxEl.style.borderColor = "#fecaca";
-  } else {
-    alertStatusEl.textContent = "Normaal";
-  }
+  setAlertStatus(signalTotal, alertBoxEl, alertStatusEl);
 }
 
 loadClientCard();
