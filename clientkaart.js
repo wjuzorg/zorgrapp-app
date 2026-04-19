@@ -252,7 +252,6 @@ async function loadClientCard() {
   );
 
   currentClient = matchingClients[0] || selectedClient;
-
   const matchingClientIds = matchingClients.map(client => client.id);
 
   const { data: allAppointments, error: appointmentError } = await supabaseClient
@@ -278,9 +277,13 @@ async function loadClientCard() {
   const clientPhoneEl = document.getElementById("clientPhone");
   const clientAddressEl = document.getElementById("clientAddress");
   const clientPaymentEl = document.getElementById("clientPayment");
-  const clientEmergencyContactEl = document.getElementById("clientEmergencyContact");
   const clientEmailEl = document.getElementById("clientEmail");
   const clientIbanEl = document.getElementById("clientIban");
+
+  const clientEmergencyContactEl = document.getElementById("clientEmergencyContact");
+  const clientEmergencyContactEmailEl = document.getElementById("clientEmergencyContactEmail");
+  const clientEmergencyContactPhoneEl = document.getElementById("clientEmergencyContactPhone");
+
   const contactNoteEl = document.getElementById("contactNote");
 
   const totalAppointmentsEl = document.getElementById("totalAppointments");
@@ -297,15 +300,19 @@ async function loadClientCard() {
   const saveContactNoteBtn = document.getElementById("saveContactNoteBtn");
 
   clientNameEl.textContent = currentClient.full_name || "Onbekende cliënt";
+
   clientPhoneEl.textContent = currentClient.phone || "-";
   clientAddressEl.textContent =
     [currentClient.address, currentClient.postal_code, currentClient.city]
       .filter(Boolean)
       .join(", ") || "-";
   clientPaymentEl.textContent = currentClient.funding_type || "-";
-  clientEmergencyContactEl.textContent = currentClient.emergency_contact || "-";
   clientEmailEl.textContent = currentClient.client_email || "-";
   clientIbanEl.textContent = currentClient.iban || "-";
+
+  clientEmergencyContactEl.textContent = currentClient.emergency_contact || "-";
+  clientEmergencyContactEmailEl.textContent = currentClient.emergency_contact_email || "-";
+  clientEmergencyContactPhoneEl.textContent = currentClient.emergency_contact_phone || "-";
 
   if (contactNoteEl) {
     contactNoteEl.value = "";
