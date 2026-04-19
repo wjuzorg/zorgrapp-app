@@ -41,6 +41,59 @@ function normalizeName(value) {
   return String(value || "").trim().toLowerCase();
 }
 
+function getTodayNoteDate() {
+  return new Intl.DateTimeFormat("nl-NL", {
+    day: "numeric",
+    month: "long",
+    year: "numeric"
+  }).format(new Date());
+}
+
+function showContactNoteMessage(text, isError = false) {
+  const el = document.getElementById("contactNoteMessage");
+  if (!el) return;
+  el.textContent = text;
+  el.style.color = isError ? "#b91c1c" : "#6b7280";
+}
+
+function renderContactNotes(noteString) {
+  const listEl = document.getElementById("contactNotesList");
+  if (!listEl) return;
+
+  if (!noteString || String(noteString).trim() === "") {
+    listEl.innerHTML = "Nog geen notities opgeslagen.";
+    return;
+  }
+
+  const notes = String(noteString)
+    .split("\n---\n")
+    .map(item => item.trim())
+    .filter(Boolean);
+
+  listEl.innerHTML = notes.map(note => {
+    const lines = note.split("\n");
+    const dateLine = lines[0] || "";
+    const textLines = lines.slice(1).join("\n") || "";
+
+    return `
+      <div class="saved-note-card">
+        <span class="saved-note-date">${dateLine}</span>
+        <div class="saved-note-text">${textLines}</div>
+      </div>
+    `;
+  }).join("");
+}
+
+function buildNewContactNote(existingNotes, newNoteText) {
+  const datedNote = `${getTodayNoteDate()}\n${newNoteText}`;
+
+  if (!existingNotes || String(existingNotes).trim() === "") {
+    return datedNote;
+  }
+
+  return `${datedNote}\n---\n${existingNotes}`;
+}
+
 function countSignalPoints(appointments) {
   let total = 0;
 
@@ -113,58 +166,6 @@ function setAlertStatus(signalTotal, alertBoxEl, alertStatusEl) {
 
   alertStatusEl.textContent = "Normaal";
 }
-function getTodayNoteDate() {
-  return new Intl.DateTimeFormat("nl-NL", {
-    day: "numeric",
-    month: "long",
-    year: "numeric"
-  }).format(new Date());
-}
-
-function renderContactNotes(noteString) {
-  const listEl = document.getElementById("contactNotesList");
-  if (!listEl) return;
-
-  if (!noteString || String(noteString).trim() === "") {
-    listEl.innerHTML = "Nog geen notities opgeslagen.";
-    return;
-  }
-
-  const notes = String(noteString)
-    .split("\n---\n")
-    .map(item => item.trim())
-    .filter(Boolean);
-
-  listEl.innerHTML = notes.map(note => {
-    const lines = note.split("\n");
-    const dateLine = lines[0] || "";
-    const textLines = lines.slice(1).join("\n") || "";
-
-    return `
-      <div class="saved-note-card">
-        <span class="saved-note-date">${dateLine}</span>
-        <div class="saved-note-text">${textLines}</div>
-      </div>
-    `;
-  }).join("");
-}
-
-function buildNewContactNote(existingNotes, newNoteText) {
-  const datedNote = `${getTodayNoteDate()}\n${newNoteText}`;
-
-  if (!existingNotes || String(existingNotes).trim() === "") {
-    return datedNote;
-  }
-
-  return `${datedNote}\n---\n${existingNotes}`;
-}
-
-function showContactNoteMessage(text, isError = false) {
-  const el = document.getElementById("contactNoteMessage");
-  if (!el) return;
-  el.textContent = text;
-  el.style.color = isError ? "#b91c1c" : "#6b7280";
-}
 
 async function saveContactNote() {
   if (!currentUser || !matchingClients.length || !currentClient) return;
@@ -172,10 +173,15 @@ async function saveContactNote() {
   const contactNoteEl = document.getElementById("contactNote");
   const note = contactNoteEl?.value.trim() || "";
 
+  if (!note) {
+    showContactNoteMessage("Vul eerst een notitie in.", true);
+    return;
+  }
+
   if (note.includes("\n---\n")) {
-  showContactNoteMessage("Plak hier alleen een nieuwe notitie in, niet het hele logboek.", true);
-  return;
-}
+    showContactNoteMessage("Typ hier alleen een nieuwe notitie.", true);
+    return;
+  }
 
   showContactNoteMessage("Opslaan...");
 
@@ -200,14 +206,13 @@ async function saveContactNote() {
   }));
 
   if (contactNoteEl) {
-  contactNoteEl.value = "";
-}
-
-renderContactNotes(currentClient.contact_note || "");
+    contactNoteEl.value = "";
+  }
 
   renderContactNotes(updatedNoteValue);
   showContactNoteMessage("Notitie opgeslagen.");
 }
+
 async function loadClientCard() {
   currentUser = await requireLogin();
   if (!currentUser) return;
@@ -303,8 +308,9 @@ async function loadClientCard() {
   clientIbanEl.textContent = currentClient.iban || "-";
 
   if (contactNoteEl) {
-    contactNoteEl.value = currentClient.contact_note || "";
+    contactNoteEl.value = "";
   }
+
   renderContactNotes(currentClient.contact_note || "");
 
   if (currentClient.phone) {

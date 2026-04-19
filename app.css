@@ -948,4 +948,63 @@ body {
     grid-template-columns: 1fr;
   }
 }
+.contact-notes-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-top: 22px;
+  align-items: start;
+}
+
+.contact-note-entry,
+.contact-note-log-card {
+  background: #f9fafb;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 16px;
+}
+
+.contact-note-log-card h4 {
+  margin: 0 0 12px;
+  font-size: 16px;
+}
+
+.scroll-box {
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.saved-notes-list {
+  display: grid;
+  gap: 10px;
+}
+
+.saved-note-card {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+
+.saved-note-date {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.saved-note-text {
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+@media (max-width: 900px) {
+  .contact-notes-layout {
+    grid-template-columns: 1fr;
+  }
+}
 }
