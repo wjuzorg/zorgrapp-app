@@ -3,6 +3,9 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+let currentWeekOffset = 0;
+let allAppointmentsCache = [];
+
 async function requireLogin() {
   const { data } = await supabaseClient.auth.getSession();
   if (!data.session) {
@@ -12,9 +15,6 @@ async function requireLogin() {
   return data.session.user;
 }
 
-let currentWeekOffset = 0;
-let allAppointmentsCache = [];
-
 const todayCountEl = document.getElementById("todayCount");
 const signalCountEl = document.getElementById("signalCount");
 const invoiceTotalEl = document.getElementById("invoiceTotal");
@@ -22,13 +22,16 @@ const appointmentsListEl = document.getElementById("appointmentsList");
 const welcomeTitleEl = document.getElementById("welcomeTitle");
 const welcomeTextEl = document.getElementById("welcomeText");
 const todayDateLabelEl = document.getElementById("todayDateLabel");
+
 const btnNewClient = document.getElementById("btnNewClient");
 const btnUserProfile = document.getElementById("btnUserProfile");
+
 const profileDropdown = document.getElementById("profileDropdown");
 const menuProfile = document.getElementById("menuProfile");
 const menuPassword = document.getElementById("menuPassword");
 const menuLogout = document.getElementById("menuLogout");
 const profileEmail = document.getElementById("profileEmail");
+
 const weekRangeLabelEl = document.getElementById("weekRangeLabel");
 const weekdayCards = document.querySelectorAll(".weekday-card");
 const prevWeekBtn = document.getElementById("prevWeekBtn");
@@ -53,16 +56,6 @@ document.addEventListener("click", () => {
 
 profileDropdown?.addEventListener("click", (e) => {
   e.stopPropagation();
-});
-
-prevWeekBtn?.addEventListener("click", () => {
-  currentWeekOffset -= 1;
-  renderWeekPlanning(allAppointmentsCache);
-});
-
-nextWeekBtn?.addEventListener("click", () => {
-  currentWeekOffset += 1;
-  renderWeekPlanning(allAppointmentsCache);
 });
 
 menuProfile?.addEventListener("click", async () => {
@@ -94,6 +87,16 @@ menuLogout?.addEventListener("click", async () => {
   window.location.href = "./login.html";
 });
 
+prevWeekBtn?.addEventListener("click", () => {
+  currentWeekOffset -= 1;
+  renderWeekPlanning(allAppointmentsCache);
+});
+
+nextWeekBtn?.addEventListener("click", () => {
+  currentWeekOffset += 1;
+  renderWeekPlanning(allAppointmentsCache);
+});
+
 function formatDutchDate(date) {
   return new Intl.DateTimeFormat("nl-NL", {
     weekday: "long",
@@ -102,12 +105,32 @@ function formatDutchDate(date) {
   }).format(date);
 }
 
+function formatShortDate(date) {
+  return new Intl.DateTimeFormat("nl-NL", {
+    day: "numeric",
+    month: "short"
+  }).format(date);
+}
+
 function getTodayString() {
   const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const day = String(now.getDate()).padStart(2, "0");
+  return toDateString(now);
+}
+
+function toDateString(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
+}
+
+function getStartOfWeek(date, offset = 0) {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = day === 0 ? -6 : 1 - day; // maandag als start
+  d.setDate(d.getDate() + diff + (offset * 7));
+  d.setHours(0, 0, 0, 0);
+  return d;
 }
 
 function isAppointmentFilled(item) {
@@ -119,14 +142,22 @@ function isAppointmentFilled(item) {
 }
 
 function getStatusLabel(item) {
+  const duration = item.duration_minutes || item.worked_minutes;
+
+  if (duration) {
+    return `<span class="status-chip status-open">${duration} min</span>`;
+  }
+
   if (isAppointmentFilled(item)) {
     return `<span class="status-chip status-filled">Ingevuld</span>`;
   }
+
   return `<span class="status-chip status-open">Nog invullen</span>`;
 }
 
 function getGreeting() {
   const hour = new Date().getHours();
+
   if (hour >= 5 && hour < 12) return "Goedemorgen";
   if (hour >= 12 && hour < 17) return "Goedemiddag";
   if (hour >= 17 && hour < 22) return "Goedenavond";
@@ -139,17 +170,17 @@ function getMotivation(name) {
 
   const mondayMessages = [
     `${name}, nieuwe week. Jij brengt vandaag weer rust en overzicht.`,
-    `Goed begin van de week, ${name}. Vandaag zet jij de toon.`,
+    `Goed begin van de week, ${name}. Vandaag zet jij de toon.`
   ];
 
   const wednesdayMessages = [
     `${name}, midden in de week en alles netjes onder controle.`,
-    `Woensdagkracht, ${name}. Jij houdt het overzicht scherp.`,
+    `Woensdagkracht, ${name}. Jij houdt het overzicht scherp.`
   ];
 
   const fridayMessages = [
     `Bijna weekend, ${name}. Nog even knallen en dan mooi afronden.`,
-    `${name}, laatste rechte lijn van de week. Jij hebt dit.`,
+    `${name}, laatste rechte lijn van de week. Jij hebt dit.`
   ];
 
   const complimentMessages = [
@@ -158,7 +189,7 @@ function getMotivation(name) {
     `${name}, mensen rekenen vandaag op jouw rust.`,
     `Jij helpt niet alleen praktisch, maar ook menselijk.`,
     `${name}, vandaag weer een kans om iemand blij te maken.`,
-    `${name}, jouw aanwezigheid geeft vertrouwen.`,
+    `${name}, jouw aanwezigheid geeft vertrouwen.`
   ];
 
   if (dayOfWeek === 1) {
@@ -180,38 +211,40 @@ async function setWelcomeText() {
   const { data } = await supabaseClient.auth.getSession();
   const user = data.session?.user;
 
- let name = "Denise";
+  let name = "Denise";
 
-const { data: profileData } = await supabaseClient
-  .from("profiles")
-  .select("full_name")
-  .eq("user_id", user.id)
-  .single();
+  if (user?.id) {
+    const { data: profileData } = await supabaseClient
+      .from("profiles")
+      .select("full_name")
+      .eq("user_id", user.id)
+      .single();
 
-if (profileData?.full_name) {
-  name = profileData.full_name;
-} else if (user?.email) {
-  name = user.email.split("@")[0];
-  name = name.charAt(0).toUpperCase() + name.slice(1);
-}
+    if (profileData?.full_name) {
+      name = profileData.full_name;
+    } else if (user?.email) {
+      name = user.email.split("@")[0];
+      name = name.charAt(0).toUpperCase() + name.slice(1);
+    }
+  }
 
   welcomeTitleEl.textContent = `${getGreeting()} ${name}`;
   welcomeTextEl.textContent = getMotivation(name);
 
   if (btnUserProfile) {
-  btnUserProfile.textContent = name;
-}
+    btnUserProfile.textContent = name;
+  }
 
-if (profileEmail && user?.email) {
-  profileEmail.textContent = user.email;
-}
+  if (profileEmail && user?.email) {
+    profileEmail.textContent = user.email;
+  }
 }
 
 function renderAppointments(items) {
   if (!items.length) {
     appointmentsListEl.innerHTML = `
       <div class="empty-state">
-        Nog geen afspraken voor vandaag.
+        Nog geen afspraken voor deze dag.
       </div>
     `;
     return;
@@ -236,8 +269,12 @@ function renderAppointments(items) {
         </div>
 
         <div class="card-actions">
-          <button class="btn btn-secondary" onclick="window.location.href='./invullen.html?id=${item.id}'">Invullen</button>
-          <button class="btn btn-outline">Cliëntenkaart</button>
+          <button class="btn btn-secondary" onclick="window.location.href='./invullen.html?id=${item.id}'">
+            Invullen
+          </button>
+          <button class="btn btn-outline">
+            Cliëntenkaart
+          </button>
           <button class="btn btn-finish ${filled ? "enabled" : ""}">
             Afronden
           </button>
@@ -245,6 +282,46 @@ function renderAppointments(items) {
       </article>
     `;
   }).join("");
+}
+
+function renderWeekPlanning(appointments) {
+  const today = new Date();
+  const startOfWeek = getStartOfWeek(today, currentWeekOffset);
+  const weekDates = [];
+
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(startOfWeek);
+    d.setDate(startOfWeek.getDate() + i);
+    weekDates.push(d);
+  }
+
+  const endOfWeek = weekDates[6];
+  if (weekRangeLabelEl) {
+    weekRangeLabelEl.textContent = `${formatShortDate(startOfWeek)} – ${formatShortDate(endOfWeek)}`;
+  }
+
+  weekdayCards.forEach((card, index) => {
+    const dateObj = weekDates[index];
+    const dateString = toDateString(dateObj);
+
+    const count = appointments.filter(item => item.appointment_date === dateString).length;
+    const countEl = card.querySelector(".weekday-count");
+
+    if (countEl) {
+      countEl.textContent = count;
+    }
+
+    card.classList.toggle("active", dateString === getTodayString() && currentWeekOffset === 0);
+
+    card.onclick = () => {
+      const dayAppointments = appointments.filter(item => item.appointment_date === dateString);
+      todayDateLabelEl.textContent = formatDutchDate(dateObj);
+      renderAppointments(dayAppointments);
+
+      weekdayCards.forEach(btn => btn.classList.remove("active"));
+      card.classList.add("active");
+    };
+  });
 }
 
 async function loadDashboard() {
@@ -263,6 +340,8 @@ async function loadDashboard() {
       .from("Appointments")
       .select("*")
       .eq("owner_id", currentUser.id)
+      .neq("status", "verwijderd")
+      .order("appointment_date", { ascending: true })
       .order("appointment_time", { ascending: true });
 
     if (error) {
@@ -276,35 +355,37 @@ async function loadDashboard() {
     }
 
     const appointments = data || [];
-allAppointmentsCache = appointments;
+    allAppointmentsCache = appointments;
 
-const todayAppointments = appointments.filter(item => item.appointment_date === today);
+    const todayAppointments = appointments.filter(item => item.appointment_date === today);
+    todayCountEl.textContent = todayAppointments.length;
 
-todayCountEl.textContent = todayAppointments.length;
+    const signalCountByClient = {};
 
-const signalCountByClient = {};
+    appointments.forEach(item => {
+      const hasSignals =
+        (item.internal_signals && String(item.internal_signals).trim() !== "") ||
+        (item.signal_notes && String(item.signal_notes).trim() !== "") ||
+        (item.person_status === "zorgelijk") ||
+        (item.house_status === "zorgelijk");
 
-appointments.forEach(item => {
-  const hasSignals =
-    (item.internal_signals && String(item.internal_signals).trim() !== "") ||
-    (item.signal_notes && String(item.signal_notes).trim() !== "") ||
-    (item.person_status && item.person_status === "zorgelijk") ||
-    (item.house_status && item.house_status === "zorgelijk");
+      const clientKey = item.client_id || item.client_name;
 
-const clientKey = item.client_id || item.client_name;
+      if (hasSignals && clientKey) {
+        signalCountByClient[clientKey] =
+          (signalCountByClient[clientKey] || 0) + 1;
+      }
+    });
 
-  if (hasSignals && item.client_id) {
-    signalCountByClient[item.client_id] = (signalCountByClient[item.client_id] || 0) + 1;
-  }
-});
+    const activeSignalClients = Object.values(signalCountByClient)
+      .filter(count => count >= 3)
+      .length;
 
-const activeSignalClients = Object.values(signalCountByClient).filter(count => count >= 3).length;
+    signalCountEl.textContent = String(activeSignalClients);
+    invoiceTotalEl.textContent = "€0";
 
-signalCountEl.textContent = String(activeSignalClients);
-invoiceTotalEl.textContent = "€0";
-
-renderAppointments(todayAppointments);
-renderWeekPlanning(appointments);
+    renderAppointments(todayAppointments);
+    renderWeekPlanning(appointments);
   } catch (err) {
     console.error("Algemene fout:", err);
     appointmentsListEl.innerHTML = `
@@ -313,64 +394,6 @@ renderWeekPlanning(appointments);
       </div>
     `;
   }
-}
-
-function toDateString(date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
-function getStartOfWeek(date, offset = 0) {
-  const d = new Date(date);
-  const day = d.getDay();
-  const diff = day === 0 ? -6 : 1 - day;
-  d.setDate(d.getDate() + diff + (offset * 7));
-  d.setHours(0, 0, 0, 0);
-  return d;
-}
-
-function formatShortDate(date) {
-  return new Intl.DateTimeFormat("nl-NL", {
-    day: "numeric",
-    month: "short"
-  }).format(date);
-}
-
-function renderWeekPlanning(appointments) {
-  const today = new Date();
-  const startOfWeek = getStartOfWeek(today, currentWeekOffset);
-  const weekDates = [];
-
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(startOfWeek);
-    d.setDate(startOfWeek.getDate() + i);
-    weekDates.push(d);
-  }
-
-  const endOfWeek = weekDates[6];
-  weekRangeLabelEl.textContent = `${formatShortDate(startOfWeek)} – ${formatShortDate(endOfWeek)}`;
-
-  weekdayCards.forEach((card, index) => {
-    const dateObj = weekDates[index];
-    const dateString = toDateString(dateObj);
-
-    const count = appointments.filter(item => item.appointment_date === dateString).length;
-    const countEl = card.querySelector(".weekday-count");
-
-    countEl.textContent = count;
-    card.classList.toggle("active", dateString === getTodayString() && currentWeekOffset === 0);
-
-    card.onclick = () => {
-      const dayAppointments = appointments.filter(item => item.appointment_date === dateString);
-      todayDateLabelEl.textContent = formatDutchDate(dateObj);
-      renderAppointments(dayAppointments);
-
-      weekdayCards.forEach(btn => btn.classList.remove("active"));
-      card.classList.add("active");
-    };
-  });
 }
 
 async function startApp() {
