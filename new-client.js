@@ -218,20 +218,26 @@ function generateUuid() {
   return crypto.randomUUID();
 }
 
-async function checkTimeSlot(date, time, userId) {
-  const { data, error } = await supabaseClient
+async function checkTimeSlot(date, time, userId, ignoreAppointmentId = null) {
+  let query = supabaseClient
     .from("Appointments")
-    .select("id")
+    .select("id, status")
     .eq("owner_id", userId)
     .eq("appointment_date", date)
     .eq("appointment_time", time)
-    .limit(1);
+    .neq("status", "verwijderd");
+
+  if (ignoreAppointmentId) {
+    query = query.neq("id", ignoreAppointmentId);
+  }
+
+  const { data, error } = await query.limit(1);
 
   if (error) {
     throw new Error(`Controle tijdslot mislukt: ${error.message}`);
   }
 
-  return data && data.length > 0;
+  return Array.isArray(data) && data.length > 0;
 }
 
 saveClientBtn.addEventListener("click", async () => {
