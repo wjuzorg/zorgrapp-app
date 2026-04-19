@@ -57,9 +57,9 @@ submitBtn.addEventListener("click", async () => {
     return;
   }
 
-  msgEl.textContent = mode === "login" ? "Bezig met inloggen..." : "Account aanmaken...";
-
   if (mode === "login") {
+    msgEl.textContent = "Bezig met inloggen...";
+
     const { error } = await supabaseClient.auth.signInWithPassword({
       email,
       password
@@ -74,9 +74,16 @@ submitBtn.addEventListener("click", async () => {
     return;
   }
 
+  msgEl.textContent = "Account aanmaken...";
+
   const { data: signUpData, error: signUpError } = await supabaseClient.auth.signUp({
     email,
-    password
+    password,
+    options: {
+      data: {
+        full_name: fullName
+      }
+    }
   });
 
   if (signUpError) {
@@ -84,21 +91,13 @@ submitBtn.addEventListener("click", async () => {
     return;
   }
 
-  const user = signUpData.user;
-
-  if (!user) {
-    msgEl.textContent = "Gebruiker aangemaakt, maar gebruiker niet gevonden.";
+  if (!signUpData.user) {
+    msgEl.textContent = "Account aangemaakt, maar gebruiker niet gevonden.";
     return;
   }
 
-  const { data, error } = await supabaseClient.auth.signUp({
-  email: email,
-  password: password,
-  options: {
-    data: {
-      full_name: fullName
-    }
-  }
+  msgEl.textContent = "Registratie gelukt. Je kunt nu inloggen.";
+  setMode("login");
 });
 
 checkExistingSession();
