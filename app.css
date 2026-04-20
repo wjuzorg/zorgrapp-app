@@ -668,36 +668,39 @@ body {
   }
 
   .topbar {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-    margin-bottom: 22px;
-  }
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: start;
+  gap: 12px;
+  margin-bottom: 22px;
+}
 
-  .topbar h1 {
-    font-size: 34px;
-  }
+.topbar > div:first-child {
+  min-width: 0;
+}
 
-  .topbar p {
-    margin-top: 12px;
-    font-size: 15px;
-  }
+.profile-menu-wrap {
+  display: flex;
+  justify-content: flex-end;
+  width: auto;
+}
 
-  .profile-menu-wrap {
-    display: block;
-    width: 100%;
-  }
-
-  .userbox {
-    display: inline-flex !important;
-    align-items: center;
-    justify-content: center;
-    padding: 10px 14px;
-    font-size: 14px;
-    min-width: auto;
-    width: auto;
-  }
+#btnUserProfile {
+  display: inline-flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px;
+  font-size: 14px;
+  min-width: 110px;
+  width: auto;
+  background: #ffffff;
+  color: #1e2430;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
 
   .welcome {
     padding: 20px;
