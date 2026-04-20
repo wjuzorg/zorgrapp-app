@@ -72,7 +72,7 @@
               id="contactNote"
               class="form-textarea"
               rows="4"
-              placeholder="Bijvoorbeeld: buurvrouw 2 deuren verderop..."
+              placeholder="Bijvoorbeeld: buurvrouw heeft een sleutel of bij verandering bel direct zoon"
             ></textarea>
 
             <div id="contactNoteMessage" class="helper-text"></div>
@@ -134,15 +134,27 @@
       <div class="section">
         <h3>Snelle acties</h3>
         <div class="action-stack">
-          <a id="callClientBtn" class="btn btn-secondary" href="#">Bel cliënt</a>
-          <a id="newAppointmentBtn" class="btn btn-outline" href="./new-client.html">Nieuwe afspraak</a>
-          <a id="backToDashboardBtn" class="btn btn-primary" href="./index.html">Terug naar dashboard</a>
-        </div>
+          <a class="action-button" href="#" id="callClientBtn">Bel cliënt</a>
+  <a class="action-button" href="#" id="newAppointmentBtn">Nieuwe afspraak</a>
+  <a class="action-button" href="#" id="clientHistoryBtn">Cliënt geschiedenis</a>
+  <a class="action-button primary" href="today.html">Terug naar dashboard</a>
+</div>
       </div>
     </section>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="./clientkaart.js"></script>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const clientId = params.get("id");
+
+  const historyBtn = document.getElementById("clientHistoryBtn");
+  if (historyBtn && clientId) {
+    historyBtn.href = `client-geschiedenis.html?id=${clientId}`;
+  }
+</script>
+
 </body>
 </html>
