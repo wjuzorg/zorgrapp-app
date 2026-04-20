@@ -294,8 +294,9 @@ async function loadClientCard() {
   const alertBoxEl = document.getElementById("alertBox");
 
   const callClientBtn = document.getElementById("callClientBtn");
-  const newAppointmentBtn = document.getElementById("newAppointmentBtn");
-  const saveContactNoteBtn = document.getElementById("saveContactNoteBtn");
+const newAppointmentBtn = document.getElementById("newAppointmentBtn");
+const clientHistoryBtn = document.getElementById("clientHistoryBtn");
+const saveContactNoteBtn = document.getElementById("saveContactNoteBtn");
 
   clientNameEl.textContent = currentClient.full_name || "Onbekende cliënt";
 
@@ -331,6 +332,10 @@ async function loadClientCard() {
   if (newAppointmentBtn) {
     newAppointmentBtn.href = `./new-client.html?client_id=${currentClient.id}`;
   }
+
+  if (clientHistoryBtn) {
+  clientHistoryBtn.href = `./client-geschiedenis.html?id=${currentClient.id}`;
+}
 
   totalAppointmentsEl.textContent = String(appointmentList.length);
 
