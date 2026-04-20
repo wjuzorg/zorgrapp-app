@@ -668,16 +668,14 @@ body {
 
 .topbar {
   display: grid !important;
-  grid-template-columns: 180px 1fr !important;
+  grid-template-columns: 1fr auto !important;
   align-items: start !important;
   column-gap: 12px !important;
-  row-gap: 0 !important;
   margin-bottom: 22px !important;
 }
 
 .topbar > div:first-child {
-  width: 180px !important;
-  max-width: 180px !important;
+  min-width: 0 !important;
 }
 
 .topbar h1 {
@@ -687,17 +685,16 @@ body {
 }
 
 .topbar p {
-  margin: 8px 0 0 0 !important;
-  font-size: 12px !important;
-  line-height: 1.25 !important;
+  margin: 6px 0 0 0 !important;
+  font-size: 11px !important;
+  line-height: 1.2 !important;
   color: #7b8190 !important;
-  max-width: 180px !important;
+  white-space: nowrap !important;
 }
 
 .profile-menu-wrap {
   display: flex !important;
   justify-content: flex-end !important;
-  align-items: flex-start !important;
   width: 100% !important;
 }
 
@@ -709,7 +706,6 @@ body {
   font-size: 14px !important;
   min-width: 115px !important;
   width: auto !important;
-  margin-top: 0 !important;
 }
 }
 
