@@ -1,133 +1,117 @@
-<!DOCTYPE html>
-<html lang="nl">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cliënt geschiedenis - WJU Zorg</title>
-  <link rel="stylesheet" href="app.css?v=2" />
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body>
-  <div class="container">
-    <div class="topbar">
-      <h1 id="clientName">Cliënt geschiedenis</h1>
-      <p>Overzicht van afspraken, signalen en notities van deze cliënt.</p>
-    </div>
+<script>
+const SUPABASE_URL = "https://bqqoxawgjxxvolljkqnp.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxcW94YXdnanh4dm9sbGprcW5wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODc0OTMsImV4cCI6MjA5MjA2MzQ5M30.WLTELxD32HFtyV1pbsB-60nF_k4Zq7DSvaR87-kj2es";
 
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const params = new URLSearchParams(window.location.search);
+const clientId = params.get("id");
+
+document.getElementById("backToClientCard").href =
+  `clientkaart.html?id=${clientId}`;
+
+function formatDate(dateString) {
+  if (!dateString) return "-";
+
+  const date = new Date(dateString);
+
+  return date.toLocaleDateString("nl-NL", {
+    day: "numeric",
+    month: "long",
+    year: "numeric"
+  });
+}
+
+function getSignalText(item) {
+  const signals = [];
+
+  if (item.risk_dropout) signals.push("Risico op uitval");
+  if (item.needs_extra_support) signals.push("Extra ondersteuning nodig");
+  if (item.hard_to_reach) signals.push("Moeilijk bereikbaar");
+  if (item.observed_decline) signals.push("Achteruitgang opgemerkt");
+
+  return signals.length ? signals.join(", ") : "-";
+}
+
+async function loadClientHistory() {
+  const historyList = document.getElementById("historyList");
+
+  if (!clientId) {
+    historyList.innerHTML =
+      `<div class="card">Geen ID gevonden.</div>`;
+    return;
+  }
+
+  const { data, error } = await supabase
+    .from("requests")
+    .select("*")
+    .eq("id", clientId);
+
+  if (error) {
+    console.error(error);
+    historyList.innerHTML =
+      `<div class="card">Fout bij laden van geschiedenis.</div>`;
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    historyList.innerHTML =
+      `<div class="card">Nog geen gegevens gevonden.</div>`;
+    return;
+  }
+
+  const first = data[0];
+
+  document.getElementById("clientName").textContent =
+    first.full_name
+      ? `Geschiedenis van ${first.full_name}`
+      : "Cliënt geschiedenis";
+
+  historyList.innerHTML = `
     <div class="card" style="margin-bottom:16px;">
-      <a id="backToClientCard" href="#" class="action-button">← Terug naar cliëntenkaart</a>
-    </div>
 
-    <section class="section">
-      <h2 class="section-title">Geschiedenis</h2>
-      <div id="historyList">
-        <div class="card">Laden...</div>
+      <div style="font-weight:700; font-size:18px; margin-bottom:8px;">
+        ${first.service_type || "Afspraak"}
       </div>
-    </section>
-  </div>
 
-  <script>
-    const SUPABASE_URL = "JOUW_SUPABASE_URL";
-    const SUPABASE_ANON_KEY = "JOUW_SUPABASE_ANON_KEY";
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      <div style="margin-bottom:8px;">
+        <strong>Datum:</strong>
+        ${formatDate(first.appointment_time || first.created_at)}
+      </div>
 
-    const params = new URLSearchParams(window.location.search);
-    const clientId = params.get("id");
+      <div style="margin-bottom:8px;">
+        <strong>Status:</strong>
+        ${first.status || "-"}
+      </div>
 
-    document.getElementById("backToClientCard").href = `clientkaart.html?id=${clientId}`;
+      <div style="margin-bottom:8px;">
+        <strong>Duur:</strong>
+        ${first.duration_minutes || 0} minuten
+      </div>
 
-    function formatDate(dateString) {
-      if (!dateString) return "-";
-      const date = new Date(dateString);
-      return date.toLocaleDateString("nl-NL", {
-        day: "numeric",
-        month: "long",
-        year: "numeric"
-      });
-    }
+      <div style="margin-bottom:8px;">
+        <strong>Werk gedaan:</strong><br>
+        ${first.work_done || "-"}
+      </div>
 
-    function getSignalText(item) {
-      const signals = [];
+      <div style="margin-bottom:8px;">
+        <strong>Niet gelukt reden:</strong><br>
+        ${first.not_done_reason || "-"}
+      </div>
 
-      if (item.risk_dropout) signals.push("Risico op uitval");
-      if (item.needs_extra_support) signals.push("Extra ondersteuning nodig");
-      if (item.hard_to_reach) signals.push("Moeilijk bereikbaar");
-      if (item.observed_decline) signals.push("Achteruitgang opgemerkt");
+      <div style="margin-bottom:8px;">
+        <strong>Signalen:</strong><br>
+        ${getSignalText(first)}
+      </div>
 
-      return signals.length ? signals.join(", ") : "-";
-    }
+      <div style="margin-bottom:8px;">
+        <strong>Interne notitie:</strong><br>
+        ${first.internal_signal_notes || "-"}
+      </div>
 
-    async function loadClientHistory() {
-      const historyList = document.getElementById("historyList");
+    </div>
+  `;
+}
 
-      if (!clientId) {
-        historyList.innerHTML = `<div class="card">Geen cliënt-ID gevonden.</div>`;
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from("requests")
-        .select("*")
-        .eq("client_id", clientId)
-        .order("appointment_time", { ascending: false });
-
-      if (error) {
-        console.error(error);
-        historyList.innerHTML = `<div class="card">Fout bij laden van geschiedenis.</div>`;
-        return;
-      }
-
-      if (!data || data.length === 0) {
-        historyList.innerHTML = `<div class="card">Nog geen geschiedenis gevonden.</div>`;
-        return;
-      }
-
-      const first = data[0];
-      document.getElementById("clientName").textContent =
-        first.full_name ? `Geschiedenis van ${first.full_name}` : "Cliënt geschiedenis";
-
-      historyList.innerHTML = data.map(item => `
-        <div class="card" style="margin-bottom:16px;">
-          <div style="font-weight:700; font-size:18px; margin-bottom:8px;">
-            ${item.service_type || "Afspraak"}
-          </div>
-
-          <div style="margin-bottom:8px;">
-            <strong>Datum:</strong> ${formatDate(item.appointment_time || item.created_at)}
-          </div>
-
-          <div style="margin-bottom:8px;">
-            <strong>Status:</strong> ${item.status || "-"}
-          </div>
-
-          <div style="margin-bottom:8px;">
-            <strong>Duur:</strong> ${item.duration_minutes || 0} minuten
-          </div>
-
-          <div style="margin-bottom:8px;">
-            <strong>Werk gedaan:</strong><br>
-            ${item.work_done ? item.work_done : "-"}
-          </div>
-
-          <div style="margin-bottom:8px;">
-            <strong>Niet gelukt reden:</strong><br>
-            ${item.not_done_reason ? item.not_done_reason : "-"}
-          </div>
-
-          <div style="margin-bottom:8px;">
-            <strong>Signalen:</strong><br>
-            ${getSignalText(item)}
-          </div>
-
-          <div style="margin-bottom:8px;">
-            <strong>Interne notitie:</strong><br>
-            ${item.internal_signal_notes ? item.internal_signal_notes : "-"}
-          </div>
-        </div>
-      `).join("");
-    }
-
-    loadClientHistory();
-  </script>
-</body>
-</html>
+loadClientHistory();
+</script>
