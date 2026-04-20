@@ -207,10 +207,7 @@ function getMotivation(name) {
   return complimentMessages[dayOfMonth % complimentMessages.length];
 }
 
-async function setWelcomeText() {
-  const { data } = await supabaseClient.auth.getSession();
-  const user = data.session?.user;
-
+async function setWelcomeText(user) {
   let name = "Gebruiker";
 
   if (user?.email) {
@@ -220,14 +217,17 @@ async function setWelcomeText() {
 
   try {
     if (user?.id) {
-      const { data: profileRows } = await supabaseClient
+      const { data: profileRows, error } = await supabaseClient
         .from("profiles")
         .select("full_name")
         .eq("user_id", user.id)
         .limit(1);
 
-      if (profileRows && profileRows.length > 0 && profileRows[0].full_name) {
-        name = profileRows[0].full_name.trim();
+      if (!error && profileRows && profileRows.length > 0) {
+        const dbName = profileRows[0].full_name;
+        if (dbName && dbName.trim() !== "") {
+          name = dbName.trim();
+        }
       }
     }
   } catch (err) {
@@ -460,6 +460,14 @@ async function setWelcomeText() {
   if (profileEmail && user?.email) {
     profileEmail.textContent = user.email;
   }
+}
+
+async function startApp() {
+  const user = await requireLogin();
+  if (!user) return;
+
+  await setWelcomeText(user);
+  await loadDashboard();
 }
 
 startApp();
