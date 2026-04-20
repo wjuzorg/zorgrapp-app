@@ -667,48 +667,50 @@ body {
 @media (max-width: 560px) {
 
 .topbar {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: start;
-  gap: 12px;
-  margin-bottom: 22px;
+  display: grid !important;
+  grid-template-columns: 180px 1fr !important;
+  align-items: start !important;
+  column-gap: 12px !important;
+  row-gap: 0 !important;
+  margin-bottom: 22px !important;
+}
+
+.topbar > div:first-child {
+  width: 180px !important;
+  max-width: 180px !important;
 }
 
 .topbar h1 {
-  font-size: 34px;
-  line-height: 1;
-  margin: 0;
+  margin: 0 !important;
+  font-size: 34px !important;
+  line-height: 1 !important;
 }
 
 .topbar p {
-  margin: 8px 0 0;
-  font-size: 12px;
-  line-height: 1.25;
-  color: #7b8190;
-  max-width: 190px;
+  margin: 8px 0 0 0 !important;
+  font-size: 12px !important;
+  line-height: 1.25 !important;
+  color: #7b8190 !important;
+  max-width: 180px !important;
 }
 
 .profile-menu-wrap {
-  display: flex;
-  justify-content: flex-end;
-  align-items: flex-start;
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: flex-start !important;
+  width: 100% !important;
 }
 
 #btnUserProfile {
   display: inline-flex !important;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 16px;
-  font-size: 14px;
-  min-width: 115px;
-  width: auto;
-  background: #ffffff;
-  color: #1e2430;
-  border: 1px solid #e5e7eb;
-  border-radius: 999px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 8px 16px !important;
+  font-size: 14px !important;
+  min-width: 115px !important;
+  width: auto !important;
+  margin-top: 0 !important;
 }
-
 }
 
   .welcome {
