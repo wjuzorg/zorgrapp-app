@@ -211,25 +211,36 @@ async function setWelcomeText() {
   const { data } = await supabaseClient.auth.getSession();
   const user = data.session?.user;
 
-  let name = "Denise";
+  let name = "Gebruiker";
 
-  if (user?.id) {
-    const { data: profileData } = await supabaseClient
-      .from("profiles")
-      .select("full_name")
-      .eq("user_id", user.id)
-      .single();
-
-    if (profileData?.full_name) {
-      name = profileData.full_name;
-    } else if (user?.email) {
-      name = user.email.split("@")[0];
-      name = name.charAt(0).toUpperCase() + name.slice(1);
-    }
+  if (user?.email) {
+    name = user.email.split("@")[0];
+    name = name.charAt(0).toUpperCase() + name.slice(1);
   }
 
-  welcomeTitleEl.textContent = `${getGreeting()} ${name}`;
-  welcomeTextEl.textContent = getMotivation(name);
+  try {
+    if (user?.id) {
+      const { data: profileRows } = await supabaseClient
+        .from("profiles")
+        .select("full_name")
+        .eq("user_id", user.id)
+        .limit(1);
+
+      if (profileRows && profileRows.length > 0 && profileRows[0].full_name) {
+        name = profileRows[0].full_name.trim();
+      }
+    }
+  } catch (err) {
+    console.error("Profiel laden mislukt:", err);
+  }
+
+  if (welcomeTitleEl) {
+    welcomeTitleEl.textContent = `${getGreeting()} ${name}`;
+  }
+
+  if (welcomeTextEl) {
+    welcomeTextEl.textContent = getMotivation(name);
+  }
 
   if (btnUserProfile) {
     btnUserProfile.textContent = name;
