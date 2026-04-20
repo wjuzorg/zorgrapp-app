@@ -997,5 +997,28 @@ body {
   .contact-notes-layout {
     grid-template-columns: 1fr;
   }
+
+  @media (max-width: 560px) {
+  .profile-menu-wrap {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  #btnUserProfile {
+    display: inline-flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 10px 14px !important;
+    font-size: 14px !important;
+    min-width: 120px !important;
+    width: auto !important;
+    background: #ffffff !important;
+    color: #1e2430 !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 999px !important;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06) !important;
+  }
 }
 }
