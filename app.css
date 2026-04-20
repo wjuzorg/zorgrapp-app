@@ -668,6 +668,10 @@ body {
   }
 
   .topbar {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
     margin-bottom: 22px;
   }
 
@@ -720,12 +724,13 @@ body {
   }
 
   .userbox {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 14px;
-  font-size: 14px;
-  min-width: auto;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 14px;
+    font-size: 14px;
+    min-width: auto;
+    width: auto;
 }
 
   .compact-weekbar {
