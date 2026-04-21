@@ -3,6 +3,10 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+let currentUser = null;
+let currentClient = null;
+let matchingClients = [];
+
 const params = new URLSearchParams(window.location.search);
 const clientId = params.get("id");
 
@@ -14,19 +18,40 @@ const totalMinutes = document.getElementById("totalMinutes");
 const totalSignals = document.getElementById("totalSignals");
 const savePdfBtn = document.getElementById("savePdfBtn");
 
-if (clientId && backToClientCard) {
-  backToClientCard.href = `./clientkaart.html?id=${clientId}`;
+async function requireLogin() {
+  const { data } = await supabaseClient.auth.getSession();
+  if (!data.session) {
+    window.location.href = "./login.html";
+    return null;
+  }
+  return data.session.user;
 }
 
-function formatDateTime(dateValue) {
+function normalizeName(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function formatDateTime(dateValue, timeValue = "") {
   if (!dateValue) return "-";
-  const date = new Date(dateValue);
+
+  let date;
+
+  if (timeValue) {
+    date = new Date(`${dateValue}T${timeValue}`);
+  } else {
+    date = new Date(dateValue);
+  }
+
+  if (Number.isNaN(date.getTime())) {
+    return dateValue || "-";
+  }
+
   return date.toLocaleString("nl-NL", {
     day: "numeric",
     month: "long",
     year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit"
+    hour: timeValue ? "2-digit" : undefined,
+    minute: timeValue ? "2-digit" : undefined
   });
 }
 
@@ -40,74 +65,66 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
-function countSignals(item) {
-  let count = 0;
-  if (item.risk_dropout) count += 1;
-  if (item.needs_extra_support) count += 1;
-  if (item.hard_to_reach) count += 1;
-  if (item.observed_decline) count += 1;
-  return count;
+function countSignalPoints(appointments) {
+  let total = 0;
+
+  appointments.forEach(item => {
+    if (item.person_status === "zorgelijk") total += 1;
+    if (item.house_status === "zorgelijk") total += 1;
+
+    if (item.internal_signals && String(item.internal_signals).trim() !== "") {
+      const arr = String(item.internal_signals)
+        .split(",")
+        .map(s => s.trim())
+        .filter(Boolean);
+      total += arr.length;
+    }
+
+    if (item.signal_notes && String(item.signal_notes).trim() !== "") {
+      total += 1;
+    }
+  });
+
+  return total;
 }
 
 function getSignalText(item) {
   const signals = [];
-  if (item.risk_dropout) signals.push("Risico op uitval");
-  if (item.needs_extra_support) signals.push("Extra ondersteuning nodig");
-  if (item.hard_to_reach) signals.push("Moeilijk bereikbaar");
-  if (item.observed_decline) signals.push("Achteruitgang opgemerkt");
-  return signals.length ? signals.join(", ") : "Geen signalen";
+
+  if (item.person_status === "zorgelijk") {
+    signals.push("Persoon is zorgelijk");
+  }
+
+  if (item.house_status === "zorgelijk") {
+    signals.push("Huis is zorgelijk");
+  }
+
+  if (item.internal_signals && String(item.internal_signals).trim() !== "") {
+    signals.push(String(item.internal_signals));
+  }
+
+  if (item.signal_notes && String(item.signal_notes).trim() !== "") {
+    signals.push(String(item.signal_notes));
+  }
+
+  return signals.length ? signals.join(" • ") : "Geen signalen";
 }
 
-async function loadClientHistory() {
-  if (!clientId) {
-    historyList.innerHTML = `<div class="history-item">Geen cliënt-ID gevonden.</div>`;
-    totalAppointments.textContent = "0";
-    totalMinutes.textContent = "0";
-    totalSignals.textContent = "0";
-    return;
-  }
-
-  const { data: historyData, error } = await supabaseClient
-    .from("requests")
-    .select("*")
-    .eq("client_id", clientId)
-    .order("appointment_time", { ascending: false });
-
-  if (error) {
-    console.error("Fout bij geschiedenis ophalen:", error);
-    historyList.innerHTML = `<div class="history-item">Deze cliëntgeschiedenis kon niet worden geladen.</div>`;
-    totalAppointments.textContent = "0";
-    totalMinutes.textContent = "0";
-    totalSignals.textContent = "0";
-    return;
-  }
-
-  if (!historyData || historyData.length === 0) {
+function renderHistoryItems(appointments) {
+  if (!appointments.length) {
     historyList.innerHTML = `<div class="history-item">Nog geen geschiedenis gevonden.</div>`;
-    totalAppointments.textContent = "0";
-    totalMinutes.textContent = "0";
-    totalSignals.textContent = "0";
     return;
   }
 
-  const firstRecord = historyData[0];
-  const clientName = firstRecord.full_name || "Cliënt";
-  pageTitle.textContent = `Geschiedenis van ${clientName}`;
+  historyList.innerHTML = appointments.map((item) => {
+    const momentText = formatDateTime(item.appointment_date || item.created_at, item.appointment_time || "");
 
-  const appointmentsCount = historyData.length;
-  const minutesCount = historyData.reduce((sum, item) => sum + (Number(item.duration_minutes) || 0), 0);
-  const signalsCount = historyData.reduce((sum, item) => sum + countSignals(item), 0);
-
-  totalAppointments.textContent = String(appointmentsCount);
-  totalMinutes.textContent = String(minutesCount);
-  totalSignals.textContent = String(signalsCount);
-
-  historyList.innerHTML = historyData.map((item) => {
     return `
       <div class="history-item">
         <div class="history-title">${escapeHtml(item.service_type || "Afspraak")}</div>
+
         <div class="history-meta">
-          ${formatDateTime(item.appointment_time || item.created_at)}
+          ${escapeHtml(momentText)}
         </div>
 
         <div class="history-block">
@@ -117,7 +134,7 @@ async function loadClientHistory() {
 
         <div class="history-block">
           <strong>Duur</strong><br>
-          ${escapeHtml(item.duration_minutes || 0)} minuten
+          ${escapeHtml(item.worked_minutes || item.duration_minutes || 0)} minuten
         </div>
 
         <div class="history-block">
@@ -137,11 +154,103 @@ async function loadClientHistory() {
 
         <div class="history-block">
           <strong>Interne notitie</strong><br>
-          ${escapeHtml(item.internal_signal_notes || "-")}
+          ${escapeHtml(item.signal_notes || "-")}
         </div>
       </div>
     `;
   }).join("");
+}
+
+async function loadClientHistory() {
+  currentUser = await requireLogin();
+  if (!currentUser) return;
+
+  if (!clientId) {
+    historyList.innerHTML = `<div class="history-item">Geen cliënt-ID gevonden.</div>`;
+    totalAppointments.textContent = "0";
+    totalMinutes.textContent = "0";
+    totalSignals.textContent = "0";
+    return;
+  }
+
+  const { data: selectedClient, error: clientError } = await supabaseClient
+    .from("Clients")
+    .select("*")
+    .eq("id", clientId)
+    .eq("owner_id", currentUser.id)
+    .single();
+
+  if (clientError || !selectedClient) {
+    console.error("Cliënt niet gevonden:", clientError);
+    historyList.innerHTML = `<div class="history-item">Deze cliëntgeschiedenis kon niet worden geladen.</div>`;
+    totalAppointments.textContent = "0";
+    totalMinutes.textContent = "0";
+    totalSignals.textContent = "0";
+    return;
+  }
+
+  currentClient = selectedClient;
+
+  if (backToClientCard) {
+    backToClientCard.href = `./clientkaart.html?id=${currentClient.id}`;
+  }
+
+  const normalizedClientName = normalizeName(selectedClient.full_name);
+
+  const { data: allClients, error: allClientsError } = await supabaseClient
+    .from("Clients")
+    .select("*")
+    .eq("owner_id", currentUser.id);
+
+  if (allClientsError) {
+    console.error("Fout bij laden van cliënten:", allClientsError);
+    historyList.innerHTML = `<div class="history-item">Cliëntgegevens konden niet worden geladen.</div>`;
+    return;
+  }
+
+  matchingClients = (allClients || []).filter(client =>
+    normalizeName(client.full_name) === normalizedClientName
+  );
+
+  const matchingClientIds = matchingClients.map(client => client.id);
+
+  const { data: allAppointments, error: appointmentError } = await supabaseClient
+    .from("Appointments")
+    .select("*")
+    .eq("owner_id", currentUser.id)
+    .neq("status", "verwijderd")
+    .order("appointment_date", { ascending: false })
+    .order("appointment_time", { ascending: false });
+
+  if (appointmentError) {
+    console.error("Fout bij laden van afspraken:", appointmentError);
+    historyList.innerHTML = `<div class="history-item">Afspraken konden niet worden geladen.</div>`;
+    totalAppointments.textContent = "0";
+    totalMinutes.textContent = "0";
+    totalSignals.textContent = "0";
+    return;
+  }
+
+  const appointmentList = (allAppointments || []).filter(item => {
+    const sameClientId = item.client_id && matchingClientIds.includes(item.client_id);
+    const sameClientName = normalizeName(item.client_name) === normalizedClientName;
+    return sameClientId || sameClientName;
+  });
+
+  pageTitle.textContent = `Geschiedenis van ${selectedClient.full_name || "Cliënt"}`;
+
+  const appointmentsCount = appointmentList.length;
+  const minutesCount = appointmentList.reduce(
+    (sum, item) => sum + Number(item.worked_minutes || item.duration_minutes || 0),
+    0
+  );
+  const signalsCount = countSignalPoints(appointmentList);
+
+  totalAppointments.textContent = String(appointmentsCount);
+  totalMinutes.textContent = String(minutesCount);
+  totalSignals.textContent = String(signalsCount);
+
+  renderHistoryItems(appointmentList);
 }
 
 if (savePdfBtn) {
