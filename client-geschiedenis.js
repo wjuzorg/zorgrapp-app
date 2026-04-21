@@ -4,7 +4,7 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const params = new URLSearchParams(window.location.search);
-const requestId = params.get("id");
+const clientId = params.get("id");
 
 const pageTitle = document.getElementById("pageTitle");
 const backToClientCard = document.getElementById("backToClientCard");
@@ -12,16 +12,15 @@ const historyList = document.getElementById("historyList");
 const totalAppointments = document.getElementById("totalAppointments");
 const totalMinutes = document.getElementById("totalMinutes");
 const totalSignals = document.getElementById("totalSignals");
+const savePdfBtn = document.getElementById("savePdfBtn");
 
-if (requestId) {
-  backToClientCard.href = `./clientkaart.html?id=${requestId}`;
+if (clientId && backToClientCard) {
+  backToClientCard.href = `./clientkaart.html?id=${clientId}`;
 }
 
 function formatDateTime(dateValue) {
   if (!dateValue) return "-";
-
   const date = new Date(dateValue);
-
   return date.toLocaleString("nl-NL", {
     day: "numeric",
     month: "long",
@@ -32,8 +31,7 @@ function formatDateTime(dateValue) {
 }
 
 function escapeHtml(value) {
-  if (!value) return "-";
-
+  if (value === null || value === undefined || value === "") return "-";
   return String(value)
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
@@ -44,78 +42,57 @@ function escapeHtml(value) {
 
 function countSignals(item) {
   let count = 0;
-
   if (item.risk_dropout) count += 1;
   if (item.needs_extra_support) count += 1;
   if (item.hard_to_reach) count += 1;
   if (item.observed_decline) count += 1;
-
   return count;
 }
 
 function getSignalText(item) {
   const signals = [];
-
   if (item.risk_dropout) signals.push("Risico op uitval");
   if (item.needs_extra_support) signals.push("Extra ondersteuning nodig");
   if (item.hard_to_reach) signals.push("Moeilijk bereikbaar");
   if (item.observed_decline) signals.push("Achteruitgang opgemerkt");
-
   return signals.length ? signals.join(", ") : "Geen signalen";
 }
 
 async function loadClientHistory() {
-  if (!requestId) {
-    historyList.innerHTML = `<div class="history-item">Geen cliënt of aanvraag-ID gevonden.</div>`;
+  if (!clientId) {
+    historyList.innerHTML = `<div class="history-item">Geen cliënt-ID gevonden.</div>`;
+    totalAppointments.textContent = "0";
+    totalMinutes.textContent = "0";
+    totalSignals.textContent = "0";
     return;
   }
 
-  const { data: firstRecord, error: firstError } = await supabaseClient
-  .from("requests")
-  .select("*")
-  .eq("client_id", clientId)
-  .order("created_at", { ascending: true })
-  .limit(1)
-  .maybeSingle();
+  const { data: historyData, error } = await supabaseClient
+    .from("requests")
+    .select("*")
+    .eq("client_id", clientId)
+    .order("appointment_time", { ascending: false });
 
-  if (firstError || !firstRecord) {
-    console.error("Fout bij eerste record ophalen:", firstError);
+  if (error) {
+    console.error("Fout bij geschiedenis ophalen:", error);
     historyList.innerHTML = `<div class="history-item">Deze cliëntgeschiedenis kon niet worden geladen.</div>`;
+    totalAppointments.textContent = "0";
+    totalMinutes.textContent = "0";
+    totalSignals.textContent = "0";
     return;
   }
 
-  const clientName = firstRecord.full_name || "Cliënt";
-  const clientPhone = firstRecord.phone || "";
-
-  pageTitle.textContent = `Geschiedenis van ${clientName}`;
-
-  let historyData = [];
-
-  if (clientPhone) {
-    const { data, error } = await supabaseClient
-      .from("requests")
-      .select("*")
-      .eq("phone", clientPhone)
-      .order("appointment_time", { ascending: false });
-
-    if (error) {
-      console.error("Fout bij geschiedenis ophalen:", error);
-      historyList.innerHTML = `<div class="history-item">Fout bij laden van geschiedenis.</div>`;
-      return;
-    }
-
-    historyData = data || [];
-  } else {
-    historyData = [firstRecord];
-  }
-
-  if (historyData.length === 0) {
+  if (!historyData || historyData.length === 0) {
     historyList.innerHTML = `<div class="history-item">Nog geen geschiedenis gevonden.</div>`;
     totalAppointments.textContent = "0";
     totalMinutes.textContent = "0";
     totalSignals.textContent = "0";
     return;
   }
+
+  const firstRecord = historyData[0];
+  const clientName = firstRecord.full_name || "Cliënt";
+  pageTitle.textContent = `Geschiedenis van ${clientName}`;
 
   const appointmentsCount = historyData.length;
   const minutesCount = historyData.reduce((sum, item) => sum + (Number(item.duration_minutes) || 0), 0);
@@ -129,7 +106,6 @@ async function loadClientHistory() {
     return `
       <div class="history-item">
         <div class="history-title">${escapeHtml(item.service_type || "Afspraak")}</div>
-
         <div class="history-meta">
           ${formatDateTime(item.appointment_time || item.created_at)}
         </div>
@@ -166,6 +142,12 @@ async function loadClientHistory() {
       </div>
     `;
   }).join("");
+}
+
+if (savePdfBtn) {
+  savePdfBtn.addEventListener("click", () => {
+    window.print();
+  });
 }
 
 loadClientHistory();
