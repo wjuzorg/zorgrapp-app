@@ -71,10 +71,12 @@ async function loadClientHistory() {
   }
 
   const { data: firstRecord, error: firstError } = await supabaseClient
-    .from("requests")
-    .select("*")
-    .eq("id", requestId)
-    .single();
+  .from("requests")
+  .select("*")
+  .eq("client_id", clientId)
+  .order("created_at", { ascending: true })
+  .limit(1)
+  .maybeSingle();
 
   if (firstError || !firstRecord) {
     console.error("Fout bij eerste record ophalen:", firstError);

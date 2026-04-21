@@ -12,10 +12,7 @@
       --muted: #6b7280;
       --line: #e5e7eb;
       --soft: #f3f4f6;
-      --green: #16a34a;
       --dark: #111827;
-      --orange: #f59e0b;
-      --red: #dc2626;
       --shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
       --radius: 18px;
     }
@@ -58,9 +55,15 @@
       color: var(--muted);
     }
 
+    .link-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
     .page-link {
       display: inline-block;
-      margin-top: 14px;
       font-size: 14px;
       color: var(--muted);
       text-decoration: none;
@@ -163,6 +166,24 @@
       font-size: 15px;
     }
 
+    .pdf-button {
+      display: block;
+      width: 100%;
+      margin-top: 20px;
+      padding: 16px 18px;
+      border: none;
+      border-radius: 14px;
+      background: #0f172a;
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .pdf-button:hover {
+      opacity: 0.96;
+    }
+
     @media (max-width: 720px) {
       .topbar {
         flex-direction: column;
@@ -177,6 +198,22 @@
         grid-template-columns: 1fr;
       }
     }
+
+    @media print {
+      .link-group,
+      #savePdfBtn {
+        display: none !important;
+      }
+
+      body {
+        background: #ffffff;
+      }
+
+      .card {
+        box-shadow: none;
+        border: 1px solid #ddd;
+      }
+    }
   </style>
 </head>
 <body>
@@ -185,7 +222,11 @@
       <div>
         <h1 id="pageTitle">Cliënt geschiedenis</h1>
         <p>Overzicht van afspraken, signalen en notities van deze cliënt.</p>
-        <a class="page-link" id="backToClientCard" href="./clientkaart.html">← Terug naar cliëntenkaart</a>
+
+        <div class="link-group">
+          <a class="page-link" id="backToClientCard" href="./clientkaart.html">← Terug naar cliëntenkaart</a>
+          <a class="page-link" href="./today.html">← Terug naar dashboard</a>
+        </div>
       </div>
     </header>
 
@@ -212,10 +253,28 @@
         <h2 class="section-title">Geschiedenis</h2>
         <div id="historyList" class="empty-text">Laden...</div>
       </div>
+
+      <button type="button" class="pdf-button" id="savePdfBtn">Opslaan als PDF</button>
     </section>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="./client-geschiedenis.js"></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const clientId = params.get("id");
+    const backToClientCard = document.getElementById("backToClientCard");
+    const savePdfBtn = document.getElementById("savePdfBtn");
+
+    if (backToClientCard && clientId) {
+      backToClientCard.href = `./clientkaart.html?id=${clientId}`;
+    }
+
+    if (savePdfBtn) {
+      savePdfBtn.addEventListener("click", () => {
+        window.print();
+      });
+    }
+  </script>
 </body>
 </html>
