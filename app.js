@@ -262,7 +262,7 @@ async function setWelcomeText(user) {
   }
 }
 
-function renderAppointments(items) {
+function renderAppointments(items, clients) {
   if (!items.length) {
     appointmentsListEl.innerHTML = `
       <div class="empty-state">
@@ -272,9 +272,12 @@ function renderAppointments(items) {
     return;
   }
 
-  appointmentsListEl.innerHTML = items.map(item => {
+  items.map(item => {
+const client = clients.find(c => c.id === item.client_id);
   const filled = isAppointmentFilled(item);
-  const addressLine = buildAddressLine(item);
+  const addressLine = client
+ ? `${client.address || ""} ${client.city || ""}`.trim()
+ : "";
   const mapsLink = buildMapsLink(addressLine);
 
   return `
@@ -354,7 +357,7 @@ function renderWeekPlanning(appointments) {
     card.onclick = () => {
       const dayAppointments = appointments.filter(item => item.appointment_date === dateString);
       todayDateLabelEl.textContent = formatDutchDate(dateObj);
-      renderAppointments(dayAppointments);
+      renderAppointments(dayAppointments, clients);
 
       weekdayCards.forEach(btn => btn.classList.remove("active"));
       card.classList.add("active");
@@ -382,6 +385,11 @@ async function loadDashboard() {
       .order("appointment_date", { ascending: true })
       .order("appointment_time", { ascending: true });
 
+      const { data: clientsData } = await supabaseClient
+  .from("Clients")
+  .select("*")
+  .eq("owner_id", currentUser.id);
+
     if (error) {
       console.error("Supabase fout:", error);
       appointmentsListEl.innerHTML = `
@@ -393,6 +401,7 @@ async function loadDashboard() {
     }
 
     const appointments = data || [];
+    const clients = clientsData || [];
     allAppointmentsCache = appointments;
 
     const todayAppointments = appointments.filter(item => item.appointment_date === today);
