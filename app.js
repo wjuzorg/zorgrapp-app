@@ -124,6 +124,17 @@ function toDateString(date) {
   return `${year}-${month}-${day}`;
 }
 
+function buildAddressLine(item) {
+  return [item.address, item.postal_code, item.city]
+    .filter(Boolean)
+    .join(", ");
+}
+
+function buildMapsLink(address) {
+  if (!address) return "#";
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+}
+
 function getStartOfWeek(date, offset = 0) {
   const d = new Date(date);
   const day = d.getDay();
@@ -262,38 +273,53 @@ function renderAppointments(items) {
   }
 
   appointmentsListEl.innerHTML = items.map(item => {
-    const filled = isAppointmentFilled(item);
+  const filled = isAppointmentFilled(item);
+  const addressLine = buildAddressLine(item);
+  const mapsLink = buildMapsLink(addressLine);
 
-    return `
-      <article class="appointment-card">
-        <div class="appointment-top">
-          <div>
-            <div class="appointment-time">${item.appointment_time || "-"}</div>
-            <h4 class="appointment-name">${item.client_name || "Onbekende cliënt"}</h4>
-            <div class="appointment-service">${item.service_type || "Geen diensttype"}</div>
-          </div>
-          ${getStatusLabel(item)}
+  return `
+    <article class="appointment-card">
+      <div class="appointment-top">
+        <div>
+          <div class="appointment-time">${item.appointment_time || "-"}</div>
+          <h4 class="appointment-name">${item.client_name || "Onbekende cliënt"}</h4>
+          <div class="appointment-service">${item.service_type || "Geen diensttype"}</div>
         </div>
+        ${getStatusLabel(item)}
+      </div>
 
-        <div class="card-note">
-          ${item.signal_notes ? `Signaal: ${item.signal_notes}` : "Nog geen signalering toegevoegd."}
+      <div class="route-mini-card">
+        <div class="route-mini-left">
+          <div class="route-mini-label">Adres</div>
+          <div class="route-mini-address">${addressLine || "Adres nog niet ingevuld"}</div>
         </div>
+        ${
+          addressLine
+            ? `<a class="route-mini-btn" href="${mapsLink}" target="_blank" rel="noopener noreferrer" aria-label="Open route in Google Maps">🧭</a>`
+            : ``
+        }
+      </div>
 
-        <div class="card-actions">
-          <button class="btn btn-secondary" onclick="window.location.href='./invullen.html?id=${item.id}'">
-            Invullen
-          </button>
-          <button class="btn btn-outline"
-onclick="window.location.href='./clientkaart.html?id=${item.client_id}'">
-Cliëntenkaart
-</button>
-          <button class="btn btn-finish ${filled ? "enabled" : ""}">
-            Afronden
-          </button>
-        </div>
-      </article>
-    `;
-  }).join("");
+      <div class="card-note">
+        ${item.signal_notes ? `Signaal: ${item.signal_notes}` : "Nog geen signalering toegevoegd."}
+      </div>
+
+      <div class="card-actions">
+        <button class="btn btn-secondary" onclick="window.location.href='./invullen.html?id=${item.id}'">
+          Invullen
+        </button>
+
+        <button class="btn btn-outline" onclick="window.location.href='./clientkaart.html?id=${item.client_id}'">
+          Cliëntenkaart
+        </button>
+
+        <button class="btn btn-finish ${filled ? "enabled" : ""}">
+          Afronden
+        </button>
+      </div>
+    </article>
+  `;
+}).join("");
 }
 
 function renderWeekPlanning(appointments) {
