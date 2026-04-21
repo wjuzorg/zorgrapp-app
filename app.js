@@ -262,7 +262,7 @@ async function setWelcomeText(user) {
   }
 }
 
-function renderAppointments(items, clients) {
+function renderAppointments(items, clients = []) {
   if (!items.length) {
     appointmentsListEl.innerHTML = `
       <div class="empty-state">
@@ -272,60 +272,62 @@ function renderAppointments(items, clients) {
     return;
   }
 
-  items.map(item => {
-const client = clients.find(c => c.id === item.client_id);
-  const filled = isAppointmentFilled(item);
-  const addressLine = client
- ? `${client.address || ""} ${client.city || ""}`.trim()
- : "";
-  const mapsLink = buildMapsLink(addressLine);
+  appointmentsListEl.innerHTML = items.map(item => {
+    const client = clients.find(c => c.id === item.client_id);
+    const filled = isAppointmentFilled(item);
 
-  return `
-    <article class="appointment-card">
-      <div class="appointment-top">
-        <div>
-          <div class="appointment-time">${item.appointment_time || "-"}</div>
-          <h4 class="appointment-name">${item.client_name || "Onbekende cliënt"}</h4>
-          <div class="appointment-service">${item.service_type || "Geen diensttype"}</div>
+    const addressLine = client
+      ? [client.address, client.postal_code, client.city].filter(Boolean).join(", ")
+      : "";
+
+    const mapsLink = buildMapsLink(addressLine);
+
+    return `
+      <article class="appointment-card">
+        <div class="appointment-top">
+          <div>
+            <div class="appointment-time">${item.appointment_time || "-"}</div>
+            <h4 class="appointment-name">${item.client_name || "Onbekende cliënt"}</h4>
+            <div class="appointment-service">${item.service_type || "Geen diensttype"}</div>
+          </div>
+          ${getStatusLabel(item)}
         </div>
-        ${getStatusLabel(item)}
-      </div>
 
-      <div class="route-mini-card">
-        <div class="route-mini-left">
-          <div class="route-mini-label">Adres</div>
-          <div class="route-mini-address">${addressLine || "Adres nog niet ingevuld"}</div>
+        <div class="route-mini-card">
+          <div class="route-mini-left">
+            <div class="route-mini-label">Adres</div>
+            <div class="route-mini-address">${addressLine || "Adres nog niet ingevuld"}</div>
+          </div>
+          ${
+            addressLine
+              ? `<a class="route-mini-btn" href="${mapsLink}" target="_blank" rel="noopener noreferrer" aria-label="Open route in Google Maps">🧭</a>`
+              : ``
+          }
         </div>
-        ${
-          addressLine
-            ? `<a class="route-mini-btn" href="${mapsLink}" target="_blank" rel="noopener noreferrer" aria-label="Open route in Google Maps">🧭</a>`
-            : ``
-        }
-      </div>
 
-      <div class="card-note">
-        ${item.signal_notes ? `Signaal: ${item.signal_notes}` : "Nog geen signalering toegevoegd."}
-      </div>
+        <div class="card-note">
+          ${item.signal_notes ? `Signaal: ${item.signal_notes}` : "Nog geen signalering toegevoegd."}
+        </div>
 
-      <div class="card-actions">
-        <button class="btn btn-secondary" onclick="window.location.href='./invullen.html?id=${item.id}'">
-          Invullen
-        </button>
+        <div class="card-actions">
+          <button class="btn btn-secondary" onclick="window.location.href='./invullen.html?id=${item.id}'">
+            Invullen
+          </button>
 
-        <button class="btn btn-outline" onclick="window.location.href='./clientkaart.html?id=${item.client_id}'">
-          Cliëntenkaart
-        </button>
+          <button class="btn btn-outline" onclick="window.location.href='./clientkaart.html?id=${item.client_id}'">
+            Cliëntenkaart
+          </button>
 
-        <button class="btn btn-finish ${filled ? "enabled" : ""}">
-          Afronden
-        </button>
-      </div>
-    </article>
-  `;
-}).join("");
+          <button class="btn btn-finish ${filled ? "enabled" : ""}">
+            Afronden
+          </button>
+        </div>
+      </article>
+    `;
+  }).join("");
 }
 
-function renderWeekPlanning(appointments) {
+function renderWeekPlanning(appointments, clients) {
   const today = new Date();
   const startOfWeek = getStartOfWeek(today, currentWeekOffset);
   const weekDates = [];
@@ -447,8 +449,8 @@ const activeSignalClients = Object.values(signalCountByClient)
     signalCountEl.textContent = String(activeSignalClients);
     invoiceTotalEl.textContent = "€0";
 
-    renderAppointments(todayAppointments);
-    renderWeekPlanning(appointments);
+    renderAppointments(todayAppointments, clients);
+    renderWeekPlanning(appointments, clients);
   } catch (err) {
     console.error("Algemene fout:", err);
     appointmentsListEl.innerHTML = `
