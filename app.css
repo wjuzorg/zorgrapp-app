@@ -1168,69 +1168,71 @@ body {
   .invoice-summary {
     grid-template-columns: 1fr;
   }
+}
 
   .topbar {
     align-items: flex-start;
     gap: 14px;
   }
-  .section-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 16px;
-  margin-bottom: 16px;
+
+  /* FACTUREN RIJEN - ALTIJD ALS LAATSTE LATEN STAAN */
+.section-head {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: flex-start !important;
+  gap: 16px !important;
+  margin-bottom: 16px !important;
 }
 
 .section-head p {
-  margin: 6px 0 0;
-  color: var(--muted);
+  margin: 6px 0 0 !important;
+  color: var(--muted) !important;
 }
 
 .invoice-row {
-  display: grid;
-  grid-template-columns: 1.8fr 1fr 1fr auto auto;
-  align-items: center;
-  gap: 14px;
-  padding: 14px 0;
-  border-top: 1px solid var(--line);
+  display: grid !important;
+  grid-template-columns: 1.8fr 1fr 1fr auto auto !important;
+  align-items: center !important;
+  gap: 14px !important;
+  padding: 14px 0 !important;
+  border-top: 1px solid var(--line) !important;
 }
 
 .invoice-row small {
-  color: var(--muted);
+  color: var(--muted) !important;
 }
 
 .small-btn,
 .light-btn,
 .dark-btn {
-  border-radius: 12px;
-  padding: 10px 14px;
-  font-weight: 700;
-  cursor: pointer;
-  border: 1px solid var(--line);
+  border-radius: 12px !important;
+  padding: 10px 14px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  border: 1px solid var(--line) !important;
 }
 
 .small-btn,
 .light-btn {
-  background: white;
-  color: var(--text);
+  background: white !important;
+  color: var(--text) !important;
 }
 
 .dark-btn {
-  background: #111827;
-  color: white;
-  border-color: #111827;
+  background: #111827 !important;
+  color: white !important;
+  border-color: #111827 !important;
 }
 
 @media (max-width: 760px) {
   .invoice-row {
-    grid-template-columns: 1fr;
-    align-items: stretch;
+    grid-template-columns: 1fr !important;
+    align-items: stretch !important;
   }
 
   .small-btn,
   .light-btn,
   .dark-btn {
-    width: 100%;
+    width: 100% !important;
   }
-}
 }
