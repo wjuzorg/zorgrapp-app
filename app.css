@@ -1315,3 +1315,10 @@ body {
  bottom:0;
  z-index:20;
 }
+
+.preview-note{
+  margin-top:16px;
+  text-align:center;
+  color:#6b7280;
+  font-size:14px;
+}

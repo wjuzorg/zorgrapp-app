@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Factuur bekijken</title>
+<link rel="stylesheet" href="app.css?v=110">
+</head>
+
+<body>
+<main class="container">
+
+<header class="topbar">
+  <div>
+    <h1>Factuur</h1>
+    <p>Controleer, pas aan en sla op als PDF.</p>
+  </div>
+
+  <button onclick="window.location.href='facturen.html'" class="secondary-btn">
+    Terug naar facturen
+  </button>
+</header>
+
+<section class="invoice-section">
+
+<div class="preview-top">
+  <div>
+    <h2>ZorgInzicht</h2>
+    <p>Factuurnummer: #2026-0031</p>
+    <p>Factuurdatum: 24-04-2026</p>
+  </div>
+
+  <div class="preview-right">
+    <strong>Te betalen</strong>
+    <span>€110,00</span>
+  </div>
+</div>
+
+<hr>
+
+<div class="client-block">
+  <strong>Factuur aan:</strong><br>
+  De heer Ahmed<br>
+  Utrecht<br>
+  ahmed@email.nl
+</div>
+
+<table class="invoice-table">
+<tr>
+  <th>Omschrijving</th>
+  <th>Minuten</th>
+  <th>Bedrag</th>
+</tr>
+
+<tr>
+  <td>Praktische ondersteuning aan huis</td>
+  <td>220</td>
+  <td>€110,00</td>
+</tr>
+</table>
+
+<div class="invoice-total">
+  <span>Totaal</span>
+  <strong>€110,00</strong>
+</div>
+
+<div class="btw-note">
+BTW vrijgesteld van omzetbelasting volgens geldende vrijstelling.
+</div>
+
+<div class="preview-actions">
+  <button onclick="window.print()" class="dark-btn">
+    Opslaan / Print PDF
+  </button>
+
+  <button onclick="window.location.href='facturen.html'" class="light-btn">
+    Terug
+  </button>
+</div>
+
+  <p class="preview-note">
+Verzonden facturen blijven terug te vinden in Maandrapportage Facturen.
+</p>
+
+</section>
+
+</main>
+</body>
+</html>
