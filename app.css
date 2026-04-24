@@ -1104,25 +1104,4 @@ body {
   border: 1px solid #e5e7eb;
   font-size: 20px;
 }
-
-.facturen-card {
-  text-decoration: none;
-  color: inherit;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.facturen-card h3,
-.facturen-card span {
-  text-decoration: none;
-  color: inherit;
-}
-
-.facturen-card:hover,
-.facturen-card:visited,
-.facturen-card:active {
-  color: inherit;
-  text-decoration: none;
-}
 }
