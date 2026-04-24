@@ -67,7 +67,7 @@ async function loadAppointment() {
   }
 
   const { data, error } = await supabaseClient
-    .from("Appointments")
+    .from("appointments")
     .select("*")
     .eq("id", appointmentId)
     .eq("owner_id", currentUser.id)
@@ -111,7 +111,7 @@ async function saveAppointment(statusValue = "open") {
   };
 
   const { error } = await supabaseClient
-    .from("Appointments")
+    .from("appointments")
     .update(payload)
     .eq("id", appointmentId)
     .eq("owner_id", currentUser.id);
@@ -154,7 +154,7 @@ deleteAppointmentBtn.addEventListener("click", async () => {
   if (!confirmed) return;
 
   const { error } = await supabaseClient
-    .from("Appointments")
+    .from("appointments")
     .update({
       status: "verwijderd",
       deleted_at: new Date().toISOString(),
