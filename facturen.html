@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Facturen - ZorgInzicht</title>
-  <link rel="stylesheet" href="app.css?v=3" />
+  <link rel="stylesheet" href="app.css?v=4" />
 </head>
 
 <body>
@@ -12,8 +12,9 @@
     <header class="topbar">
       <div>
         <h1>Facturen</h1>
-        <p>Overzicht van afgeronde afspraken die gefactureerd kunnen worden.</p>
+        <p>Overzicht van facturen, betalingen en openstaande bedragen.</p>
       </div>
+
       <button onclick="window.location.href='dashboard.html'" class="secondary-btn">
         Terug naar dashboard
       </button>
@@ -22,36 +23,83 @@
     <section class="invoice-summary">
       <div class="summary-card">
         <span>Klaar om te verzenden</span>
-        <strong id="readyTotal">€0,00</strong>
+        <strong id="readyTotal">€420,00</strong>
+        <small>3 facturen</small>
       </div>
 
       <div class="summary-card">
-        <span>Openstaand</span>
-        <strong id="openTotal">€0,00</strong>
+        <span>Wacht op betaling</span>
+        <strong id="openTotal">€580,00</strong>
+        <small>4 facturen</small>
       </div>
 
       <div class="summary-card warning">
         <span>Herinnering nodig</span>
-        <strong id="reminderTotal">€0,00</strong>
+        <strong id="reminderTotal">€145,00</strong>
+        <small>2 facturen</small>
       </div>
     </section>
 
     <section class="invoice-section">
-      <h2>Klaar om te verzenden</h2>
-      <div id="readyInvoices" class="invoice-list"></div>
+      <div class="section-head">
+        <div>
+          <h2>Klaar om te verzenden</h2>
+          <p>Facturen die klaar staan om te verzenden naar de cliënt.</p>
+        </div>
+        <button class="small-btn">Alles bekijken</button>
+      </div>
+
+      <div class="invoice-row">
+        <div><strong>Mevrouw Janssen</strong><br><small>April 2026 · 3 afspraken</small></div>
+        <span>210 minuten</span>
+        <strong>€105,00</strong>
+        <button class="light-btn">Factuur bekijken</button>
+        <button class="dark-btn">Verzenden</button>
+      </div>
+
+      <div class="invoice-row">
+        <div><strong>Meneer de Vries</strong><br><small>April 2026 · 2 afspraken</small></div>
+        <span>150 minuten</span>
+        <strong>€75,00</strong>
+        <button class="light-btn">Factuur bekijken</button>
+        <button class="dark-btn">Verzenden</button>
+      </div>
     </section>
 
     <section class="invoice-section">
-      <h2>Openstaande facturen</h2>
-      <div id="openInvoices" class="invoice-list"></div>
+      <div class="section-head">
+        <div>
+          <h2>Wacht op betaling</h2>
+          <p>Facturen die verzonden zijn en nog niet betaald.</p>
+        </div>
+        <button class="small-btn">Alles bekijken</button>
+      </div>
+
+      <div class="invoice-row">
+        <div><strong>De heer Ahmed</strong><br><small>Factuur #2026-0031</small></div>
+        <span>220 minuten</span>
+        <strong>€110,00</strong>
+        <button class="light-btn">Bekijk factuur</button>
+      </div>
     </section>
 
     <section class="invoice-section">
-      <h2>Herinnering nodig</h2>
-      <div id="reminderInvoices" class="invoice-list"></div>
+      <div class="section-head">
+        <div>
+          <h2>Herinnering nodig</h2>
+          <p>Facturen die langer dan 14 dagen open staan.</p>
+        </div>
+        <button class="small-btn">Alles bekijken</button>
+      </div>
+
+      <div class="invoice-row">
+        <div><strong>Pieter Willems</strong><br><small>Factuur #2026-0027</small></div>
+        <span>160 minuten</span>
+        <strong>€80,00</strong>
+        <button class="light-btn">Bekijk factuur</button>
+        <button class="light-btn">Herinnering versturen</button>
+      </div>
     </section>
   </main>
-
-  <script src="facturen.js"></script>
 </body>
 </html>
