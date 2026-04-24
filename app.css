@@ -1104,4 +1104,28 @@ body {
   border: 1px solid #e5e7eb;
   font-size: 20px;
 }
+
+.today {
+  width: 100% !important;
+  max-width: none !important;
+  display: block !important;
+}
+
+.today > div:first-child {
+  width: 100% !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+}
+
+#appointmentsList,
+.appointments-list {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+.empty-state {
+  width: 100% !important;
+  max-width: none !important;
+}
 }
