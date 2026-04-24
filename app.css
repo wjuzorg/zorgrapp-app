@@ -1173,5 +1173,64 @@ body {
     align-items: flex-start;
     gap: 14px;
   }
+  .section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.section-head p {
+  margin: 6px 0 0;
+  color: var(--muted);
+}
+
+.invoice-row {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr 1fr auto auto;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+}
+
+.invoice-row small {
+  color: var(--muted);
+}
+
+.small-btn,
+.light-btn,
+.dark-btn {
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid var(--line);
+}
+
+.small-btn,
+.light-btn {
+  background: white;
+  color: var(--text);
+}
+
+.dark-btn {
+  background: #111827;
+  color: white;
+  border-color: #111827;
+}
+
+@media (max-width: 760px) {
+  .invoice-row {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .small-btn,
+  .light-btn,
+  .dark-btn {
+    width: 100%;
+  }
 }
 }
