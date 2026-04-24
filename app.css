@@ -1035,6 +1035,7 @@ body {
   .contact-notes-layout {
     grid-template-columns: 1fr;
   }
+} 
 
   @media (max-width: 560px) {
   .profile-menu-wrap {
