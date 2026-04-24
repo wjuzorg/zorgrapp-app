@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Facturen - ZorgInzicht</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <main class="container">
+    <header class="topbar">
+      <div>
+        <h1>Facturen</h1>
+        <p>Overzicht van afgeronde afspraken die gefactureerd kunnen worden.</p>
+      </div>
+      <button onclick="window.location.href='dashboard.html'" class="secondary-btn">
+        Terug naar dashboard
+      </button>
+    </header>
+
+    <section class="invoice-summary">
+      <div class="summary-card">
+        <span>Klaar om te verzenden</span>
+        <strong id="readyTotal">€0,00</strong>
+      </div>
+
+      <div class="summary-card">
+        <span>Openstaand</span>
+        <strong id="openTotal">€0,00</strong>
+      </div>
+
+      <div class="summary-card warning">
+        <span>Herinnering nodig</span>
+        <strong id="reminderTotal">€0,00</strong>
+      </div>
+    </section>
+
+    <section class="invoice-section">
+      <h2>Klaar om te verzenden</h2>
+      <div id="readyInvoices" class="invoice-list"></div>
+    </section>
+
+    <section class="invoice-section">
+      <h2>Openstaande facturen</h2>
+      <div id="openInvoices" class="invoice-list"></div>
+    </section>
+
+    <section class="invoice-section">
+      <h2>Herinnering nodig</h2>
+      <div id="reminderInvoices" class="invoice-list"></div>
+    </section>
+  </main>
+
+  <script src="facturen.js"></script>
+</body>
+</html>
