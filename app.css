@@ -1309,3 +1309,9 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+.bottom-nav{
+ position:sticky;
+ bottom:0;
+ z-index:20;
+}
