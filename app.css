@@ -1104,4 +1104,23 @@ body {
   border: 1px solid #e5e7eb;
   font-size: 20px;
 }
+
+.dashboard-card-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.dashboard-card-link:visited {
+  color: inherit;
+}
+
+.dashboard-card-link:hover {
+  transform: translateY(-1px);
+}
+
+.dashboard-card-link:active {
+  transform: scale(0.99);
+}
+
 }
