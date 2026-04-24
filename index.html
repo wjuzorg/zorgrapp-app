@@ -31,49 +31,47 @@
 </div>
   </header>
 
-  <section class="welcome">
-    <h2 id="welcomeTitle">Goedemorgen</h2>
-    <p id="welcomeText">Laden...</p>
-  </section>
+ <section class="welcome">
+  <h2 id="welcomeTitle">Goedemorgen</h2>
+  <p id="welcomeText">Laden...</p>
+</section>
 
-  <section class="stats">
-    <div class="card dark" id="btnNewClient">
-      <h3>Nieuwe cliënt</h3>
-      <span>+</span>
-    </div>
+<section class="stats">
+  <div class="card dark" id="btnNewClient">
+    <h3>Nieuwe cliënt</h3>
+    <span>+</span>
+  </div>
 
-    <div class="card">
-      <h3>Afspraken vandaag</h3>
-      <span id="todayCount">0</span>
-    </div>
+  <div class="card">
+    <h3>Afspraken vandaag</h3>
+    <span id="todayCount">0</span>
+  </div>
 
-    <div class="card orange">
-      <h3>Actiesignalen</h3>
-      <span id="signalCount">0</span>
-    </div>
+  <div class="card orange">
+    <h3>Actiesignalen</h3>
+    <span id="signalCount">0</span>
+  </div>
 
-   <div class="card blue" onclick="window.location.href='./facturen.html'" style="cursor:pointer;">
-  <h3>Facturen</h3>
-  <span id="invoiceTotal">€0</span>
-</div>
+  <div class="card blue" onclick="window.location.href='./facturen.html'" style="cursor:pointer;">
+    <h3>Facturen</h3>
+    <span id="invoiceTotal">€0</span>
+  </div>
+</section>
 
-  <section class="today">
-    <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:18px;">
-      <h2 style="margin:0;">Vandaag</h2>
-      <div class="userbox" id="todayDateLabel">Vandaag</div>
-    </div>
+<section class="today">
+  <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:18px;">
+    <h2 style="margin:0;">Vandaag</h2>
+    <div class="userbox" id="todayDateLabel">Vandaag</div>
+  </div>
 
-    <div id="appointmentsList" class="empty-state">
-      Afspraken laden...
-    </div>
-  </section>
-
-</div>
+  <div id="appointmentsList" class="empty-state">
+    Afspraken laden...
+  </div>
+</section>
 
 <section class="weekbar compact-weekbar">
   <div class="weekbar-header compact-weekbar-header">
     <h3>Weekplanning</h3>
-
     <div class="week-nav">
       <button class="week-nav-btn" id="prevWeekBtn" type="button">‹</button>
       <span id="weekRangeLabel">Week laden...</span>
