@@ -58,33 +58,9 @@ profileDropdown?.addEventListener("click", (e) => {
   e.stopPropagation();
 });
 
-menuProfile?.addEventListener("click", async () => {
-  const { data } = await supabaseClient.auth.getSession();
-  const user = data.session?.user;
-
+menuProfile?.addEventListener("click", () => {
   profileDropdown?.classList.add("hidden");
-
-  if (!user) {
-    window.location.href = "./login.html";
-    return;
-  }
-
-  alert(
-    "Mijn profiel\n\n" +
-    "E-mail: " + user.email + "\n\n" +
-    "Hier komt straks een nette profielpagina."
-  );
-});
-
-menuPassword?.addEventListener("click", () => {
-  profileDropdown?.classList.add("hidden");
-  alert("Hier komt straks: wachtwoord wijzigen.");
-});
-
-menuLogout?.addEventListener("click", async () => {
-  profileDropdown?.classList.add("hidden");
-  await supabaseClient.auth.signOut();
-  window.location.href = "./login.html";
+  window.location.href = "./bedrijfsprofiel.html";
 });
 
 prevWeekBtn?.addEventListener("click", () => {

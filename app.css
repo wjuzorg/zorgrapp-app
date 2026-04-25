@@ -1350,3 +1350,14 @@ body {
   }
 }
 
+.profile-back-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 14px;
+}
+
+.profile-back-links .page-link {
+  margin-top: 0;
+}
+
