@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bedrijfsprofiel - ZorgInzicht</title>
+  <link rel="stylesheet" href="app.css?v=120" />
+</head>
+
+<body>
+  <main class="container">
+    <header class="topbar">
+      <div>
+        <h1>Bedrijfsprofiel</h1>
+        <p>Gegevens voor facturen en bedrijfsinstellingen.</p>
+      </div>
+
+      <button onclick="window.location.href='facturen.html'" class="secondary-btn">
+        Terug naar facturen
+      </button>
+    </header>
+
+    <section class="form-card">
+      <div class="form-title-wrap">
+        <h2>Bedrijfsgegevens</h2>
+        <p>Deze gegevens worden later automatisch gebruikt op de factuur.</p>
+      </div>
+
+      <div class="section">
+        <h3>Algemeen</h3>
+
+        <label class="form-label" for="company_name">Bedrijfsnaam</label>
+        <input id="company_name" class="form-input" type="text" placeholder="Bijvoorbeeld: ZorgInzicht / WJU Zorg">
+
+        <label class="form-label" for="owner_name">Naam ondernemer</label>
+        <input id="owner_name" class="form-input" type="text" placeholder="Naam ZZP'er">
+
+        <label class="form-label" for="kvk_number">KVK-nummer</label>
+        <input id="kvk_number" class="form-input" type="text" placeholder="Bijvoorbeeld: 12345678">
+
+        <label class="form-label" for="btw_number">BTW-nummer</label>
+        <input id="btw_number" class="form-input" type="text" placeholder="Optioneel">
+      </div>
+
+      <div class="section">
+        <h3>Factuurgegevens</h3>
+
+        <label class="form-label" for="iban">Rekeningnummer / IBAN</label>
+        <input id="iban" class="form-input" type="text" placeholder="NL00 BANK 0000 0000 00">
+
+        <label class="form-label" for="hourly_rate">Standaard uurtarief</label>
+        <input id="hourly_rate" class="form-input" type="number" placeholder="Bijvoorbeeld: 50">
+
+        <label class="form-label" for="payment_term_days">Betaaltermijn in dagen</label>
+        <input id="payment_term_days" class="form-input" type="number" value="14">
+
+        <label class="form-label" for="vat_status">BTW-instelling</label>
+        <select id="vat_status" class="form-input">
+          <option value="">Kies btw-instelling</option>
+          <option value="vrijgesteld">BTW vrijgesteld</option>
+          <option value="verlegd">BTW verlegd</option>
+          <option value="geen">Geen btw vermelden</option>
+        </select>
+
+        <label class="form-label" for="vat_text">BTW-tekst op factuur</label>
+        <textarea id="vat_text" class="form-textarea" rows="3">BTW vrijgesteld van omzetbelasting volgens geldende vrijstelling.</textarea>
+      </div>
+
+      <div class="section">
+        <h3>Contactgegevens</h3>
+
+        <label class="form-label" for="company_email">E-mailadres</label>
+        <input id="company_email" class="form-input" type="email" placeholder="info@bedrijf.nl">
+
+        <label class="form-label" for="company_phone">Telefoonnummer</label>
+        <input id="company_phone" class="form-input" type="text" placeholder="06...">
+
+        <label class="form-label" for="company_address">Adres</label>
+        <input id="company_address" class="form-input" type="text" placeholder="Straat en huisnummer">
+
+        <div class="form-grid-two">
+          <div>
+            <label class="form-label" for="company_postcode">Postcode</label>
+            <input id="company_postcode" class="form-input" type="text" placeholder="1234 AB">
+          </div>
+
+          <div>
+            <label class="form-label" for="company_city">Plaats</label>
+            <input id="company_city" class="form-input" type="text" placeholder="Utrecht">
+          </div>
+        </div>
+      </div>
+
+      <div class="action-stack">
+        <button class="btn btn-primary" type="button">
+          Bedrijfsprofiel opslaan
+        </button>
+
+        <a href="facturen.html" class="page-link">
+          ← Terug naar facturen
+        </a>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
