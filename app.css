@@ -1323,3 +1323,30 @@ body {
   font-size:14px;
 }
 
+.settings-nav {
+  margin: 0 0 22px;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  padding: 10px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.settings-nav button {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 13px 10px;
+  font-weight: 800;
+  color: #1f2937;
+  cursor: pointer;
+}
+
+@media (max-width: 560px) {
+  .settings-nav {
+    grid-template-columns: 1fr;
+  }
+}
+
