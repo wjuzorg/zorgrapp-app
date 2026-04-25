@@ -59,8 +59,18 @@ profileDropdown?.addEventListener("click", (e) => {
 });
 
 menuProfile?.addEventListener("click", () => {
-  profileDropdown?.classList.add("hidden");
   window.location.href = "./bedrijfsprofiel.html";
+});
+
+menuPassword?.addEventListener("click", () => {
+  profileDropdown?.classList.add("hidden");
+  alert("Wachtwoord wijzigen komt later.");
+});
+
+menuLogout?.addEventListener("click", async () => {
+  profileDropdown?.classList.add("hidden");
+  await supabaseClient.auth.signOut();
+  window.location.href = "./login.html";
 });
 
 prevWeekBtn?.addEventListener("click", () => {

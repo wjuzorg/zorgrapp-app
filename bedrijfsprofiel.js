@@ -18,6 +18,7 @@ const fields = [
   "company_address",
   "company_postcode",
   "company_city"
+  "bookkeeping_email"
 ];
 
 let currentUser = null;
@@ -105,6 +106,7 @@ async function saveBusinessProfile() {
     company_address: el("company_address").value.trim(),
     company_postcode: el("company_postcode").value.trim(),
     company_city: el("company_city").value.trim(),
+    bookkeeping_email: el("bookkeeping_email").value.trim(),
 
     updated_at: new Date().toISOString()
   };
