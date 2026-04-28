@@ -71,9 +71,20 @@
   BTW-tekst laden...
 </div>
 
+<div class="bookkeeping-check">
+  <label>
+    <input type="checkbox" id="sendToBookkeeping">
+    Ook kopie naar boekhouding sturen
+  </label>
+</div>
+
 <div class="preview-actions">
   <button onclick="window.print()" class="dark-btn">
     Opslaan / Print PDF
+  </button>
+
+  <button onclick="chooseSendMethod()" class="mint-btn">
+    Verzenden
   </button>
 
   <button onclick="window.location.href='facturen.html'" class="light-btn">

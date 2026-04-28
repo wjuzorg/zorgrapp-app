@@ -68,3 +68,37 @@ async function loadBusinessProfile() {
 }
 
 document.addEventListener("DOMContentLoaded", initInvoicePreview);
+
+function chooseSendMethod() {
+  const sendBookkeeping = document.getElementById("sendToBookkeeping")?.checked;
+
+  const choice = confirm(
+    sendBookkeeping
+      ? "Factuur verzenden naar cliënt én kopie naar boekhouding?"
+      : "Factuur verzenden naar cliënt?"
+  );
+
+  if (!choice) return;
+
+  const method = prompt(
+    "Hoe wilt u verzenden?\n\nTyp: email\nof typ: post"
+  );
+
+  if (!method) return;
+
+  if (method.toLowerCase() === "email") {
+    alert(
+      sendBookkeeping
+        ? "Factuur wordt later per e-mail verzonden met kopie naar boekhouding."
+        : "Factuur wordt later per e-mail verzonden."
+    );
+  } else if (method.toLowerCase() === "post") {
+    alert(
+      sendBookkeeping
+        ? "Factuur wordt gemarkeerd voor postverzending met kopie naar boekhouding."
+        : "Factuur wordt gemarkeerd voor postverzending."
+    );
+  } else {
+    alert("Kies email of post.");
+  }
+}
