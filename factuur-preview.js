@@ -6,13 +6,13 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let currentUser = null;
 
 function setText(id, value) {
-  const el = document.getElementById(id);
-  if (el) el.textContent = value || "";
+  const element = document.getElementById(id);
+  if (element) element.textContent = value || "";
 }
 
 function getText(id) {
-  const el = document.getElementById(id);
-  return el ? el.textContent.trim() : "";
+  const element = document.getElementById(id);
+  return element ? element.textContent.trim() : "";
 }
 
 function formatToday() {
@@ -22,9 +22,14 @@ function formatToday() {
 async function initInvoicePreview() {
   const { data, error } = await supabaseClient.auth.getSession();
 
-  if (error || !data.session || !data.session.user) {
-    alert("U bent niet ingelogd. Log opnieuw in.");
-    window.location.href = "login.html";
+  if (error) {
+    console.error("Sessie fout:", error.message);
+    alert("Sessie controleren mislukt. Log opnieuw in.");
+    return;
+  }
+
+  if (!data.session || !data.session.user) {
+    alert("U bent niet ingelogd. Ga terug naar het dashboard en log opnieuw in.");
     return;
   }
 
@@ -44,11 +49,19 @@ async function loadBusinessProfile() {
     .maybeSingle();
 
   if (error) {
+    console.error("Bedrijfsprofiel laden mislukt:", error.message);
     alert("Bedrijfsprofiel laden mislukt: " + error.message);
     return;
   }
 
-  if (!data) return;
+  if (!data) {
+    setText("companyName", "Bedrijfsprofiel nog niet ingevuld");
+    setText("companyOwner", "");
+    setText("companyKvk", "");
+    setText("companyIban", "");
+    setText("invoiceVatText", "Vul eerst uw bedrijfsprofiel in.");
+    return;
+  }
 
   setText("companyName", data.company_name || "Bedrijfsnaam");
   setText("companyOwner", data.owner_name || "");
@@ -74,25 +87,27 @@ function enableInvoiceEdit() {
 
 async function saveInvoiceDraft() {
   if (!currentUser) {
-    alert("Geen gebruiker gevonden.");
+    alert("Geen ingelogde gebruiker gevonden. Open opnieuw via het dashboard.");
     return;
   }
 
   const invoiceNumber = getText("invoiceNumber") || "#2026-TEST";
 
-  const amountNumber = Number(
-    getText("invoiceAmount")
-      .replace("€", "")
-      .replace(",", ".")
-      .trim()
-  ) || 0;
+  const amountNumber =
+    Number(
+      getText("invoiceAmount")
+        .replace("€", "")
+        .replace(",", ".")
+        .trim()
+    ) || 0;
 
-  const totalNumber = Number(
-    getText("invoiceTotal")
-      .replace("€", "")
-      .replace(",", ".")
-      .trim()
-  ) || amountNumber;
+  const totalNumber =
+    Number(
+      getText("invoiceTotal")
+        .replace("€", "")
+        .replace(",", ".")
+        .trim()
+    ) || amountNumber;
 
   const payload = {
     owner_id: currentUser.id,
@@ -117,6 +132,7 @@ async function saveInvoiceDraft() {
     .upsert(payload, { onConflict: "owner_id,invoice_number" });
 
   if (error) {
+    console.error("Opslaan mislukt:", error.message);
     alert("Opslaan mislukt: " + error.message);
     return;
   }
@@ -125,6 +141,8 @@ async function saveInvoiceDraft() {
 }
 
 async function loadInvoiceDraft() {
+  if (!currentUser) return;
+
   const invoiceNumber = getText("invoiceNumber") || "#2026-TEST";
 
   const { data, error } = await supabaseClient
@@ -148,12 +166,20 @@ async function loadInvoiceDraft() {
   setText("invoiceClientEmail", data.client_email);
   setText("invoiceDescription", data.description);
   setText("invoiceMinutes", data.minutes ? String(data.minutes) : "");
-  setText("invoiceAmount", data.amount ? `€${Number(data.amount).toFixed(2).replace(".", ",")}` : "");
-  setText("invoiceTotal", data.total ? `€${Number(data.total).toFixed(2).replace(".", ",")}` : "");
+  setText(
+    "invoiceAmount",
+    data.amount ? `€${Number(data.amount).toFixed(2).replace(".", ",")}` : ""
+  );
+  setText(
+    "invoiceTotal",
+    data.total ? `€${Number(data.total).toFixed(2).replace(".", ",")}` : ""
+  );
 }
 
 function chooseSendMethod() {
-  const sendBookkeeping = document.getElementById("sendToBookkeeping")?.checked;
+  const sendBookkeeping =
+    document.getElementById("sendToBookkeeping")?.checked ||
+    document.getElementById("sendAccountingCopy")?.checked;
 
   const choice = confirm(
     sendBookkeeping
