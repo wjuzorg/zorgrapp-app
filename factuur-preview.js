@@ -1,5 +1,5 @@
 const SUPABASE_URL = "https://bqqoxawgjxxvolljkqnp.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxcW94YXdnanh4dm9sbGprcW5wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODc0OTMsImV4cCI6MjA5MjA2MzQ5M30.WLTELxD32HFtyV1pbsB-60nF_k4Zq7DSvaR87-kj2es";
+const SUPABASE_ANON_KEY = "JOUW_ANON_KEY_HIER";
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -8,6 +8,11 @@ let currentUser = null;
 function setText(id, value) {
   const el = document.getElementById(id);
   if (el) el.textContent = value || "";
+}
+
+function getText(id) {
+  const el = document.getElementById(id);
+  return el ? el.textContent.trim() : "";
 }
 
 function formatToday() {
@@ -27,6 +32,7 @@ async function initInvoicePreview() {
   setText("invoiceDate", formatToday());
 
   await loadBusinessProfile();
+  await loadInvoiceDraft();
 }
 
 async function loadBusinessProfile() {
@@ -41,33 +47,109 @@ async function loadBusinessProfile() {
     return;
   }
 
-  if (!data) {
-    setText("invoiceCompanyName", "Bedrijfsprofiel nog niet ingevuld");
-    setText("invoiceVatText", "Vul eerst uw bedrijfsprofiel in.");
+  if (!data) return;
+
+  setText("companyName", data.company_name || "Bedrijfsnaam");
+  setText("companyOwner", data.owner_name || "");
+  setText("companyKvk", data.kvk_number || "");
+  setText("companyIban", data.iban || "");
+  setText("invoiceVatText", data.vat_text || "");
+}
+
+function enableInvoiceEdit() {
+  const fields = document.querySelectorAll(
+    "#invoiceNumber, #invoiceClientName, #invoiceClientAddress, #invoiceClientPostcode, #invoiceClientCity, #invoiceClientEmail, #invoiceDescription, #invoiceMinutes, #invoiceAmount, #invoiceTotal"
+  );
+
+  fields.forEach((field) => {
+    field.contentEditable = "true";
+    field.style.background = "#fff8dc";
+    field.style.padding = "4px 6px";
+    field.style.borderRadius = "6px";
+  });
+
+  alert("Factuur staat nu in bewerkmodus.");
+}
+
+async function saveInvoiceDraft() {
+  if (!currentUser) {
+    alert("Geen gebruiker gevonden.");
     return;
   }
 
-  setText("invoiceCompanyName", data.company_name);
-  setText("invoiceOwnerName", data.owner_name);
+  const invoiceNumber = getText("invoiceNumber") || "#2026-TEST";
 
-  setText(
-    "invoiceCompanyAddress",
-    `${data.company_address || ""} ${data.company_postcode || ""} ${data.company_city || ""}`.trim()
-  );
+  const amountNumber = Number(
+    getText("invoiceAmount")
+      .replace("€", "")
+      .replace(",", ".")
+      .trim()
+  ) || 0;
 
-  setText(
-    "invoiceCompanyContact",
-    `${data.company_email || ""} ${data.company_phone || ""}`.trim()
-  );
+  const totalNumber = Number(
+    getText("invoiceTotal")
+      .replace("€", "")
+      .replace(",", ".")
+      .trim()
+  ) || amountNumber;
 
-  setText("invoiceKvk", data.kvk_number ? `KVK: ${data.kvk_number}` : "");
-  setText("invoiceBtw", data.btw_number ? `BTW: ${data.btw_number}` : "");
-  setText("invoiceIban", data.iban ? `IBAN: ${data.iban}` : "");
+  const payload = {
+    owner_id: currentUser.id,
+    invoice_number: invoiceNumber,
 
-  setText("invoiceVatText", data.vat_text);
+    client_name: getText("invoiceClientName"),
+    client_address: getText("invoiceClientAddress"),
+    client_postcode: getText("invoiceClientPostcode"),
+    client_city: getText("invoiceClientCity"),
+    client_email: getText("invoiceClientEmail"),
+
+    description: getText("invoiceDescription"),
+    minutes: Number(getText("invoiceMinutes")) || null,
+    amount: amountNumber,
+    total: totalNumber,
+
+    updated_at: new Date().toISOString()
+  };
+
+  const { error } = await supabaseClient
+    .from("invoice_drafts")
+    .upsert(payload, { onConflict: "owner_id,invoice_number" });
+
+  if (error) {
+    alert("Opslaan mislukt: " + error.message);
+    return;
+  }
+
+  alert("Wijzigingen opgeslagen.");
 }
 
-document.addEventListener("DOMContentLoaded", initInvoicePreview);
+async function loadInvoiceDraft() {
+  const invoiceNumber = getText("invoiceNumber") || "#2026-TEST";
+
+  const { data, error } = await supabaseClient
+    .from("invoice_drafts")
+    .select("*")
+    .eq("owner_id", currentUser.id)
+    .eq("invoice_number", invoiceNumber)
+    .maybeSingle();
+
+  if (error) {
+    console.error("Conceptfactuur laden mislukt:", error.message);
+    return;
+  }
+
+  if (!data) return;
+
+  setText("invoiceClientName", data.client_name);
+  setText("invoiceClientAddress", data.client_address);
+  setText("invoiceClientPostcode", data.client_postcode);
+  setText("invoiceClientCity", data.client_city);
+  setText("invoiceClientEmail", data.client_email);
+  setText("invoiceDescription", data.description);
+  setText("invoiceMinutes", data.minutes ? String(data.minutes) : "");
+  setText("invoiceAmount", data.amount ? `€${Number(data.amount).toFixed(2).replace(".", ",")}` : "");
+  setText("invoiceTotal", data.total ? `€${Number(data.total).toFixed(2).replace(".", ",")}` : "");
+}
 
 function chooseSendMethod() {
   const sendBookkeeping = document.getElementById("sendToBookkeeping")?.checked;
@@ -80,9 +162,7 @@ function chooseSendMethod() {
 
   if (!choice) return;
 
-  const method = prompt(
-    "Hoe wilt u verzenden?\n\nTyp: email\nof typ: post"
-  );
+  const method = prompt("Hoe wilt u verzenden?\n\nTyp: email\nof typ: post");
 
   if (!method) return;
 
@@ -103,26 +183,4 @@ function chooseSendMethod() {
   }
 }
 
-function enableInvoiceEdit() {
-  const fields = document.querySelectorAll(
-    "#invoiceNumber, \
-#invoiceClientName, \
-#invoiceClientAddress, \
-#invoiceClientPostcode, \
-#invoiceClientCity, \
-#invoiceClientEmail, \
-#invoiceDescription, \
-#invoiceMinutes, \
-#invoiceAmount, \
-#invoiceTotal"
-  );
-
-  fields.forEach(field => {
-    field.contentEditable = true;
-    field.style.background = "#fff8dc";
-    field.style.padding = "4px 6px";
-    field.style.borderRadius = "6px";
-  });
-
-  alert("Factuur staat nu in bewerkmodus.");
-}
+document.addEventListener("DOMContentLoaded", initInvoicePreview);
