@@ -1,109 +1,137 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Factuur bekijken</title>
-<link rel="stylesheet" href="app.css?v=99">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Factuur bekijken</title>
+  <link rel="stylesheet" href="app.css?v=150" />
 </head>
-
 <body>
-<main class="container">
 
-<header class="topbar">
-  <div>
-    <h1>Factuur</h1>
-    <p>Controleer, pas aan en sla op als PDF.</p>
-  </div>
+<main class="page-shell">
 
-  <button onclick="window.location.href='facturen.html'" class="secondary-btn">
-    Terug naar facturen
-  </button>
-</header>
+  <section class="page-header">
+    <div>
+      <h1>Factuur</h1>
+      <p>Controleer, pas aan en sla op als PDF.</p>
+    </div>
 
-<section class="invoice-section">
+    <button onclick="window.location.href='facturen.html'" class="light-btn">
+      Terug naar facturen
+    </button>
+  </section>
 
-<div class="preview-top">
-  <div>
-    <h2 id="invoiceCompanyName">Bedrijfsnaam laden...</h2>
-<p id="invoiceOwnerName"></p>
-<p id="invoiceCompanyAddress"></p>
-<p id="invoiceCompanyContact"></p>
-<p id="invoiceKvk"></p>
-<p id="invoiceBtw"></p>
-<p id="invoiceIban"></p>
+  <section class="content-card invoice-preview-card">
 
-<br>
+    <!-- Bedrijfsgegevens -->
+    <div class="invoice-company-block">
+      <h2 id="companyName">Test</h2>
+      <p id="companyOwner">Test</p>
+      <p>KVK: <span id="companyKvk">1234567</span></p>
+      <p>IBAN: <span id="companyIban">NL88Test0101010101</span></p>
+    </div>
 
-<p>Factuurnummer: <span id="invoiceNumber">#2026-TEST</span></p>
-<p>Factuurdatum: <span id="invoiceDate"></span></p>
-  </div>
+    <div class="invoice-meta">
+      <p>Factuurnummer: <span id="invoiceNumber">#2026-TEST</span></p>
+      <p>Factuurdatum: <span id="invoiceDate">28-4-2026</span></p>
+    </div>
 
-<hr>
+    <hr class="invoice-line">
 
-<div class="client-block">
-  <strong>Factuur aan:</strong><br>
-  De heer Ahmed<br>
-  Utrecht<br>
-  ahmed@email.nl
-</div>
+    <!-- Klant -->
+    <div class="invoice-client">
+      <h3>Factuur aan:</h3>
+      <p><span id="invoiceClientName">De heer Ahmed</span></p>
+      <p><span id="invoiceClientCity">Utrecht</span></p>
+      <p><span id="invoiceClientEmail">ahmed@email.nl</span></p>
+    </div>
 
-<table class="invoice-table">
-<tr>
-  <th>Omschrijving</th>
-  <th>Minuten</th>
-  <th>Bedrag</th>
-</tr>
+    <!-- Tabel -->
+    <table class="invoice-table">
+      <thead>
+        <tr>
+          <th>Omschrijving</th>
+          <th>Minuten</th>
+          <th>Bedrag</th>
+        </tr>
+      </thead>
 
-<tr>
-  <td>Praktische ondersteuning aan huis</td>
-  <td>220</td>
-  <td>€110,00</td>
-</tr>
-</table>
+      <tbody>
+        <tr>
+          <td><span id="invoiceDescription">Praktische ondersteuning aan huis</span></td>
+          <td><span id="invoiceMinutes">220</span></td>
+          <td><span id="invoiceAmount">€110,00</span></td>
+        </tr>
+      </tbody>
+    </table>
 
-<div class="invoice-total">
-  <span>Totaal</span>
-  <strong>€110,00</strong>
-</div>
+    <div class="invoice-total">
+      <strong>Totaal</strong>
+      <strong id="invoiceTotal">€110,00</strong>
+    </div>
 
-<div class="btw-note" id="invoiceVatText">
-  BTW-tekst laden...
-</div>
+    <p class="invoice-vat" id="invoiceVatText">
+      BTW vrijgesteld van omzetbelasting volgens geldende vrijstelling.
+    </p>
 
-<div class="bookkeeping-check">
-  <label>
-    <input type="checkbox" id="sendToBookkeeping">
-    Ook kopie naar boekhouding sturen
-  </label>
-</div>
+    <!-- Boekhouding -->
+    <label class="invoice-check-row">
+      <input type="checkbox" id="sendAccountingCopy">
+      Ook kopie naar boekhouding sturen
+    </label>
 
-<div class="preview-actions">
-  <button onclick="enableInvoiceEdit()" class="light-btn">
-    Factuur aanpassen
-  </button>
+    <!-- Knoppen -->
+    <div class="preview-actions">
 
-  <button onclick="window.print()" class="dark-btn">
-    Opslaan / Print PDF
-  </button>
+      <button type="button" class="light-btn" onclick="enableInvoiceEdit()">
+        Factuur aanpassen
+      </button>
 
-  <button onclick="chooseSendMethod()" class="mint-btn">
-    Verzenden
-  </button>
+      <button type="button" class="dark-btn" onclick="window.print()">
+        Opslaan / Print PDF
+      </button>
 
-  <button onclick="window.location.href='facturen.html'" class="light-btn">
-    Terug
-  </button>
-</div>
+      <button type="button" class="mint-btn">
+        Verzenden
+      </button>
 
-  <p class="preview-note">
-Verzonden facturen blijven terug te vinden in Maandrapportage Facturen.
-</p>
+      <button type="button" class="light-btn"
+        onclick="window.location.href='facturen.html'">
+        Terug
+      </button>
 
-</section>
+    </div>
+
+    <p class="preview-note">
+      Verzonden facturen blijven terug te vinden in Maandrapportage Facturen.
+    </p>
+
+  </section>
+
 </main>
+
+<script>
+function enableInvoiceEdit() {
+  const ids = [
+    "invoiceNumber",
+    "invoiceClientName",
+    "invoiceDescription",
+    "invoiceMinutes",
+    "invoiceAmount",
+    "invoiceTotal"
+  ];
+
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.contentEditable = true;
+  });
+
+  alert("Factuur staat nu in bewerkmodus.");
+}
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="factuur-preview.js"></script>
+
 </body>
 </html>

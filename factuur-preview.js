@@ -102,3 +102,18 @@ function chooseSendMethod() {
     alert("Kies email of post.");
   }
 }
+
+function enableInvoiceEdit() {
+  const fields = document.querySelectorAll(
+    "#invoiceClientName, #invoiceDescription, #invoiceMinutes, #invoiceAmount, #invoiceNumber"
+  );
+
+  fields.forEach(el => {
+    el.contentEditable = "true";
+    el.style.background = "#fff8dc";
+    el.style.padding = "4px 6px";
+    el.style.borderRadius = "6px";
+  });
+
+  alert("Factuur staat nu in bewerkmodus.");
+}
