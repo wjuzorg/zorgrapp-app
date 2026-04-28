@@ -20,14 +20,15 @@ function formatToday() {
 }
 
 async function initInvoicePreview() {
-  const { data, error } = await supabaseClient.auth.getUser();
+  const { data, error } = await supabaseClient.auth.getSession();
 
-  if (error || !data.user) {
+  if (error || !data.session || !data.session.user) {
+    alert("U bent niet ingelogd. Log opnieuw in.");
     window.location.href = "login.html";
     return;
   }
 
-  currentUser = data.user;
+  currentUser = data.session.user;
 
   setText("invoiceDate", formatToday());
 
