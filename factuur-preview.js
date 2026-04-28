@@ -105,14 +105,23 @@ function chooseSendMethod() {
 
 function enableInvoiceEdit() {
   const fields = document.querySelectorAll(
-    "#invoiceClientName, #invoiceDescription, #invoiceMinutes, #invoiceAmount, #invoiceNumber"
+    "#invoiceNumber, \
+#invoiceClientName, \
+#invoiceClientAddress, \
+#invoiceClientPostcode, \
+#invoiceClientCity, \
+#invoiceClientEmail, \
+#invoiceDescription, \
+#invoiceMinutes, \
+#invoiceAmount, \
+#invoiceTotal"
   );
 
-  fields.forEach(el => {
-    el.contentEditable = "true";
-    el.style.background = "#fff8dc";
-    el.style.padding = "4px 6px";
-    el.style.borderRadius = "6px";
+  fields.forEach(field => {
+    field.contentEditable = true;
+    field.style.background = "#fff8dc";
+    field.style.padding = "4px 6px";
+    field.style.borderRadius = "6px";
   });
 
   alert("Factuur staat nu in bewerkmodus.");

@@ -1458,3 +1458,65 @@ body {
   color: #6b7280;
   font-size: 14px;
 }
+
+.page-shell {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 34px;
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: 42px;
+  font-weight: 800;
+}
+
+.page-header p {
+  margin: 12px 0 0;
+  color: #6b7280;
+}
+
+.invoice-preview-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 28px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+  padding: 34px;
+  max-width: 900px;
+  margin: 0 auto 28px;
+}
+
+.invoice-client {
+  margin: 34px 0;
+  line-height: 1.6;
+}
+
+.invoice-client p {
+  margin: 6px 0;
+}
+
+.invoice-check-row {
+  margin-top: 28px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+}
+
+[contenteditable="true"] {
+  background: #fff8dc;
+  padding: 4px 6px;
+  border-radius: 6px;
+}
