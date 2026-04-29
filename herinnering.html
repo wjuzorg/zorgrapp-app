@@ -13,7 +13,7 @@
 <header class="topbar">
 <div>
 <h1>Betalingsherinnering</h1>
-<p>Controleer en verstuur een nette herinnering.</p>
+<p>Controleer de factuur voor verzenden.</p>
 </div>
 
 <button onclick="window.location.href='facturen.html'" class="secondary-btn">
@@ -35,18 +35,21 @@ Beste heer/mevrouw,
 Volgens onze administratie staat onderstaande factuur nog open.
 
 Factuurnummer: #2026-0031
-Bedrag: €110,00
+Openstaand bedrag: €110,00
 
-Wellicht is deze aan uw aandacht ontsnapt. Wij verzoeken u vriendelijk het openstaande bedrag alsnog te voldoen.
+Wellicht is deze factuur aan uw aandacht ontsnapt.
+
+Wij verzoeken u vriendelijk het openstaande bedrag binnen 7 werkdagen alsnog te voldoen.
+
+Heeft u de betaling inmiddels gedaan? Dan kunt u deze herinnering als niet verzonden beschouwen.
 
 Met vriendelijke groet,
 
-ZorgInzicht
-</textarea>
+<span id="companyNameReminder">Naam ondernemer</span>
 
 <div class="preview-actions">
-<button onclick="copyReminder()" class="dark-btn">
-Tekst kopiëren
+<button onclick="chooseReminderMethod()" class="dark-btn">
+  Herinnering versturen
 </button>
 
 <button onclick="window.location.href='facturen.html'" class="light-btn">
@@ -58,11 +61,20 @@ Terug
 </main>
 
 <script>
-function copyReminder() {
-const text = document.getElementById("reminderText");
-text.select();
-document.execCommand("copy");
-alert("Herinnering gekopieerd.");
+function chooseReminderMethod() {
+  const choice = prompt(
+    "Hoe wilt u de herinnering versturen?\n\nTyp: email\nof typ: post"
+  );
+
+  if (!choice) return;
+
+  if (choice.toLowerCase() === "email") {
+    alert("Herinnering wordt later per e-mail verzonden.");
+  } else if (choice.toLowerCase() === "post") {
+    alert("Herinnering wordt gemarkeerd voor verzending per post.");
+  } else {
+    alert("Kies email of post.");
+  }
 }
 </script>
 
