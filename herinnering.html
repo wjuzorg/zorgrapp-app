@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Herinnering sturen</title>
+<link rel="stylesheet" href="app.css?v=200">
+</head>
+
+<body>
+<main class="container">
+
+<header class="topbar">
+<div>
+<h1>Betalingsherinnering</h1>
+<p>Controleer en verstuur een nette herinnering.</p>
+</div>
+
+<button onclick="window.location.href='facturen.html'" class="secondary-btn">
+Terug naar facturen
+</button>
+</header>
+
+<section class="form-card">
+
+<h2>Dhr. Test</h2>
+<p>Factuur #2026-0031</p>
+<p><strong>Openstaand bedrag: €110,00</strong></p>
+
+<label class="form-label">Bericht</label>
+
+<textarea class="form-textarea" rows="10" id="reminderText">
+Beste heer/mevrouw,
+
+Volgens onze administratie staat onderstaande factuur nog open.
+
+Factuurnummer: #2026-0031
+Bedrag: €110,00
+
+Wellicht is deze aan uw aandacht ontsnapt. Wij verzoeken u vriendelijk het openstaande bedrag alsnog te voldoen.
+
+Met vriendelijke groet,
+
+ZorgInzicht
+</textarea>
+
+<div class="preview-actions">
+<button onclick="copyReminder()" class="dark-btn">
+Tekst kopiëren
+</button>
+
+<button onclick="window.location.href='facturen.html'" class="light-btn">
+Terug
+</button>
+</div>
+
+</section>
+</main>
+
+<script>
+function copyReminder() {
+const text = document.getElementById("reminderText");
+text.select();
+document.execCommand("copy");
+alert("Herinnering gekopieerd.");
+}
+</script>
+
+</body>
+</html>
