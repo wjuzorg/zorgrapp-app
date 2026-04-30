@@ -51,11 +51,15 @@ ${companySignName}`;
 }
 
 function sendReminderByEmail() {
-  alert("Herinnering wordt later per e-mail verzonden.");
+  const clientEmail = "test@email.nl"; // later uit cliëntgegevens
+  const subject = encodeURIComponent("Betalingsherinnering factuur #2026-0031");
+  const body = encodeURIComponent(document.getElementById("reminderText").value);
+
+  window.location.href = `mailto:${clientEmail}?subject=${subject}&body=${body}`;
 }
 
 function sendReminderByPost() {
-  alert("Herinnering wordt gemarkeerd voor verzending per post.");
+  window.print();
 }
 
 
