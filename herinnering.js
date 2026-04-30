@@ -50,20 +50,13 @@ Met vriendelijke groet,
 ${companySignName}`;
 }
 
-function chooseReminderMethod() {
-  const choice = prompt(
-    "Hoe wilt u de herinnering versturen?\n\nTyp: email\nof typ: post"
-  );
-
-  if (!choice) return;
-
-  if (choice.toLowerCase() === "email") {
-    alert("Herinnering wordt later per e-mail verzonden.");
-  } else if (choice.toLowerCase() === "post") {
-    alert("Herinnering wordt gemarkeerd voor verzending per post.");
-  } else {
-    alert("Kies email of post.");
-  }
+function sendReminderByEmail() {
+  alert("Herinnering wordt later per e-mail verzonden.");
 }
+
+function sendReminderByPost() {
+  alert("Herinnering wordt gemarkeerd voor verzending per post.");
+}
+
 
 document.addEventListener("DOMContentLoaded", initReminderPage);
