@@ -153,9 +153,21 @@ function fillReminderPage() {
   const reminderText = document.getElementById("reminderText");
   if (!reminderText) return;
 
-  reminderText.value = `Beste heer/mevrouw,
+  const rawName = getClientName();
+const salutation = currentClient?.salutation;
+
+let aanhef = rawName;
+
+if (salutation === "dhr") {
+  aanhef = `Dhr. ${rawName}`;
+} else if (salutation === "mw") {
+  aanhef = `Mevr. ${rawName}`;
+}
+
+reminderText.value = `Beste ${aanhef},
 
 Volgens onze administratie staat onderstaande factuur nog open.
+
 
 Factuurnummer: ${invoiceNumber}
 Openstaand bedrag: ${formatEuro(amount)}

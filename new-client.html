@@ -328,17 +328,21 @@
       <form id="clientForm">
 
         <div class="section">
-          <h3>Basisgegevens</h3>
+  <h3>Basisgegevens</h3>
 
-          <div class="field">
-            <label class="label" for="full_name">Naam</label>
-            <input type="text" id="full_name" class="input" />
-          </div>
+  <div class="field">
+    <label class="label" for="salutation">Aanhef</label>
+    <select id="salutation" class="input">
+      <option value="">Geen voorkeur</option>
+      <option value="dhr">Dhr.</option>
+      <option value="mw">Mevr.</option>
+    </select>
+  </div>
 
-          <div class="field">
-            <label class="label" for="phone">Telefoonnummer</label>
-            <input type="text" id="phone" class="input" />
-          </div>
+  <div class="field">
+    <label class="label" for="full_name">Naam</label>
+    <input type="text" id="full_name" class="input" />
+  </div>
 
           <div class="field">
             <label class="label" for="address">Adres</label>

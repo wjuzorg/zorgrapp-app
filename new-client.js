@@ -114,6 +114,7 @@ function fillForm(client) {
   selectedClientId = client.id;
 
   document.getElementById("full_name").value = client.full_name || "";
+  document.getElementById("salutation").value = client.salutation || "";
   document.getElementById("phone").value = client.phone || "";
   document.getElementById("address").value = client.address || "";
   document.getElementById("postal_code").value = client.postal_code || "";
@@ -247,6 +248,7 @@ saveClientBtn.addEventListener("click", async () => {
 
     showSaveMessage("Opslaan...");
 
+    const salutation = document.getElementById("salutation").value;
     const full_name = document.getElementById("full_name").value.trim();
     const phone = document.getElementById("phone").value.trim();
     const address = document.getElementById("address").value.trim();
