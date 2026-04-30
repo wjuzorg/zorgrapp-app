@@ -236,4 +236,64 @@ function chooseSendMethod() {
   }
 }
 
+async function markInvoiceAsOpen() {
+  const invoiceNumber = getText("invoiceNumber") || getInvoiceNumberFromUrl();
+
+  const { error } = await supabaseClient
+    .from("invoice_drafts")
+    .update({
+      status: "open",
+      sent_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    })
+    .eq("owner_id", currentUser.id)
+    .eq("invoice_number", invoiceNumber);
+
+  if (error) {
+    alert("Status aanpassen mislukt: " + error.message);
+    return false;
+  }
+
+  return true;
+}
+
+async function sendInvoice() {
+  const { data: sessionData } = await supabaseClient.auth.getSession();
+  const user = sessionData?.session?.user;
+
+  if (!user) {
+    alert("Niet ingelogd");
+    return;
+  }
+
+  const invoiceNumber = document
+    .getElementById("invoiceNumber")
+    ?.textContent?.replace("Factuurnummer:", "")
+    .trim();
+
+  if (!invoiceNumber) {
+    alert("Factuurnummer niet gevonden");
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("invoice_drafts")
+    .update({
+      status: "open",
+      sent_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("owner_id", user.id)
+    .eq("invoice_number", invoiceNumber);
+
+  if (error) {
+    alert("Verzenden mislukt: " + error.message);
+    return;
+  }
+
+  alert("Factuur verzonden! Staat nu bij 'Wacht op betaling'.");
+
+  window.location.href = "facturen.html";
+}
+
 document.addEventListener("DOMContentLoaded", initInvoicePreview);

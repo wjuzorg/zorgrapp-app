@@ -1567,3 +1567,17 @@ body {
     display: none !important;
   }
 }
+
+.bottom-nav {
+  grid-template-columns: repeat(3, 1fr);
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-width: 760px) {
+  .bottom-nav {
+    grid-template-columns: 1fr;
+    max-width: none;
+  }
+}
