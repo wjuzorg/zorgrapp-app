@@ -82,9 +82,9 @@ function renderFacturen(facturen) {
           Factuur bekijken
         </button>
 
-        <button class="light-btn" onclick="markAsPaid('${factuur.id}')">
-          Markeer betaald
-        </button>
+       <button onclick="markAsPaid('${invoice.invoice_number}')" class="light-btn">
+  Markeer betaald
+</button>
       `;
 
       open.appendChild(row);
@@ -161,6 +161,36 @@ async function markAsPaid(invoiceId) {
   }
 
   alert("Factuur gemarkeerd als betaald.");
+  loadFacturen();
+}
+
+async function markAsPaid(invoiceNumber) {
+  const { data: sessionData } = await supabaseClient.auth.getSession();
+  const user = sessionData?.session?.user;
+
+  if (!user) {
+    alert("Niet ingelogd");
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("invoice_drafts")
+    .update({
+      status: "betaald",
+      paid_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("owner_id", user.id)
+    .eq("invoice_number", invoiceNumber);
+
+  if (error) {
+    alert("Fout bij betalen: " + error.message);
+    return;
+  }
+
+  alert("Factuur gemarkeerd als betaald ✅");
+
+  // opnieuw laden zodat hij verdwijnt
   loadFacturen();
 }
 
