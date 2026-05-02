@@ -290,8 +290,40 @@ async function sendInvoice() {
     alert("Verzenden mislukt: " + error.message);
     return;
   }
+function sendInvoiceEmail() {
+  if (!currentInvoice) {
+    alert("Geen factuur geladen.");
+    return;
+  }
 
-  alert("Factuur verzonden! Staat nu bij 'Wacht op betaling'.");
+  const clientName = currentInvoice.client_name || "cliënt";
+  const email = currentInvoice.client_email || "";
+  const invoiceNumber = currentInvoice.invoice_number || "";
+  const amount = `€${Number(currentInvoice.total || 0).toFixed(2).replace(".", ",")}`;
+
+  const subject = encodeURIComponent(`Factuur ${invoiceNumber}`);
+
+  const body = encodeURIComponent(
+`Beste ${clientName},
+
+Hierbij ontvangt u uw factuur.
+
+Factuurnummer: ${invoiceNumber}
+Bedrag: ${amount}
+
+Wij verzoeken u vriendelijk het bedrag binnen 14 dagen te voldoen.
+
+Met vriendelijke groet,
+${currentInvoice.company_name || "WJU Zorg"}`
+  );
+
+  // 👉 Gmail openen
+  window.location.href = `https://mail.google.com/mail/?view=cm&to=${email}&su=${subject}&body=${body}`;
+
+  // 👉 status aanpassen
+  markAsSent(invoiceNumber);
+}
+  
 
   window.location.href = "facturen.html";
 }
