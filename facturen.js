@@ -23,6 +23,10 @@ async function loadFacturen() {
     .eq("owner_id", currentUser.id)
     .order("created_at", { ascending: false });
 
+    console.log("Ingelogde user:", currentUser.id);
+console.log("Facturen uit Supabase:", data);
+console.log("Supabase error:", error);
+
   if (error) {
     alert("Facturen laden mislukt: " + error.message);
     return;
