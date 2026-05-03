@@ -380,6 +380,10 @@ async function loadDashboard() {
     const { data: sessionData } = await supabaseClient.auth.getSession();
     const currentUser = sessionData.session?.user;
 
+    if (currentUser) {
+  await loadInvoiceDashboardTotal(currentUser.id);
+}
+
     const { data, error } = await supabaseClient
       .from("Appointments")
       .select("*")
