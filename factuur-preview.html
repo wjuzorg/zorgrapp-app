@@ -137,17 +137,22 @@ function enableInvoiceEdit() {
   alert("Factuur staat nu in bewerkmodus.");
 }
 
-function sendInvoiceEmail() {
+async function sendInvoiceEmail() {
   if (!currentInvoice) {
     alert("Geen factuur geladen.");
     return;
   }
 
-  const companyName = businessProfile?.company_name || "Uw zorgonderneming";
+  const companyName = currentProfile?.company_name || "Uw zorgonderneming";
   const clientName = currentInvoice.client_name || "cliënt";
   const email = currentInvoice.client_email || "";
   const invoiceNumber = currentInvoice.invoice_number || "";
-  const amount = `€${Number(currentInvoice.total || 0).toFixed(2).replace(".", ",")}`;
+  const amount = euro(currentInvoice.total || currentInvoice.amount || 0);
+
+  if (!email) {
+    alert("Geen e-mailadres gevonden bij deze cliënt.");
+    return;
+  }
 
   const subject = encodeURIComponent(`Factuur ${invoiceNumber}`);
 
@@ -162,11 +167,31 @@ Bedrag: ${amount}
 Wij verzoeken u vriendelijk het bedrag binnen 14 dagen te voldoen.
 
 Met vriendelijke groet,
+
 ${companyName}`
   );
 
-  window.location.href =
-    `https://mail.google.com/mail/?view=cm&to=${email}&su=${subject}&body=${body}`;
+  window.open(
+    `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(email)}&su=${subject}&body=${body}`,
+    "_blank"
+  );
+
+  const { error } = await supabaseClient
+    .from("invoice_drafts")
+    .update({
+      status: "open",
+      sent_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    })
+    .eq("owner_id", currentUser.id)
+    .eq("invoice_number", invoiceNumber);
+
+  if (error) {
+    alert("Status aanpassen mislukt: " + error.message);
+    return;
+  }
+
+  alert("Gmail is geopend. De factuur staat nu bij Wacht op betaling.");
 }
 </script>
 
