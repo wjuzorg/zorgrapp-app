@@ -17,51 +17,62 @@
 
     </header>
 
-    <section class="form-card">
-      <div class="form-title-wrap">
-        <h2>Bedrijfsgegevens</h2>
-        <p>Deze gegevens worden later automatisch gebruikt op de factuur.</p>
-      </div>
+   <section class="form-card">
+  <div class="form-title-wrap">
+    <h2>Bedrijfsgegevens</h2>
+    <p>Deze gegevens worden later automatisch gebruikt op de factuur.</p>
+  </div>
 
-      <div class="section">
-        <h3>Algemeen</h3>
+  <!-- ALGEMEEN -->
+  <div class="section">
+    <h3>Algemeen</h3>
 
-        <label class="form-label" for="company_name">Bedrijfsnaam</label>
-        <input id="company_name" class="form-input" type="text" placeholder="Bijvoorbeeld: ZorgInzicht / WJU Zorg">
+    <label class="form-label" for="company_name">Bedrijfsnaam</label>
+    <input id="company_name" class="form-input" type="text" required
+      placeholder="">
 
-        <label class="form-label" for="owner_name">Naam ondernemer</label>
-        <input id="owner_name" class="form-input" type="text" placeholder="Naam ZZP'er">
+    <label class="form-label" for="owner_name">Naam ondernemer</label>
+    <input id="owner_name" class="form-input" type="text" required
+      placeholder="Naam ZZP'er">
 
-        <label class="form-label" for="kvk_number">KVK-nummer</label>
-        <input id="kvk_number" class="form-input" type="text" placeholder="Bijvoorbeeld: 12345678">
+    <label class="form-label" for="kvk_number">KVK-nummer</label>
+    <input id="kvk_number" class="form-input" type="text" required
+      placeholder="Bijvoorbeeld: 12345678">
 
-        <label class="form-label" for="btw_number">BTW-nummer</label>
-        <input id="btw_number" required>
-      </div>
+    <label class="form-label" for="btw_number">BTW-nummer</label>
+    <input id="btw_number" class="form-input" type="text" required
+      placeholder="NL123456789B01">
+  </div>
 
-      <div class="section">
-        <h3>Factuurgegevens</h3>
+  <!-- FACTUURGEGEVENS -->
+  <div class="section">
+    <h3>Factuurgegevens</h3>
 
-        <label class="form-label" for="iban">Rekeningnummer / IBAN</label>
-        <input id="iban" class="form-input" type="text" placeholder="NL00 BANK 0000 0000 00">
+    <label class="form-label" for="iban">Rekeningnummer / IBAN</label>
+    <input id="iban" class="form-input" type="text" required
+      placeholder="NL00 BANK 0000 0000 00">
 
-        <label class="form-label" for="hourly_rate">Standaard uurtarief</label>
-        <input id="hourly_rate" class="form-input" type="number" placeholder="Bijvoorbeeld: 50">
+    <label class="form-label" for="hourly_rate">Standaard uurtarief</label>
+    <input id="hourly_rate" class="form-input" type="number"
+      placeholder="Bijvoorbeeld: 50">
 
-        <label class="form-label" for="payment_term_days">Betaaltermijn in dagen</label>
-        <input id="payment_term_days" class="form-input" type="number" value="14">
+    <label class="form-label" for="payment_term_days">Betaaltermijn in dagen</label>
+    <input id="payment_term_days" class="form-input" type="number" required value="14">
 
-        <label class="form-label" for="vat_status">BTW-instelling</label>
-        <select id="vat_status" class="form-input">
-          <option value="">Kies btw-instelling</option>
-          <option value="vrijgesteld">BTW vrijgesteld</option>
-          <option value="verlegd">BTW verlegd</option>
-          <option value="geen">Geen btw vermelden</option>
-        </select>
+    <label class="form-label" for="vat_status">BTW-instelling</label>
+    <select id="vat_status" class="form-input" required>
+      <option value="">Kies btw-instelling</option>
+      <option value="vrijgesteld">BTW vrijgesteld</option>
+      <option value="verlegd">BTW verlegd</option>
+      <option value="geen">Geen btw vermelden</option>
+    </select>
 
-        <label class="form-label" for="vat_text">BTW-tekst op factuur</label>
-        <textarea id="vat_text" class="form-textarea" rows="3">BTW vrijgesteld van omzetbelasting volgens geldende vrijstelling.</textarea>
-      </div>
+    <label class="form-label" for="vat_text">BTW-tekst op factuur</label>
+    <textarea id="vat_text" class="form-textarea" rows="3">
+BTW vrijgesteld van omzetbelasting volgens geldende vrijstelling.
+    </textarea>
+  </div>
+</section>
 
       <label class="form-label" for="bookkeeping_email">
 E-mailadres boekhouding
