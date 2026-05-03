@@ -628,8 +628,8 @@ async function loadInvoiceDashboardTotal(userId) {
   }
 
   const total = (data || []).reduce((sum, item) => {
-    return sum + Number(item.total || item.amount || 0);
-  }, 0);
+  return sum + Number(item.amount || 0);
+}, 0);
 
   invoiceTotalEl.textContent =
     `€${total.toFixed(2).replace(".", ",")}`;
