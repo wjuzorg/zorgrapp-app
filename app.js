@@ -617,7 +617,7 @@ async function loadInvoiceDashboardTotal(userId) {
 
   const { data, error } = await supabaseClient
     .from("invoice_drafts")
-    .select("amount, total, status")
+    .select("amount, status")
     .eq("owner_id", userId)
     .in("status", ["klaar", "open", "herinnering"]);
 
@@ -628,11 +628,10 @@ async function loadInvoiceDashboardTotal(userId) {
   }
 
   const total = (data || []).reduce((sum, item) => {
-  return sum + Number(item.amount || 0);
-}, 0);
+    return sum + Number(item.amount || 0);
+  }, 0);
 
-  invoiceTotalEl.textContent =
-    `€${total.toFixed(2).replace(".", ",")}`;
+  invoiceTotalEl.textContent = `€${total.toFixed(2).replace(".", ",")}`;
 }
 
 startApp();
