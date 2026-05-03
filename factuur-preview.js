@@ -214,26 +214,74 @@ async function saveInvoiceDraft() {
   alert("Wijzigingen opgeslagen.");
 }
 
-function chooseSendMethod() {
-  const sendBookkeeping =
-    document.getElementById("sendToBookkeeping")?.checked ||
-    document.getElementById("sendAccountingCopy")?.checked;
-
-  const method = prompt("Hoe wilt u verzenden?\n\nTyp: email\nof typ: post");
-
-  if (!method) return;
-
-  if (method.toLowerCase() === "email") {
-    alert(
-      sendBookkeeping
-        ? "Factuur wordt later per e-mail verzonden met kopie naar boekhouding."
-        : "Factuur wordt later per e-mail verzonden."
-    );
-  } else if (method.toLowerCase() === "post") {
-    window.print();
-  } else {
-    alert("Kies email of post.");
+async function sendInvoiceEmail() {
+  if (!currentInvoice) {
+    alert("Geen factuur geladen.");
+    return;
   }
+
+  const companyName = currentProfile?.company_name || "Uw zorgonderneming";
+  const clientName = currentInvoice.client_name || "cliënt";
+  const email = currentInvoice.client_email || "";
+  const invoiceNumber = currentInvoice.invoice_number || "";
+  const amount = euro(currentInvoice.total || currentInvoice.amount || 0);
+
+  if (!email) {
+    alert("Geen e-mailadres gevonden bij deze cliënt.");
+    return;
+  }
+
+  const subject = encodeURIComponent(`Factuur ${invoiceNumber}`);
+
+  const body = encodeURIComponent(
+`Beste ${clientName},
+
+Hierbij ontvangt u uw factuur.
+
+Factuurnummer: ${invoiceNumber}
+Bedrag: ${amount}
+
+Wij verzoeken u vriendelijk het bedrag binnen 14 dagen te voldoen.
+
+Met vriendelijke groet,
+
+${companyName}`
+  );
+
+  // 👉 checkbox uitlezen (JOUW ID)
+  const sendCopy = document.getElementById("sendAccountingCopy")?.checked;
+  const bookkeepingEmail = currentProfile?.bookkeeping_email || "";
+
+  let gmailUrl =
+    `https://mail.google.com/mail/?view=cm` +
+    `&to=${encodeURIComponent(email)}` +
+    `&su=${subject}` +
+    `&body=${body}`;
+
+  // 👉 BCC toevoegen als vinkje aan staat
+  if (sendCopy && bookkeepingEmail) {
+    gmailUrl += `&bcc=${encodeURIComponent(bookkeepingEmail)}`;
+  }
+
+  window.open(gmailUrl, "_blank");
+
+  // 👉 status aanpassen
+  const { error } = await supabaseClient
+    .from("invoice_drafts")
+    .update({
+      status: "open",
+      sent_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    })
+    .eq("owner_id", currentUser.id)
+    .eq("invoice_number", invoiceNumber);
+
+  if (error) {
+    alert("Status aanpassen mislukt: " + error.message);
+    return;
+  }
+
+  alert("Gmail geopend. Factuur staat nu bij Wacht op betaling.");
 }
 
 async function markInvoiceAsOpen() {
