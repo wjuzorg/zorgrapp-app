@@ -64,7 +64,9 @@ function toggleInvoiceFields() {
 
 recurrenceTypeEl.addEventListener("change", toggleRecurrenceFields);
 invoiceDeliveryMethodEl.addEventListener("change", toggleInvoiceFields);
-invoiceSameAsClientAddressEl.addEventListener("change", toggleInvoiceFields);
+if (invoiceSameAsClientAddressEl) {
+  invoiceSameAsClientAddressEl.addEventListener("change", toggleInvoiceFields);
+}
 
 function renderSearchResults(clients) {
   if (!clients.length) {
@@ -271,7 +273,8 @@ saveClientBtn.addEventListener("click", async () => {
 
     const invoice_delivery_method = document.getElementById("invoice_delivery_method").value;
     const invoice_email = document.getElementById("invoice_email").value.trim();
-    const invoice_same_as_client_address = invoiceSameAsClientAddressEl.value === "true";
+    const invoice_same_as_client_address =
+  document.getElementById("invoice_same_as_client_address")?.value !== "false";
     const invoice_address = document.getElementById("invoice_address").value.trim();
     const invoice_postal_code = document.getElementById("invoice_postal_code").value.trim();
     const invoice_city = document.getElementById("invoice_city").value.trim();
