@@ -152,6 +152,12 @@ function fillInvoicePreview() {
   setText("invoiceMinutes", currentInvoice?.minutes || "");
   setText("invoiceAmount", formatEuro(amount));
   setText("invoiceTotal", formatEuro(total));
+  setText("companyAddressLine", currentProfile?.company_address || "");
+setText(
+  "companyCityLine",
+  `${currentProfile?.company_postcode || ""} ${currentProfile?.company_city || ""}`.trim()
+);
+setText("companyBtw", currentProfile?.btw_number || "-");
 }
 
 function enableInvoiceEdit() {
@@ -241,7 +247,7 @@ Hierbij ontvangt u uw factuur.
 Factuurnummer: ${invoiceNumber}
 Bedrag: ${amount}
 
-Wij verzoeken u vriendelijk het bedrag binnen 14 dagen te voldoen.
+Wij verzoeken u vriendelijk het bedrag binnen ${currentProfile?.payment_term_days || 14} dagen te voldoen.
 
 Met vriendelijke groet,
 
