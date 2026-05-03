@@ -138,9 +138,35 @@ function enableInvoiceEdit() {
 }
 
 function sendInvoiceEmail() {
-  alert("klik werkt"); // test eerst
+  if (!currentInvoice) {
+    alert("Geen factuur geladen.");
+    return;
+  }
 
-  // later vervangen we dit met echte mail
+  const companyName = businessProfile?.company_name || "Uw zorgonderneming";
+  const clientName = currentInvoice.client_name || "cliënt";
+  const email = currentInvoice.client_email || "";
+  const invoiceNumber = currentInvoice.invoice_number || "";
+  const amount = `€${Number(currentInvoice.total || 0).toFixed(2).replace(".", ",")}`;
+
+  const subject = encodeURIComponent(`Factuur ${invoiceNumber}`);
+
+  const body = encodeURIComponent(
+`Beste ${clientName},
+
+Hierbij ontvangt u uw factuur.
+
+Factuurnummer: ${invoiceNumber}
+Bedrag: ${amount}
+
+Wij verzoeken u vriendelijk het bedrag binnen 14 dagen te voldoen.
+
+Met vriendelijke groet,
+${companyName}`
+  );
+
+  window.location.href =
+    `https://mail.google.com/mail/?view=cm&to=${email}&su=${subject}&body=${body}`;
 }
 </script>
 
