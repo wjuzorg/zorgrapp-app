@@ -395,7 +395,7 @@ async function loadDashboard() {
     const todayAppointments = appointments.filter(item => item.appointment_date === today);
     todayCountEl.textContent = todayAppointments.length;
 
-    const signalCountByClient = {};
+   const signalCountByClient = {};
 
 appointments.forEach(item => {
   const clientKey = item.client_id || item.client_name;
@@ -415,7 +415,7 @@ appointments.forEach(item => {
     const signalsArray = String(item.internal_signals)
       .split(",")
       .map(s => s.trim())
-      .filter(Boolean);
+      .filter(s => s && s !== "[]" && s !== "null" && s !== "undefined");
 
     signalPoints += signalsArray.length;
   }
@@ -424,16 +424,18 @@ appointments.forEach(item => {
     signalPoints += 1;
   }
 
-  signalCountByClient[clientKey] =
-    (signalCountByClient[clientKey] || 0) + signalPoints;
+  if (signalPoints > 0) {
+    signalCountByClient[clientKey] =
+      (signalCountByClient[clientKey] || 0) + signalPoints;
+  }
 });
 
-const activeSignalClients = Object.values(signalCountByClient)
-  .filter(count => count >= 3)
-  .length;
+const totalSignalClients = Object.keys(signalCountByClient).length;
 
-    signalCountEl.textContent = String(activeSignalClients);
-    invoiceTotalEl.textContent = "€0";
+const signalCountEl = document.getElementById("signalCount");
+if (signalCountEl) {
+  signalCountEl.textContent = totalSignalClients;
+}
 
     renderAppointments(todayAppointments, clients);
     renderWeekPlanning(appointments, clients);
@@ -492,5 +494,17 @@ async function startApp() {
   await setWelcomeText(user);
   await loadDashboard();
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  const signalCard = document.getElementById("signalCard");
+
+  if (signalCard) {
+    signalCard.addEventListener("click", () => {
+      alert(
+        "Actiesignalen zijn aandachtspunten per cliënt.\n\nBijvoorbeeld als iemand achteruitgaat, vaker niet aanwezig is of extra ondersteuning nodig lijkt.\n\nBij verdere verslechtering kun je contact opnemen met bijvoorbeeld een mantelzorger, huisarts, buurtteam of wijkverpleegkundige."
+      );
+    });
+  }
+});
 
 startApp();
