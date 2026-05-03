@@ -6,6 +6,7 @@
   <title>ZorgInzicht - Invullen</title>
   <link rel="stylesheet" href="./app.css" />
 </head>
+
 <body>
   <div class="container">
     <header class="topbar">
@@ -27,18 +28,15 @@
 
       <div class="section">
         <h3>Afspraakgegevens</h3>
-
         <div class="info-grid">
           <div class="info-box">
             <span class="info-label">Naam</span>
             <strong id="infoClientName">Laden...</strong>
           </div>
-
           <div class="info-box">
             <span class="info-label">Tijd</span>
             <strong id="infoTime">-</strong>
           </div>
-
           <div class="info-box">
             <span class="info-label">Dienst</span>
             <strong id="infoServiceType">-</strong>
@@ -48,15 +46,11 @@
 
       <form id="fillForm">
         <div class="section section-work">
-  <h3>Wat heb je gedaan?</h3>
+          <h3>Wat heb je gedaan?</h3>
 
           <label class="form-label" for="work_done">Werkzaamheden</label>
-          <textarea
-            id="work_done"
-            class="form-textarea"
-            rows="5"
-            placeholder="Bijvoorbeeld: boodschappen gedaan, samen koffie gedronken, medicatie opgehaald..."
-          ></textarea>
+          <textarea id="work_done" class="form-textarea" rows="5"
+            placeholder="Bijvoorbeeld: boodschappen gedaan, samen koffie gedronken, medicatie opgehaald..."></textarea>
 
           <label class="form-label" for="worked_minutes">Hoeveel minuten gewerkt?</label>
           <select id="worked_minutes" class="form-input">
@@ -94,12 +88,20 @@
               </select>
             </div>
           </div>
+
+          <label class="form-label" for="signal_status">Actiestatus signaal</label>
+          <select id="signal_status" class="form-input">
+            <option value="geen">Geen actief signaal</option>
+            <option value="actief">Actiesignaal actief</option>
+            <option value="verbeterd">Situatie verbeterd</option>
+            <option value="afgesloten">Signaal afgesloten</option>
+          </select>
         </div>
 
         <div class="section">
           <h3>Specificatie</h3>
 
-          <div class="signal-grid">
+          <div class="signal-grid checkbox-list">
             <label class="signal-chip"><input type="checkbox" value="vergeetachtig"> Vergeetachtig</label>
             <label class="signal-chip"><input type="checkbox" value="somber"> Somber</label>
             <label class="signal-chip"><input type="checkbox" value="eenzaam"> Eenzaam</label>
@@ -110,12 +112,8 @@
           </div>
 
           <label class="form-label" for="signal_notes">Extra notitie signalering</label>
-          <textarea
-            id="signal_notes"
-            class="form-textarea"
-            rows="4"
-            placeholder="Extra observaties of bijzonderheden..."
-          ></textarea>
+          <textarea id="signal_notes" class="form-textarea" rows="4"
+            placeholder="Extra observaties of bijzonderheden..."></textarea>
         </div>
 
         <div class="section">
@@ -129,6 +127,41 @@
             <option value="wmo">Wmo</option>
             <option value="onbekend">Onbekend / later bespreken</option>
           </select>
+        </div>
+
+        <div class="section">
+          <h3>Factuuradres</h3>
+
+          <label class="form-label" for="invoice_delivery_method">Factuur ontvangen via</label>
+          <select id="invoice_delivery_method" class="form-input">
+            <option value="nog_niet_afgesproken">Nog niet afgesproken</option>
+            <option value="email">Per e-mail</option>
+            <option value="address">Per adres</option>
+          </select>
+
+          <div id="invoiceEmailWrap" class="hidden">
+            <label class="form-label" for="invoice_email">Factuur e-mail</label>
+            <input id="invoice_email" type="email" class="form-input" placeholder="Bijvoorbeeld: dochter@voorbeeld.nl">
+          </div>
+
+          <div id="invoiceAddressModeWrap" class="hidden">
+            <label class="form-label" for="invoice_same_as_client_address">Factuuradres</label>
+            <select id="invoice_same_as_client_address" class="form-input">
+              <option value="true">Zelfde als cliëntadres</option>
+              <option value="false">Ander factuuradres invullen</option>
+            </select>
+          </div>
+
+          <div id="invoiceAddressFields" class="hidden">
+            <label class="form-label" for="invoice_address">Factuuradres</label>
+            <input id="invoice_address" type="text" class="form-input">
+
+            <label class="form-label" for="invoice_postal_code">Factuur postcode</label>
+            <input id="invoice_postal_code" type="text" class="form-input">
+
+            <label class="form-label" for="invoice_city">Factuur plaats</label>
+            <input id="invoice_city" type="text" class="form-input">
+          </div>
         </div>
 
         <div id="saveMessage" class="helper-text" style="margin: 12px 0 18px;"></div>
@@ -149,6 +182,6 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="./invullen.js"></script>
+  <script src="./invullen.js?v=3"></script>
 </body>
 </html>
