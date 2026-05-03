@@ -17,7 +17,7 @@ const fields = [
   "company_phone",
   "company_address",
   "company_postcode",
-  "company_city"
+  "company_city",
   "bookkeeping_email"
 ];
 
