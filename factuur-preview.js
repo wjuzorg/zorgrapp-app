@@ -158,6 +158,14 @@ setText(
   `${currentProfile?.company_postcode || ""} ${currentProfile?.company_city || ""}`.trim()
 );
 setText("companyBtw", currentProfile?.btw_number || "-");
+
+const paymentDays = currentProfile?.payment_term_days || 14;
+
+setText(
+  "invoicePaymentText",
+  `Wij verzoeken u vriendelijk het bedrag binnen ${paymentDays} dagen te voldoen.`
+);
+
 }
 
 function enableInvoiceEdit() {
