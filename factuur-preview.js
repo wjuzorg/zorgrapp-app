@@ -421,4 +421,37 @@ ${currentInvoice.company_name || "WJU Zorg"}`
   window.location.href = "facturen.html";
 }
 
+async function printAndMarkSent() {
+  if (!currentInvoice) {
+    alert("Geen factuur geladen.");
+    return;
+  }
+
+  window.print();
+
+  const ok = confirm("Is de factuur geprint of opgeslagen als PDF en klaar om per post te versturen?");
+
+  if (!ok) return;
+
+  const invoiceNumber = currentInvoice.invoice_number;
+
+  const { error } = await supabaseClient
+    .from("invoice_drafts")
+    .update({
+      status: "open",
+      sent_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    })
+    .eq("owner_id", currentUser.id)
+    .eq("invoice_number", invoiceNumber);
+
+  if (error) {
+    alert("Status aanpassen mislukt: " + error.message);
+    return;
+  }
+
+  alert("Factuur staat nu bij Wacht op betaling.");
+  window.location.href = "facturen.html";
+}
+
 document.addEventListener("DOMContentLoaded", initInvoicePreview);
