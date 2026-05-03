@@ -535,7 +535,6 @@ async function createInvoiceFromAppointment(appointmentId) {
       return;
     }
 
-    // voorkom dubbele facturen
     const { data: existing } = await supabaseClient
       .from("invoice_drafts")
       .select("id")
@@ -547,11 +546,23 @@ async function createInvoiceFromAppointment(appointmentId) {
       return;
     }
 
+    const { data: profile, error: profileError } = await supabaseClient
+      .from("business_profiles")
+      .select("invoice_counter, hourly_rate")
+      .eq("owner_id", appointment.owner_id)
+      .maybeSingle();
+
+    if (profileError) {
+      alert("Bedrijfsprofiel laden mislukt: " + profileError.message);
+      return;
+    }
+
+    const nextCounter = Number(profile?.invoice_counter || 0) + 1;
+    const year = new Date().getFullYear();
+    const invoiceNumber = `#${year}-${String(nextCounter).padStart(4, "0")}`;
+
     const minutes = appointment.worked_minutes || appointment.duration_minutes || 60;
-
-    // 🔥 hier later koppelen aan bedrijfsprofiel
-    const hourlyRate = 50;
-
+    const hourlyRate = Number(profile?.hourly_rate || 50);
     const amount = (minutes / 60) * hourlyRate;
 
     const { error: insertError } = await supabaseClient
@@ -561,6 +572,7 @@ async function createInvoiceFromAppointment(appointmentId) {
         client_id: appointment.client_id,
         client_name: appointment.client_name,
         appointment_id: appointment.id,
+        invoice_number: invoiceNumber,
         minutes,
         hourly_rate: hourlyRate,
         amount,
@@ -572,24 +584,51 @@ async function createInvoiceFromAppointment(appointmentId) {
       return;
     }
 
-    // update afspraak
+    await supabaseClient
+      .from("business_profiles")
+      .update({ invoice_counter: nextCounter })
+      .eq("owner_id", appointment.owner_id);
+
     await supabaseClient
       .from("Appointments")
       .update({
         ready_for_invoice: true,
-        status: "afgerond"
+        status: "afgerond",
+        updated_at: new Date().toISOString()
       })
       .eq("id", appointmentId);
 
     alert("Factuur aangemaakt");
-
-    // refresh pagina
     window.location.reload();
 
   } catch (err) {
     console.error(err);
-    alert("Algemene fout");
+    alert("Algemene fout bij factuur maken.");
   }
+}
+
+async function loadInvoiceDashboardTotal(userId) {
+  const invoiceTotalEl = document.getElementById("invoiceTotal");
+  if (!invoiceTotalEl) return;
+
+  const { data, error } = await supabaseClient
+    .from("invoice_drafts")
+    .select("amount, total, status")
+    .eq("owner_id", userId)
+    .in("status", ["klaar", "open", "herinnering"]);
+
+  if (error) {
+    console.error("Factuurtotaal laden mislukt:", error.message);
+    invoiceTotalEl.textContent = "€0";
+    return;
+  }
+
+  const total = (data || []).reduce((sum, item) => {
+    return sum + Number(item.total || item.amount || 0);
+  }, 0);
+
+  invoiceTotalEl.textContent =
+    `€${total.toFixed(2).replace(".", ",")}`;
 }
 
 startApp();
