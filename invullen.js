@@ -19,7 +19,7 @@ const deleteAppointmentBtn = document.getElementById("deleteAppointmentBtn");
 const saveDraftBtn = document.getElementById("saveDraftBtn");
 const saveMessage = document.getElementById("saveMessage");
 
-let appointmentId = null;
+let AppointmentId = null;
 let currentUser = null;
 
 async function requireLogin() {
@@ -59,17 +59,17 @@ function getAppointmentIdFromUrl() {
 }
 
 async function loadAppointment() {
-  appointmentId = getAppointmentIdFromUrl();
+  AppointmentId = getAppointmentIdFromUrl();
 
-  if (!appointmentId) {
+  if (!AppointmentId) {
     showMessage("Geen afspraak gevonden.", true);
     return;
   }
 
   const { data, error } = await supabaseClient
-    .from("appointments")
+    .from("Appointments")
     .select("*")
-    .eq("id", appointmentId)
+    .eq("id", AppointmentId)
     .eq("owner_id", currentUser.id)
     .single();
 
@@ -78,8 +78,8 @@ async function loadAppointment() {
     return;
   }
 
-  infoClientName.textContent = data.client_name || "-";
-  infoTime.textContent = data.appointment_time || "-";
+  infoClientName.textContent = data.Client_name || "-";
+  infoTime.textContent = data.Appointment_time || "-";
   infoServiceType.textContent = data.service_type || "-";
 
   workDoneEl.value = data.work_done || "";
@@ -92,7 +92,7 @@ async function loadAppointment() {
 }
 
 async function saveAppointment(statusValue = "open") {
-  if (!appointmentId) {
+  if (!AppointmentId) {
     showMessage("Geen afspraak-ID gevonden.", true);
     return false;
   }
@@ -111,9 +111,9 @@ async function saveAppointment(statusValue = "open") {
   };
 
   const { error } = await supabaseClient
-    .from("appointments")
+    .from("Appointments")
     .update(payload)
-    .eq("id", appointmentId)
+    .eq("id", AppointmentId)
     .eq("owner_id", currentUser.id);
 
   if (error) {
@@ -154,13 +154,13 @@ deleteAppointmentBtn.addEventListener("click", async () => {
   if (!confirmed) return;
 
   const { error } = await supabaseClient
-    .from("appointments")
+    .from("Appointments")
     .update({
       status: "verwijderd",
       deleted_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     })
-    .eq("id", appointmentId)
+    .eq("id", AppointmentId)
     .eq("owner_id", currentUser.id);
 
   if (error) {
