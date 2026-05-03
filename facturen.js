@@ -35,20 +35,42 @@ console.log("Supabase error:", error);
   renderFacturen(data || []);
 }
 
+function formatDateTime(dateString) {
+  if (!dateString) return "";
+
+  const date = new Date(dateString);
+
+  return date.toLocaleString("nl-NL", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
 function makeInvoiceRow(factuur, buttons) {
-  const bedrag = Number(factuur.total || factuur.amount || 0);
+  const bedrag = Number(factuur.amount || 0);
 
   const row = document.createElement("div");
   row.className = "invoice-row";
+
   row.innerHTML = `
     <div>
       <strong>${factuur.client_name || "Onbekende cliënt"}</strong><br>
       <small>${factuur.invoice_number || ""}</small>
+
+      ${
+        factuur.reminder_sent_at
+          ? `<div class="invoice-meta">
+              Laatste herinnering: ${formatDateTime(factuur.reminder_sent_at)}
+            </div>`
+          : ""
+      }
     </div>
 
     <span>${factuur.minutes || 0} minuten</span>
     <strong>${euro(bedrag)}</strong>
-
     ${buttons}
   `;
 
