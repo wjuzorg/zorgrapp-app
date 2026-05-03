@@ -304,13 +304,28 @@ function renderAppointments(items, clients = []) {
             Cliëntenkaart
           </button>
 
-          <button class="btn btn-finish ${filled ? "enabled" : ""}">
-            Afronden
-          </button>
+          <button class="btn btn-finish ${filled ? "enabled" : ""}" data-id="${item.id}">
+  Afronden
+</button>
         </div>
       </article>
     `;
   }).join("");
+
+  document.querySelectorAll(".btn-finish").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const appointmentId = btn.dataset.id;
+
+      if (!appointmentId) return;
+
+      if (!btn.classList.contains("enabled")) {
+        alert("Vul de afspraak eerst in voordat je deze afrondt.");
+        return;
+      }
+
+      await createInvoiceFromAppointment(appointmentId);
+    });
+  });
 }
 
 function renderWeekPlanning(appointments, clients) {
@@ -506,5 +521,75 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
+async function createInvoiceFromAppointment(appointmentId) {
+  try {
+    const { data: appointment, error } = await supabaseClient
+      .from("Appointments")
+      .select("*")
+      .eq("id", appointmentId)
+      .single();
+
+    if (error || !appointment) {
+      alert("Afspraak niet gevonden");
+      return;
+    }
+
+    // voorkom dubbele facturen
+    const { data: existing } = await supabaseClient
+      .from("invoice_drafts")
+      .select("id")
+      .eq("appointment_id", appointmentId)
+      .maybeSingle();
+
+    if (existing) {
+      alert("Factuur bestaat al.");
+      return;
+    }
+
+    const minutes = appointment.worked_minutes || appointment.duration_minutes || 60;
+
+    // 🔥 hier later koppelen aan bedrijfsprofiel
+    const hourlyRate = 50;
+
+    const amount = (minutes / 60) * hourlyRate;
+
+    const { error: insertError } = await supabaseClient
+      .from("invoice_drafts")
+      .insert([{
+        owner_id: appointment.owner_id,
+        client_id: appointment.client_id,
+        client_name: appointment.client_name,
+        appointment_id: appointment.id,
+        minutes,
+        hourly_rate: hourlyRate,
+        amount,
+        status: "klaar_om_te_verzenden"
+      }]);
+
+    if (insertError) {
+      alert("Fout bij maken factuur: " + insertError.message);
+      return;
+    }
+
+    // update afspraak
+    await supabaseClient
+      .from("Appointments")
+      .update({
+        ready_for_invoice: true,
+        status: "afgerond"
+      })
+      .eq("id", appointmentId);
+
+    alert("Factuur aangemaakt");
+
+    // refresh pagina
+    window.location.reload();
+
+  } catch (err) {
+    console.error(err);
+    alert("Algemene fout");
+  }
+}
 
 startApp();
