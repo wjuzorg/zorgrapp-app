@@ -1,5 +1,5 @@
 const SUPABASE_URL = "https://bqqoxawgjxxvolljkqnp.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxcW94YXdnanh4dm9sbGprcW5wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODc0OTMsImV4cCI6MjA5MjA2MzQ5M30.WLTELxD32HFtyV1pbsB-60nF_k4Zq7DSvaR87-kj2es";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxcW94YXdnanh4dm9sbGprcW5wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODc0OTMzImV4cCI6MjA5MjA2MzQ5M30.WLTELxD32HFtyV1pbsB-60nF_k4Zq7DSvaR87-kj2es";
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -20,7 +20,7 @@ function formatEuro(value) {
 
 function getInvoiceNumberFromUrl() {
   const params = new URLSearchParams(window.location.search);
-  return params.get("invoice") || "#2026-0031";
+  return params.get("invoice") || "";
 }
 
 async function initReminderPage() {
@@ -36,7 +36,6 @@ async function initReminderPage() {
   await loadBusinessProfile();
   await loadInvoiceDraft();
   await loadClientFromInvoice();
-
   fillReminderPage();
 }
 
@@ -74,7 +73,7 @@ async function loadInvoiceDraft() {
     invoice_number: invoiceNumber,
     client_name: "Dhr. Test",
     client_email: "test@email.nl",
-    total: 110
+    amount: 110
   };
 }
 
@@ -117,26 +116,30 @@ function getClientEmail() {
 }
 
 function getClientAddressBlock() {
-  const invoiceAddress = currentClient?.invoice_address;
-  const invoicePostcode = currentClient?.invoice_postal_code;
-  const invoiceCity = currentClient?.invoice_city;
+  const useInvoiceAddress =
+    currentClient?.invoice_delivery_method === "address" &&
+    currentClient?.invoice_same_as_client_address === false;
 
-  const normalAddress = currentClient?.address;
-  const normalPostcode = currentClient?.postal_code;
-  const normalCity = currentClient?.city;
+  const address = useInvoiceAddress
+    ? currentClient?.invoice_address || ""
+    : currentClient?.address || "";
 
-  const address = invoiceAddress || normalAddress || "";
-  const postcode = invoicePostcode || normalPostcode || "";
-  const city = invoiceCity || normalCity || "";
+  const postcode = useInvoiceAddress
+    ? currentClient?.invoice_postal_code || ""
+    : currentClient?.postal_code || "";
+
+  const city = useInvoiceAddress
+    ? currentClient?.invoice_city || ""
+    : currentClient?.city || "";
 
   return `${address}\n${postcode} ${city}`.trim();
 }
 
 function fillReminderPage() {
-  const invoiceNumber = currentInvoice?.invoice_number || "#2026-0031";
+  const invoiceNumber = currentInvoice?.invoice_number || "";
   const clientName = getClientName();
   const clientAddress = getClientAddressBlock();
-  const amount = currentInvoice?.total || currentInvoice?.amount || 110;
+  const amount = currentInvoice?.total || currentInvoice?.amount || 0;
 
   const signName =
     currentProfile?.owner_name ||
@@ -153,21 +156,15 @@ function fillReminderPage() {
   const reminderText = document.getElementById("reminderText");
   if (!reminderText) return;
 
-  const rawName = getClientName();
-const salutation = currentClient?.salutation;
+  const salutation = currentClient?.salutation;
+  let aanhef = clientName;
 
-let aanhef = rawName;
+  if (salutation === "dhr") aanhef = `Dhr. ${clientName}`;
+  if (salutation === "mw") aanhef = `Mevr. ${clientName}`;
 
-if (salutation === "dhr") {
-  aanhef = `Dhr. ${rawName}`;
-} else if (salutation === "mw") {
-  aanhef = `Mevr. ${rawName}`;
-}
-
-reminderText.value = `Beste ${aanhef},
+  let text = `Beste ${aanhef},
 
 Volgens onze administratie staat onderstaande factuur nog open.
-
 
 Factuurnummer: ${invoiceNumber}
 Openstaand bedrag: ${formatEuro(amount)}
@@ -183,12 +180,36 @@ Met vriendelijke groet,
 ${signName}${iban ? `\nIBAN: ${iban}` : ""}${kvk ? `\nKVK: ${kvk}` : ""}`;
 
   if (clientAddress) {
-    reminderText.value =
-      `Aan:\n${clientName}\n${clientAddress}\n\n` + reminderText.value;
+    text = `Aan:\n${clientName}\n${clientAddress}\n\n${text}`;
   }
+
+  reminderText.value = text;
 }
 
-function sendReminderByEmail() {
+async function registerReminderSent(type) {
+  if (!currentInvoice?.invoice_number) {
+    alert("Geen factuur gevonden.");
+    return false;
+  }
+
+  const { error } = await supabaseClient
+    .from("invoice_drafts")
+    .update({
+      reminder_sent_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    })
+    .eq("owner_id", currentUser.id)
+    .eq("invoice_number", currentInvoice.invoice_number);
+
+  if (error) {
+    alert("Herinnering registreren mislukt: " + error.message);
+    return false;
+  }
+
+  return true;
+}
+
+async function sendReminderByEmail() {
   const clientEmail = getClientEmail();
 
   if (!clientEmail) {
@@ -196,15 +217,29 @@ function sendReminderByEmail() {
     return;
   }
 
-  const invoiceNumber = currentInvoice?.invoice_number || "#2026-0031";
+  const invoiceNumber = currentInvoice?.invoice_number || "";
   const subject = encodeURIComponent(`Betalingsherinnering factuur ${invoiceNumber}`);
   const body = encodeURIComponent(document.getElementById("reminderText").value);
 
+  const ok = await registerReminderSent("mail");
+  if (!ok) return;
+
   window.location.href = `mailto:${clientEmail}?subject=${subject}&body=${body}`;
+
+  alert("Herinnering per mail is geregistreerd als verzonden.");
 }
 
-function sendReminderByPost() {
+async function sendReminderByPost() {
   window.print();
+
+  const confirmed = confirm("Is de herinnering geprint of opgeslagen als PDF en klaar om per post te versturen?");
+  if (!confirmed) return;
+
+  const ok = await registerReminderSent("post");
+  if (!ok) return;
+
+  alert("Herinnering is geregistreerd als per post verzonden.");
+  window.location.href = "facturen.html";
 }
 
 document.addEventListener("DOMContentLoaded", initReminderPage);
