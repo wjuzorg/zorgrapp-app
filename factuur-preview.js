@@ -143,10 +143,41 @@ function fillInvoicePreview() {
   setText("invoiceDate", formatToday());
 
   setText("invoiceClientName", getClientName());
-  setText("invoiceClientAddress", currentClient?.invoice_address || currentClient?.address || currentInvoice?.client_address || "");
-  setText("invoiceClientPostcode", currentClient?.invoice_postal_code || currentClient?.postal_code || currentInvoice?.client_postcode || "");
-  setText("invoiceClientCity", currentClient?.invoice_city || currentClient?.city || currentInvoice?.client_city || "");
-  setText("invoiceClientEmail", currentClient?.invoice_email || currentClient?.email || currentClient?.client_email || currentInvoice?.client_email || "");
+  const useInvoiceAddress =
+  currentClient?.invoice_delivery_method === "address" &&
+  currentClient?.invoice_same_as_client_address === false;
+
+setText("invoiceClientName", getClientName());
+
+setText(
+  "invoiceClientAddress",
+  useInvoiceAddress
+    ? currentClient?.invoice_address || ""
+    : currentClient?.address || currentInvoice?.client_address || ""
+);
+
+setText(
+  "invoiceClientPostcode",
+  useInvoiceAddress
+    ? currentClient?.invoice_postal_code || ""
+    : currentClient?.postal_code || currentInvoice?.client_postcode || ""
+);
+
+setText(
+  "invoiceClientCity",
+  useInvoiceAddress
+    ? currentClient?.invoice_city || ""
+    : currentClient?.city || currentInvoice?.client_city || ""
+);
+
+setText(
+  "invoiceClientEmail",
+  currentClient?.invoice_email ||
+  currentClient?.email ||
+  currentClient?.client_email ||
+  currentInvoice?.client_email ||
+  ""
+);
 
   setText("invoiceDescription", currentInvoice?.description || "Praktische ondersteuning aan huis");
   setText("invoiceMinutes", currentInvoice?.minutes || "");
