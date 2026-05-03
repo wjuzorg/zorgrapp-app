@@ -564,7 +564,7 @@ async function createInvoiceFromAppointment(appointmentId) {
         minutes,
         hourly_rate: hourlyRate,
         amount,
-        status: "klaar_om_te_verzenden"
+        status: "klaar"
       }]);
 
     if (insertError) {
