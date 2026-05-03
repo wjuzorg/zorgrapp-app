@@ -209,13 +209,18 @@ async function saveClient() {
     if (clientId) {
       await supabaseClient.from("Clients").update(clientPayload).eq("id", clientId);
     } else {
-      const { data } = await supabaseClient
-        .from("Clients")
-        .insert([clientPayload])
-        .select()
-        .single();
+      const { data, error } = await supabaseClient
+  .from("Clients")
+  .insert([clientPayload])
+  .select()
+  .single();
 
-      clientId = data.id;
+if (error || !data) {
+  showSaveMessage("Opslaan cliënt mislukt: " + (error?.message || "geen data"), true);
+  return;
+}
+
+clientId = data.id;
     }
 
     const date = val("appointment_date");
