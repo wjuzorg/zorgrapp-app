@@ -385,12 +385,13 @@ async function loadDashboard() {
 }
 
     const { data, error } = await supabaseClient
-      .from("Appointments")
-      .select("*")
-      .eq("owner_id", currentUser.id)
-      .neq("status", "verwijderd")
-      .order("appointment_date", { ascending: true })
-      .order("appointment_time", { ascending: true });
+  .from("Appointments")
+  .select("*")
+  .eq("owner_id", currentUser.id)
+  .neq("status", "verwijderd")
+  .neq("status", "afgerond")
+  .order("appointment_date", { ascending: true })
+  .order("appointment_time", { ascending: true });
 
       const { data: clientsData } = await supabaseClient
   .from("Clients")
