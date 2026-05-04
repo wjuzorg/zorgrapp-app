@@ -137,66 +137,115 @@ function fillInvoicePreview() {
   setText("companyOwner", currentProfile?.owner_name || "");
   setText("companyKvk", currentProfile?.kvk_number || "");
   setText("companyIban", currentProfile?.iban || "");
-  setText("invoiceVatText", currentProfile?.vat_text || "");
+  setText("companyAddressLine", currentProfile?.company_address || "");
+  setText(
+    "companyCityLine",
+    `${currentProfile?.company_postcode || ""} ${currentProfile?.company_city || ""}`.trim()
+  );
+  setText("companyBtw", currentProfile?.btw_number || "-");
 
+  setText("invoiceVatText", currentProfile?.vat_text || "");
   setText("invoiceNumber", invoiceNumber);
   setText("invoiceDate", formatToday());
 
-  setText("invoiceClientName", getClientName());
   const useInvoiceAddress =
-  currentClient?.invoice_delivery_method === "address" &&
-  currentClient?.invoice_same_as_client_address === false;
+    currentClient?.invoice_delivery_method === "address" &&
+    currentClient?.invoice_same_as_client_address === false;
 
-setText("invoiceClientName", getClientName());
-
-setText(
-  "invoiceClientAddress",
-  useInvoiceAddress
-    ? currentClient?.invoice_address || ""
-    : currentClient?.address || currentInvoice?.client_address || ""
-);
-
-setText(
-  "invoiceClientPostcode",
-  useInvoiceAddress
-    ? currentClient?.invoice_postal_code || ""
-    : currentClient?.postal_code || currentInvoice?.client_postcode || ""
-);
-
-setText(
-  "invoiceClientCity",
-  useInvoiceAddress
-    ? currentClient?.invoice_city || ""
-    : currentClient?.city || currentInvoice?.client_city || ""
-);
-
-setText(
-  "invoiceClientEmail",
-  currentClient?.invoice_email ||
-  currentClient?.email ||
-  currentClient?.client_email ||
-  currentInvoice?.client_email ||
-  ""
-);
+  setText("invoiceClientName", getClientName());
+  setText(
+    "invoiceClientAddress",
+    useInvoiceAddress
+      ? currentClient?.invoice_address || ""
+      : currentClient?.address || currentInvoice?.client_address || ""
+  );
+  setText(
+    "invoiceClientPostcode",
+    useInvoiceAddress
+      ? currentClient?.invoice_postal_code || ""
+      : currentClient?.postal_code || currentInvoice?.client_postcode || ""
+  );
+  setText(
+    "invoiceClientCity",
+    useInvoiceAddress
+      ? currentClient?.invoice_city || ""
+      : currentClient?.city || currentInvoice?.client_city || ""
+  );
+  setText(
+    "invoiceClientEmail",
+    currentClient?.invoice_email ||
+      currentClient?.email ||
+      currentClient?.client_email ||
+      currentInvoice?.client_email ||
+      ""
+  );
 
   setText("invoiceDescription", currentInvoice?.description || "Praktische ondersteuning aan huis");
   setText("invoiceMinutes", currentInvoice?.minutes || "");
   setText("invoiceAmount", formatEuro(amount));
   setText("invoiceTotal", formatEuro(total));
-  setText("companyAddressLine", currentProfile?.company_address || "");
-setText(
-  "companyCityLine",
-  `${currentProfile?.company_postcode || ""} ${currentProfile?.company_city || ""}`.trim()
-);
-setText("companyBtw", currentProfile?.btw_number || "-");
 
-const paymentDays = currentProfile?.payment_term_days || 14;
+  const paymentDays = currentProfile?.payment_term_days || 14;
+  setText(
+    "invoicePaymentText",
+    `Wij verzoeken u vriendelijk het bedrag binnen ${paymentDays} dagen te voldoen.`
+  );
 
-setText(
-  "invoicePaymentText",
-  `Wij verzoeken u vriendelijk het bedrag binnen ${paymentDays} dagen te voldoen.`
-);
+  renderInvoiceLines();
+}
 
+function renderInvoiceLines() {
+  const tbody = document.getElementById("invoiceLines");
+  if (!tbody || !currentInvoice) return;
+
+  const minutes = Number(currentInvoice.minutes || 0);
+  const hourlyRate = Number(currentInvoice.hourly_rate || 0);
+  const laborAmount = (minutes / 60) * hourlyRate;
+
+  const km = Number(currentInvoice.km || 0);
+  const kmAmount = Number(currentInvoice.km_amount || 0);
+  const materialCost = Number(currentInvoice.material_cost || 0);
+  const parkingCost = Number(currentInvoice.parking_cost || 0);
+
+  let rows = `
+    <tr>
+      <td>${currentInvoice.description || "Praktische ondersteuning"}</td>
+      <td>${minutes} minuten</td>
+      <td>${euro(laborAmount)}</td>
+    </tr>
+  `;
+
+  if (km > 0 || kmAmount > 0) {
+    rows += `
+      <tr>
+        <td>Kilometervergoeding (${km} km × €0,23)</td>
+        <td>${km} km</td>
+        <td>${euro(kmAmount)}</td>
+      </tr>
+    `;
+  }
+
+  if (materialCost > 0) {
+    rows += `
+      <tr>
+        <td>Materiaal / overige kosten</td>
+        <td>-</td>
+        <td>${euro(materialCost)}</td>
+      </tr>
+    `;
+  }
+
+  if (parkingCost > 0) {
+    rows += `
+      <tr>
+        <td>Parkeerkosten</td>
+        <td>-</td>
+        <td>${euro(parkingCost)}</td>
+      </tr>
+    `;
+  }
+
+  tbody.innerHTML = rows;
 }
 
 function enableInvoiceEdit() {
