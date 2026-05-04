@@ -568,7 +568,15 @@ async function createInvoiceFromAppointment(appointmentId) {
 
     const minutes = appointment.worked_minutes || appointment.duration_minutes || 60;
     const hourlyRate = Number(profile?.hourly_rate || 50);
-    const amount = (minutes / 60) * hourlyRate;
+    const km = Number(appointment.km || 0);
+const materialCost = Number(appointment.material_cost || 0);
+const parkingCost = Number(appointment.parking_cost || 0);
+
+const kmRate = 0.23;
+const kmAmount = km * kmRate;
+
+const laborAmount = (minutes / 60) * hourlyRate;
+const amount = laborAmount + kmAmount + materialCost + parkingCost;
 
     const { error: insertError } = await supabaseClient
       .from("invoice_drafts")
@@ -581,8 +589,12 @@ async function createInvoiceFromAppointment(appointmentId) {
         minutes,
         hourly_rate: hourlyRate,
         amount,
-        status: "klaar"
-      }]);
+        km,
+  km_amount: kmAmount,
+  material_cost: materialCost,
+  parking_cost: parkingCost,
+  status: "klaar"
+}]);
 
     if (insertError) {
       alert("Fout bij maken factuur: " + insertError.message);
