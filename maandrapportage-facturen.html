@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Maandrapportage facturen</title>
+  <link rel="stylesheet" href="./app.css" />
+</head>
+
+<body>
+  <div class="container">
+    <header class="topbar">
+      <div>
+        <h1>Maandrapportage facturen</h1>
+        <p>Overzicht van facturen, betalingen en herinneringen per maand.</p>
+      </div>
+    </header>
+
+    <section class="form-card">
+      <label class="form-label" for="monthPicker">Kies maand</label>
+      <input type="month" id="monthPicker" class="form-input" />
+    </section>
+
+    <section class="stats">
+      <div class="card">
+        <h3>Totaal gefactureerd</h3>
+        <span id="totalInvoiced">€0</span>
+      </div>
+
+      <div class="card green-soft">
+        <h3>Betaald</h3>
+        <span id="totalPaid">€0</span>
+      </div>
+
+      <div class="card orange">
+        <h3>Openstaand</h3>
+        <span id="totalOpen">€0</span>
+      </div>
+
+      <div class="card red-soft">
+        <h3>Herinneringen</h3>
+        <span id="totalReminders">0</span>
+      </div>
+    </section>
+
+    <section class="form-card">
+      <div class="form-title-wrap">
+        <h2>Facturen deze maand</h2>
+        <p>Alle facturen binnen de gekozen maand.</p>
+      </div>
+
+      <div id="invoiceReportList" class="report-list">
+        Rapportage laden...
+      </div>
+    </section>
+  </div>
+
+  <nav class="settings-nav">
+    <button onclick="window.location.href='index.html'">Dashboard</button>
+    <button onclick="window.location.href='maandrapportages.html'">Rapportages</button>
+    <button onclick="window.location.href='facturen.html'">Facturen</button>
+  </nav>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./maandrapportage-facturen.js?v=1"></script>
+</body>
+</html>
