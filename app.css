@@ -1682,6 +1682,17 @@ body {
 
 .report-card span {
   font-size: 26px;
+  margin-top: 6px;
+}
+
+/* Facturen (groen) */
+.report-card:nth-child(1) span {
+  color: #22c55e; /* licht groen */
+}
+
+/* Cliënten (blauw) */
+.report-card:nth-child(2) span {
+  color: #3b82f6; /* licht blauw */
 }
 
 @media (max-width: 560px) {
@@ -1702,8 +1713,28 @@ body {
   .report-card span {
     font-size: 22px;
   }
-}
+
 
 .report-card:active {
   transform: scale(0.97);
+}
+
+.report-cards {
+  margin: 12px auto;   /* was 20px → compacter */
+}
+
+.report-card {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+body {
+  background: linear-gradient(to bottom, #f9fafb, #f3f4f6);
+}
+
+h1 {
+  margin-bottom: 6px;
+}
+
+p {
+  margin-bottom: 10px;
 }
