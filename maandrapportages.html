@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Maandrapportages</title>
+  <link rel="stylesheet" href="./app.css">
+</head>
+<body>
+<div class="container">
+
+  <header class="topbar">
+    <div>
+      <h1>Maandrapportages</h1>
+      <p>Kies welke rapportage je wilt bekijken</p>
+    </div>
+  </header>
+
+  <section class="stats" style="margin-top: 40px;">
+
+    <div class="card dark"
+      onclick="window.location.href='maandrapportage-facturen.html'"
+      style="cursor:pointer; text-align:center; padding:40px;">
+      <h3>Maandrapportage facturen</h3>
+      <span>€</span>
+    </div>
+
+    <div class="card blue"
+      onclick="window.location.href='maandrapportage-clienten.html'"
+      style="cursor:pointer; text-align:center; padding:40px;">
+      <h3>Maandrapportage cliënten</h3>
+      <span>👥</span>
+    </div>
+
+  </section>
+
+</div>
+
+<nav class="settings-nav">
+  <button onclick="window.location.href='index.html'">
+    Dashboard
+  </button>
+  <button onclick="window.location.href='bedrijfsprofiel.html'">
+    Bedrijfsprofiel
+  </button>
+  <button onclick="window.location.href='privacy.html'">
+    Privacy
+  </button>
+</nav>
+
+</body>
+</html>
