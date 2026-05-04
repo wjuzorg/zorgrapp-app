@@ -8,6 +8,38 @@ function euro(value) {
   return `€${Number(value || 0).toFixed(2).replace(".", ",")}`;
 }
 
+async function getPaymentTermDays(userId) {
+  const { data } = await supabaseClient
+    .from("business_profiles")
+    .select("payment_term_days")
+    .eq("owner_id", userId)
+    .maybeSingle();
+
+  return Number(data?.payment_term_days || 14);
+}
+
+async function updateOverdueInvoices(userId) {
+  const days = await getPaymentTermDays(userId);
+
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - days);
+
+  const { error } = await supabaseClient
+    .from("invoice_drafts")
+    .update({
+      status: "herinnering",
+      updated_at: new Date().toISOString()
+    })
+    .eq("owner_id", userId)
+    .eq("status", "open")
+    .is("paid_at", null)
+    .lt("sent_at", cutoff.toISOString());
+
+  if (error) {
+    console.error("Automatische herinnering mislukt:", error.message);
+  }
+}
+
 async function loadFacturen() {
   const { data: sessionData } = await supabaseClient.auth.getSession();
   currentUser = sessionData?.session?.user;
@@ -16,6 +48,8 @@ async function loadFacturen() {
     alert("Niet ingelogd.");
     return;
   }
+
+  await updateOverdueInvoices(currentUser.id);
 
   const { data, error } = await supabaseClient
     .from("invoice_drafts")
