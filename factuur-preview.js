@@ -211,7 +211,7 @@ function renderInvoiceLines() {
     <tr>
       <td>${currentInvoice.description || "Praktische ondersteuning"}</td>
       <td>${minutes} minuten</td>
-      <td>${euro(laborAmount)}</td>
+      <td>${formatEuro(laborAmount)}</td>
     </tr>
   `;
 
@@ -230,7 +230,7 @@ function renderInvoiceLines() {
       <tr>
         <td>Materiaal / overige kosten</td>
         <td>-</td>
-        <td>${euro(materialCost)}</td>
+        <td>${formatEuro(materialCost)}</td>
       </tr>
     `;
   }
@@ -240,7 +240,7 @@ function renderInvoiceLines() {
       <tr>
         <td>Parkeerkosten</td>
         <td>-</td>
-        <td>${euro(parkingCost)}</td>
+        <td>${formatEuro(parkingCost)}</td>
       </tr>
     `;
   }
