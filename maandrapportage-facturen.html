@@ -2,12 +2,13 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Maandrapportage facturen - ZorgInzicht</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Maandrapportage - ZorgInzicht</title>
   <link rel="stylesheet" href="app.css" />
 </head>
 
 <body>
+
 <main class="container">
 
   <header class="topbar">
@@ -21,7 +22,7 @@
     </button>
   </header>
 
-  <!-- MAAND KIEZER -->
+  <!-- MAAND -->
   <section class="card">
     <div class="form-row">
       <div>
@@ -77,7 +78,11 @@
             <th>Totaal</th>
           </tr>
         </thead>
-        <tbody id="reportBody"></tbody>
+        <tbody id="reportBody">
+          <tr>
+            <td colspan="9">Nog geen data geladen</td>
+          </tr>
+        </tbody>
       </table>
     </div>
 
@@ -94,7 +99,9 @@
 
 </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="maandrapportage-facturen.js"></script>
+<!-- BELANGRIJK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="maandrapportage-facturen.js"></script>
+
 </body>
 </html>
