@@ -137,6 +137,10 @@ async function loadAppointment() {
 
   setSelectedSignals(data.internal_signals || "");
 
+ setValue("km", data.km || "");
+setValue("material_cost", data.material_cost || "");
+setValue("parking_cost", data.parking_cost || "");
+
   await loadClient(data.client_id);
 }
 
@@ -194,6 +198,9 @@ function buildAppointmentPayload(statusValue) {
     payment_type: val("payment_type") || null,
     ready_for_invoice: statusValue === "voltooid",
     status: statusValue,
+    km: Number(val("km") || 0),
+material_cost: Number(val("material_cost") || 0),
+parking_cost: Number(val("parking_cost") || 0),
     updated_at: new Date().toISOString()
   };
 }
