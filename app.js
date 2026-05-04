@@ -568,7 +568,7 @@ async function createInvoiceFromAppointment(appointmentId) {
 
     const minutes = appointment.worked_minutes || appointment.duration_minutes || 60;
     const hourlyRate = Number(profile?.hourly_rate || 50);
-    const km = Number(appointment.km || 0);
+     const km = Number(appointment.km || 0);
 const materialCost = Number(appointment.material_cost || 0);
 const parkingCost = Number(appointment.parking_cost || 0);
 
