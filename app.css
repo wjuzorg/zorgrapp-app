@@ -1649,3 +1649,56 @@ body {
     padding: 10px 4px;
   }
 }
+
+.report-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.report-card {
+  padding: 18px 12px;
+  border-radius: 18px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  text-align: center;
+}
+
+.report-card h3 {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.report-card span {
+  font-size: 26px;
+}
+
+@media (max-width: 560px) {
+  .report-cards {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .report-card {
+    padding: 14px 8px;
+  }
+
+  .report-card h3 {
+    font-size: 14px;
+  }
+
+  .report-card span {
+    font-size: 22px;
+  }
+}
+
+.report-card:active {
+  transform: scale(0.97);
+}
