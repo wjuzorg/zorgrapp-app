@@ -1653,21 +1653,25 @@ body {
 .report-cards {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 14px;
-  margin-top: 20px;
+  gap: 12px;
+
+  width: 100%;
+  max-width: 400px;     /* 👈 dit fixt het probleem */
+  margin: 20px auto;    /* 👈 centreert */
+  padding: 0 12px;      /* 👈 voorkomt afsnijden */
+  box-sizing: border-box;
 }
 
 .report-card {
-  padding: 18px 12px;
+  padding: 16px 10px;   /* iets kleiner */
   border-radius: 18px;
   background: #fff;
   border: 1px solid #e5e7eb;
 
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-
+  justify-content: center;
   text-align: center;
 }
 
@@ -1682,13 +1686,14 @@ body {
 
 @media (max-width: 560px) {
   .report-cards {
-    grid-template-columns: 1fr 1fr;
+    max-width: 360px;
     gap: 10px;
   }
 
   .report-card {
     padding: 14px 8px;
   }
+}
 
   .report-card h3 {
     font-size: 14px;
