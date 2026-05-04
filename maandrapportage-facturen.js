@@ -49,17 +49,11 @@ async function loadReport() {
   `;
 
   const { data, error } = await supabaseClient
-    .from("invoices")
-    .select(`
-      *,
-      clients (
-        full_name,
-        name
-      )
-    `)
-    .gte("invoice_date", start)
-    .lt("invoice_date", end)
-    .order("invoice_date", { ascending: true });
+  .from("invoices")
+  .select("*")
+  .gte("invoice_date", start)
+  .lt("invoice_date", end)
+  .order("invoice_date", { ascending: true });
 
   if (error) {
     console.error(error);
@@ -89,11 +83,11 @@ function renderReport(rows) {
 
   reportBody.innerHTML = rows.map(invoice => {
     const clientName =
-      invoice.clients?.full_name ||
-      invoice.clients?.name ||
-      invoice.client_name ||
-      "Onbekende cliënt";
-
+  invoice.client_name ||
+  invoice.full_name ||
+  invoice.name ||
+  "Onbekende cliënt";
+      
     const workAmount = Number(invoice.work_amount || invoice.subtotal_amount || 0);
     const kmAmount = Number(invoice.km_amount || invoice.travel_amount || 0);
     const materialAmount = Number(invoice.material_amount || 0);
