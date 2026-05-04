@@ -133,8 +133,8 @@ function getStartOfWeek(date, offset = 0) {
 function isAppointmentFilled(item) {
   return Boolean(
     item.work_done &&
-    item.worked_minutes &&
-    String(item.work_done).trim() !== ""
+    String(item.work_done).trim() !== "" &&
+    (item.worked_minutes || item.duration_minutes)
   );
 }
 
