@@ -4,82 +4,95 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Maandrapportage facturen - ZorgInzicht</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="app.css" />
 </head>
 
 <body>
-  <main class="container">
-    <header class="topbar">
+<main class="container">
+
+  <header class="topbar">
+    <div>
+      <h1>Maandrapportage</h1>
+      <p>Overzicht voor jou en je boekhouder</p>
+    </div>
+
+    <button onclick="window.location.href='facturen.html'" class="btn">
+      Terug
+    </button>
+  </header>
+
+  <!-- MAAND KIEZER -->
+  <section class="card">
+    <div class="form-row">
       <div>
-        <h1>Maandrapportage facturen</h1>
-        <p>Kort overzicht voor jou en je boekhouder.</p>
-      </div>
-      <button onclick="window.location.href='facturen.html'">Terug naar facturen</button>
-    </header>
-
-    <section class="card">
-      <label for="monthPicker"><strong>Kies maand</strong></label>
-      <input type="month" id="monthPicker" />
-      <button id="btnLoadReport">Rapportage laden</button>
-    </section>
-
-    <section class="stats">
-      <div class="card">
-        <h3>Omzet totaal</h3>
-        <span id="totalRevenue">€0,00</span>
+        <label>Kies maand</label>
+        <input type="month" id="monthPicker">
       </div>
 
-      <div class="card">
-        <h3>Betaald</h3>
-        <span id="paidTotal">€0,00</span>
-      </div>
+      <button id="btnLoadReport" class="btn primary">
+        Rapportage laden
+      </button>
+    </div>
+  </section>
 
-      <div class="card orange">
-        <h3>Openstaand</h3>
-        <span id="openTotal">€0,00</span>
-      </div>
+  <!-- STATS -->
+  <section class="stats">
+    <div class="card">
+      <h3>Omzet</h3>
+      <span id="totalRevenue">€0</span>
+    </div>
 
-      <div class="card red">
-        <h3>Herinnering nodig</h3>
-        <span id="reminderTotal">€0,00</span>
-      </div>
-    </section>
+    <div class="card green">
+      <h3>Betaald</h3>
+      <span id="paidTotal">€0</span>
+    </div>
 
-    <section class="card">
-      <h2>Overzicht facturen</h2>
-      <p class="muted">
-        Dit overzicht kan direct naar de boekhouder.
-      </p>
+    <div class="card orange">
+      <h3>Openstaand</h3>
+      <span id="openTotal">€0</span>
+    </div>
 
-      <div class="table-wrap">
-        <table id="reportTable">
-          <thead>
-            <tr>
-              <th>Factuurnummer</th>
-              <th>Datum</th>
-              <th>Cliënt</th>
-              <th>Status</th>
-              <th>Werk</th>
-              <th>Km</th>
-              <th>Materiaal</th>
-              <th>Parkeren</th>
-              <th>Totaal</th>
-            </tr>
-          </thead>
-          <tbody id="reportBody">
-            <tr>
-              <td colspan="9">Nog geen rapportage geladen.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+    <div class="card red">
+      <h3>Herinnering</h3>
+      <span id="reminderTotal">€0</span>
+    </div>
+  </section>
 
-      <div class="actions">
-        <button id="btnDownloadCsv">Download voor boekhouder</button>
-        <button id="btnPrint">Print / opslaan als PDF</button>
-      </div>
-    </section>
-  </main>
+  <!-- TABEL -->
+  <section class="card">
+    <h2>Facturen overzicht</h2>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Nr</th>
+            <th>Datum</th>
+            <th>Cliënt</th>
+            <th>Status</th>
+            <th>Werk</th>
+            <th>Km</th>
+            <th>Materiaal</th>
+            <th>Parkeren</th>
+            <th>Totaal</th>
+          </tr>
+        </thead>
+        <tbody id="reportBody"></tbody>
+      </table>
+    </div>
+
+    <div class="actions">
+      <button id="btnDownloadCsv" class="btn primary">
+        Download voor boekhouder
+      </button>
+
+      <button id="btnPrint" class="btn">
+        Print / PDF
+      </button>
+    </div>
+  </section>
+
+</main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="maandrapportage-facturen.js"></script>
