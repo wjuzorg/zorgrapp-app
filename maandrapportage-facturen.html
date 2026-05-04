@@ -3,65 +3,85 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Maandrapportage facturen</title>
-  <link rel="stylesheet" href="./app.css" />
+  <title>Maandrapportage facturen - ZorgInzicht</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
-  <div class="container">
+  <main class="container">
     <header class="topbar">
       <div>
         <h1>Maandrapportage facturen</h1>
-        <p>Overzicht van facturen, betalingen en herinneringen per maand.</p>
+        <p>Kort overzicht voor jou en je boekhouder.</p>
       </div>
+      <button onclick="window.location.href='facturen.html'">Terug naar facturen</button>
     </header>
 
-    <section class="form-card">
-      <label class="form-label" for="monthPicker">Kies maand</label>
-      <input type="month" id="monthPicker" class="form-input" />
+    <section class="card">
+      <label for="monthPicker"><strong>Kies maand</strong></label>
+      <input type="month" id="monthPicker" />
+      <button id="btnLoadReport">Rapportage laden</button>
     </section>
 
     <section class="stats">
       <div class="card">
-        <h3>Totaal gefactureerd</h3>
-        <span id="totalInvoiced">€0</span>
+        <h3>Omzet totaal</h3>
+        <span id="totalRevenue">€0,00</span>
       </div>
 
-      <div class="card green-soft">
+      <div class="card">
         <h3>Betaald</h3>
-        <span id="totalPaid">€0</span>
+        <span id="paidTotal">€0,00</span>
       </div>
 
       <div class="card orange">
         <h3>Openstaand</h3>
-        <span id="totalOpen">€0</span>
+        <span id="openTotal">€0,00</span>
       </div>
 
-      <div class="card red-soft">
-        <h3>Herinneringen</h3>
-        <span id="totalReminders">0</span>
-      </div>
-    </section>
-
-    <section class="form-card">
-      <div class="form-title-wrap">
-        <h2>Facturen deze maand</h2>
-        <p>Alle facturen binnen de gekozen maand.</p>
-      </div>
-
-      <div id="invoiceReportList" class="report-list">
-        Rapportage laden...
+      <div class="card red">
+        <h3>Herinnering nodig</h3>
+        <span id="reminderTotal">€0,00</span>
       </div>
     </section>
-  </div>
 
-  <nav class="settings-nav">
-    <button onclick="window.location.href='index.html'">Dashboard</button>
-    <button onclick="window.location.href='maandrapportages.html'">Rapportages</button>
-    <button onclick="window.location.href='facturen.html'">Facturen</button>
-  </nav>
+    <section class="card">
+      <h2>Overzicht facturen</h2>
+      <p class="muted">
+        Dit overzicht kan direct naar de boekhouder.
+      </p>
+
+      <div class="table-wrap">
+        <table id="reportTable">
+          <thead>
+            <tr>
+              <th>Factuurnummer</th>
+              <th>Datum</th>
+              <th>Cliënt</th>
+              <th>Status</th>
+              <th>Werk</th>
+              <th>Km</th>
+              <th>Materiaal</th>
+              <th>Parkeren</th>
+              <th>Totaal</th>
+            </tr>
+          </thead>
+          <tbody id="reportBody">
+            <tr>
+              <td colspan="9">Nog geen rapportage geladen.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="actions">
+        <button id="btnDownloadCsv">Download voor boekhouder</button>
+        <button id="btnPrint">Print / opslaan als PDF</button>
+      </div>
+    </section>
+  </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="./maandrapportage-facturen.js?v=1"></script>
+  <script src="maandrapportage-facturen.js"></script>
 </body>
 </html>
