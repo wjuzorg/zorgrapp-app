@@ -1797,3 +1797,8 @@ td, th {
 tbody tr {
   border-bottom: 1px solid #f1f1f1;
 }
+
+.table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
