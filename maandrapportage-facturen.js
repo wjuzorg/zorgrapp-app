@@ -102,7 +102,17 @@ function renderReport(rows) {
         : "-"}
     </td>
 
-    <td>${clientName}</td>
+   <td>
+  ${
+    invoice.status === "klaar"
+      ? "Openstaand"
+      : invoice.status === "herinnering"
+      ? "Herinnering"
+      : invoice.status === "betaald"
+      ? "Betaald"
+      : invoice.status || "-"
+  }
+</td>
 
     <td>${invoice.status || "-"}</td>
 
