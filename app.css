@@ -1789,3 +1789,11 @@ select {
   font-size: 16px;
   background: white;
 }
+
+td, th {
+  padding: 14px 10px;
+}
+
+tbody tr {
+  border-bottom: 1px solid #f1f1f1;
+}
