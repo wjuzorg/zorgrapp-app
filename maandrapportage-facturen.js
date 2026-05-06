@@ -45,12 +45,12 @@ async function loadReport() {
     </tr>
   `;
 
-  const { data, error } = await supabaseClient
-    .from("invoices")
-    .select("*")
-    .gte("invoice_date", start)
-    .lt("invoice_date", end)
-    .order("invoice_date", { ascending: true });
+ const { data, error } = await supabaseClient
+  .from("invoice_drafts")
+  .select("*")
+  .gte("created_at", start)
+  .lt("created_at", end)
+  .order("created_at", { ascending: true });
 
   if (error) {
     console.error(error);
@@ -84,19 +84,40 @@ function renderReport(rows) {
       invoice.name ||
       "Onbekend";
 
-    return `
-      <tr>
-        <td>${invoice.invoice_number || "-"}</td>
-        <td>${invoice.invoice_date ? new Date(invoice.invoice_date).toLocaleDateString("nl-NL") : "-"}</td>
-        <td>${clientName}</td>
-        <td>${invoice.status || "-"}</td>
-        <td>${euro(invoice.work_amount)}</td>
-        <td>${euro(invoice.km_amount)}</td>
-        <td>${euro(invoice.material_amount)}</td>
-        <td>${euro(invoice.parking_amount)}</td>
-        <td><strong>${euro(invoice.total_amount)}</strong></td>
-      </tr>
-    `;
+   return `
+  <tr>
+    <td>${invoice.invoice_number || "-"}</td>
+
+    <td>
+      ${invoice.created_at
+        ? new Date(invoice.created_at).toLocaleDateString("nl-NL")
+        : "-"}
+    </td>
+
+    <td>${clientName}</td>
+
+    <td>${invoice.status || "-"}</td>
+
+    <td>${euro(invoice.amount)}</td>
+
+    <td>${euro(invoice.km_amount)}</td>
+
+    <td>${euro(invoice.material_cost)}</td>
+
+    <td>${euro(invoice.parking_cost)}</td>
+
+    <td>
+      <strong>
+        ${euro(
+          Number(invoice.amount || 0) +
+          Number(invoice.km_amount || 0) +
+          Number(invoice.material_cost || 0) +
+          Number(invoice.parking_cost || 0)
+        )}
+      </strong>
+    </td>
+  </tr>
+`;
   }).join("");
 
   updateTotals(rows);
@@ -106,8 +127,11 @@ function updateTotals(rows) {
   let total = 0, paid = 0, open = 0, reminder = 0;
 
   rows.forEach(i => {
-    const amount = Number(i.total_amount || 0);
-    total += amount;
+    const amount =
+  Number(i.amount || 0) +
+  Number(i.km_amount || 0) +
+  Number(i.material_cost || 0) +
+  Number(i.parking_cost || 0);
 
     if (i.status === "betaald") paid += amount;
     else if (i.status === "herinnering") {
@@ -125,17 +149,22 @@ function updateTotals(rows) {
 function downloadCsv() {
   if (!currentRows.length) return alert("Geen data");
 
-  const rows = currentRows.map(i => [
-    i.invoice_number,
-    i.invoice_date,
-    i.client_name,
-    i.status,
-    i.work_amount,
-    i.km_amount,
-    i.material_amount,
-    i.parking_amount,
-    i.total_amount
-  ]);
+ const rows = currentRows.map(i => [
+  i.invoice_number || "-",
+  i.created_at ? new Date(i.created_at).toLocaleDateString("nl-NL") : "",
+  i.client_name || "Onbekend",
+  i.status || "",
+  Number(i.amount || 0).toFixed(2),
+  Number(i.km_amount || 0).toFixed(2),
+  Number(i.material_cost || 0).toFixed(2),
+  Number(i.parking_cost || 0).toFixed(2),
+  (
+    Number(i.amount || 0) +
+    Number(i.km_amount || 0) +
+    Number(i.material_cost || 0) +
+    Number(i.parking_cost || 0)
+  ).toFixed(2)
+]);
 
   const csv = [
     ["Nr","Datum","Client","Status","Werk","Km","Materiaal","Parkeren","Totaal"].join(";"),
