@@ -133,11 +133,21 @@ function updateTotals(rows) {
   Number(i.material_cost || 0) +
   Number(i.parking_cost || 0);
 
-    if (i.status === "betaald") paid += amount;
-    else if (i.status === "herinnering") {
+    total += amount;
+
+    if (i.status === "betaald") {
+
+      paid += amount;
+
+    } else if (i.status === "herinnering") {
+
       reminder += amount;
       open += amount;
-    } else open += amount;
+
+    } else {
+
+      open += amount;
+    }
   });
 
   document.getElementById("totalRevenue").textContent = euro(total);
