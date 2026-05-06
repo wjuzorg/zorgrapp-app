@@ -1803,14 +1803,26 @@ tbody tr {
   -webkit-overflow-scrolling: touch;
 }
 
-input[type="month"] {
-  border: 2px solid #111;
-  border-radius: 16px;
-  padding: 10px 14px;
-  background: white;
+input[type="month"],
+select {
+  height: 52px;
+  min-width: 170px;
+  border: 1px solid #ddd;
+  border-radius: 14px;
+  padding: 0 16px;
+  background: #fff;
   font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  box-shadow: none;
+  outline: none;
 }
 
+input[type="month"]:focus,
+select:focus {
+  border-color: #111;
+  box-shadow: 0 0 0 2px rgba(17, 17, 17, 0.08);
+}
 th, td {
   padding: 14px 12px;
 }
