@@ -1903,7 +1903,7 @@ tbody tr {
 
 .report-header p {
   margin: 0;
-  line-height: 1.5;
+  line-height: 1.35;
   color: #555;
 }
 
@@ -1915,4 +1915,8 @@ tbody tr {
   .report-header {
     grid-template-columns: 1fr;
   }
+}
+
+.report-header br {
+  line-height: 1.2;
 }
