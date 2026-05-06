@@ -1830,3 +1830,44 @@ th, td {
 tbody tr {
   border-bottom: 1px solid #f1f1f1;
 }
+
+@media (max-width: 768px) {
+
+  .form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    align-items: stretch;
+  }
+
+  .form-row > div {
+    width: 100%;
+  }
+
+  .form-row label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  input[type="month"],
+  select,
+  #btnLoadReport {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  #btnLoadReport {
+    margin-top: 4px;
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  table {
+    min-width: 760px;
+  }
+}
