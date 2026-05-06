@@ -1888,3 +1888,31 @@ tbody tr {
     max-width: 100% !important;
   }
 }
+
+.report-header {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.report-header h2 {
+  margin: 0 0 10px;
+  font-size: 22px;
+}
+
+.report-header p {
+  margin: 0;
+  line-height: 1.5;
+  color: #555;
+}
+
+.report-meta p {
+  margin-bottom: 8px;
+}
+
+@media (max-width: 768px) {
+  .report-header {
+    grid-template-columns: 1fr;
+  }
+}
