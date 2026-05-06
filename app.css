@@ -1802,3 +1802,19 @@ tbody tr {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
+
+input[type="month"] {
+  border: 2px solid #111;
+  border-radius: 16px;
+  padding: 10px 14px;
+  background: white;
+  font-size: 16px;
+}
+
+th, td {
+  padding: 14px 12px;
+}
+
+tbody tr {
+  border-bottom: 1px solid #f1f1f1;
+}
