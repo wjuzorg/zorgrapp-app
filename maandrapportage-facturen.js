@@ -9,6 +9,7 @@ const btnLoadReport = document.getElementById("btnLoadReport");
 const btnDownloadCsv = document.getElementById("btnDownloadCsv");
 const btnPrint = document.getElementById("btnPrint");
 const reportBody = document.getElementById("reportBody");
+const companyInfo = document.getElementById("companyInfo");
 
 let currentRows = [];
 
@@ -35,6 +36,35 @@ function getMonthRange(monthValue) {
     start: start.toISOString(),
     end: end.toISOString(),
   };
+}
+
+async function loadBusinessProfile() {
+
+  const { data, error } = await supabaseClient
+    .from("business_profiles")
+    .select("*")
+    .single();
+
+  if (error) {
+
+    console.error(error);
+
+    companyInfo.innerHTML = `
+      Bedrijfsgegevens nog niet ingesteld.<br>
+      Voeg later bedrijfsnaam, KvK, btw-id en IBAN toe via Bedrijfsprofiel.
+    `;
+
+    return;
+  }
+
+  companyInfo.innerHTML = `
+    ${data.company_name || "Bedrijfsnaam niet ingevuld"}<br>
+    ${data.address || ""}<br>
+    ${data.postal_code || ""} ${data.city || ""}<br>
+    KvK: ${data.kvk_number || "-"}<br>
+    BTW-ID: ${data.vat_number || "-"}<br>
+    IBAN: ${data.iban || "-"}
+  `;
 }
 
 async function loadReport() {
@@ -214,4 +244,5 @@ btnPrint.onclick = () => window.print();
 
 statusFilter.addEventListener("change", loadReport);
 
+loadBusinessProfile();
 loadReport();
