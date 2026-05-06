@@ -1781,3 +1781,11 @@ p {
   gap: 10px;
   margin-top: 15px;
 }
+
+select {
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 16px;
+  background: white;
+}

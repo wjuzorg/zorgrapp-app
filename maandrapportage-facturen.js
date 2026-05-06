@@ -4,6 +4,7 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const monthPicker = document.getElementById("monthPicker");
+const statusFilter = document.getElementById("statusFilter");
 const btnLoadReport = document.getElementById("btnLoadReport");
 const btnDownloadCsv = document.getElementById("btnDownloadCsv");
 const btnPrint = document.getElementById("btnPrint");
@@ -45,12 +46,19 @@ async function loadReport() {
     </tr>
   `;
 
- const { data, error } = await supabaseClient
+let query = supabaseClient
   .from("invoice_drafts")
   .select("*")
   .gte("created_at", start)
-  .lt("created_at", end)
-  .order("created_at", { ascending: true });
+  .lt("created_at", end);
+
+ if (statusFilter.value !== "all") {
+  query = query.eq("status", statusFilter.value);
+}
+
+const { data, error } = await query.order("created_at", {
+  ascending: true
+});
 
   if (error) {
     console.error(error);
@@ -193,5 +201,7 @@ function downloadCsv() {
 btnLoadReport.onclick = loadReport;
 btnDownloadCsv.onclick = downloadCsv;
 btnPrint.onclick = () => window.print();
+
+statusFilter.addEventListener("change", loadReport);
 
 loadReport();
