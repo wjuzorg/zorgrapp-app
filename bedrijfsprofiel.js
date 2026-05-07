@@ -1,12 +1,48 @@
-function updateVatText() {
-  const vatStatus = document.getElementById("vat_status");
-  const vatText = document.getElementById("vat_text");
-  const vatCustomerWrap = document.getElementById("vatCustomerWrap");
+const SUPABASE_URL = "https://bqqoxawgjxxvolljkqnp.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxcW94YXdnanh4dm9sbGprcW5wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODc0OTMsImV4cCI6MjA5MjA2MzQ5M30.WLTELxD32HFtyV1pbsB-60nF_k4Zq7DSvaR87-kj2es";
 
-  if (!vatStatus || !vatText || !vatCustomerWrap) {
-    console.log("BTW velden niet gevonden");
-    return;
-  }
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let currentUser = null;
+
+function el(id) {
+  return document.getElementById(id);
+}
+
+const fields = [
+  "company_name",
+  "owner_name",
+  "kvk_number",
+  "btw_number",
+  "iban",
+  "hourly_rate",
+  "payment_term_days",
+  "vat_status",
+  "vat_text",
+  "vat_customer_number",
+  "company_email",
+  "company_phone",
+  "company_address",
+  "company_postcode",
+  "company_city",
+  "bookkeeping_email",
+  "accountant_name"
+];
+
+function showMessage(text, isError = false) {
+  const box = el("profileMessage");
+  if (!box) return;
+
+  box.textContent = text;
+  box.style.color = isError ? "#b91c1c" : "#166534";
+}
+
+function updateVatText() {
+  const vatStatus = el("vat_status");
+  const vatText = el("vat_text");
+  const vatCustomerWrap = el("vatCustomerWrap");
+
+  if (!vatStatus || !vatText || !vatCustomerWrap) return;
 
   vatCustomerWrap.style.display = "none";
 
@@ -21,3 +57,101 @@ function updateVatText() {
     vatCustomerWrap.style.display = "block";
   }
 }
+
+async function init() {
+  const { data: userData, error: userError } = await supabaseClient.auth.getUser();
+
+  if (userError || !userData.user) {
+    showMessage("Niet ingelogd. Log opnieuw in.", true);
+    return;
+  }
+
+  currentUser = userData.user;
+
+  const { data, error } = await supabaseClient
+    .from("business_profiles")
+    .select("*")
+    .eq("owner_id", currentUser.id)
+    .single();
+
+  if (error) {
+    console.log("Nog geen bedrijfsprofiel gevonden:", error.message);
+    updateVatText();
+    return;
+  }
+
+  fields.forEach(field => {
+    const input = el(field);
+    if (input && data[field] !== null && data[field] !== undefined) {
+      input.value = data[field];
+    }
+  });
+
+  updateVatText();
+}
+
+async function saveBusinessProfile() {
+  if (!currentUser) {
+    showMessage("Niet ingelogd. Log opnieuw in.", true);
+    return;
+  }
+
+  const payload = {
+    owner_id: currentUser.id,
+
+    company_name: el("company_name")?.value.trim() || "",
+    owner_name: el("owner_name")?.value.trim() || "",
+    kvk_number: el("kvk_number")?.value.trim() || "",
+    btw_number: el("btw_number")?.value.trim() || "",
+    iban: el("iban")?.value.trim() || "",
+
+    hourly_rate: el("hourly_rate")?.value
+      ? Number(el("hourly_rate").value)
+      : 50,
+
+    payment_term_days: el("payment_term_days")?.value
+      ? Number(el("payment_term_days").value)
+      : 14,
+
+    vat_status: el("vat_status")?.value || "",
+    vat_text: el("vat_text")?.value.trim() || "",
+    vat_customer_number: el("vat_customer_number")?.value.trim() || "",
+
+    company_email: el("company_email")?.value.trim() || "",
+    company_phone: el("company_phone")?.value.trim() || "",
+    company_address: el("company_address")?.value.trim() || "",
+    company_postcode: el("company_postcode")?.value.trim() || "",
+    company_city: el("company_city")?.value.trim() || "",
+
+    bookkeeping_email: el("bookkeeping_email")?.value.trim() || "",
+    accountant_name: el("accountant_name")?.value.trim() || "",
+
+    updated_at: new Date().toISOString()
+  };
+
+  const { error } = await supabaseClient
+    .from("business_profiles")
+    .upsert(payload, { onConflict: "owner_id" });
+
+  if (error) {
+    showMessage("Opslaan mislukt: " + error.message, true);
+    return;
+  }
+
+  showMessage("Bedrijfsprofiel opgeslagen.");
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  await init();
+
+  const saveBtn = el("saveBusinessProfileBtn");
+  const vatStatus = el("vat_status");
+
+  if (vatStatus) {
+    vatStatus.addEventListener("change", updateVatText);
+  }
+
+  if (saveBtn) {
+    saveBtn.addEventListener("click", saveBusinessProfile);
+  }
+});
