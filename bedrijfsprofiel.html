@@ -61,7 +61,7 @@
 
   <label class="form-label" for="vat_status">BTW-instelling</label>
 
-<select id="vat_status" class="form-input" required>
+<select id="vat_status" class="form-input" required onchange="updateVatText()">
   <option value="">Kies btw-instelling</option>
   <option value="btw_plichtig">BTW-plichtig</option>
   <option value="kor">Kleineondernemersregeling / KOR</option>
@@ -71,9 +71,7 @@
 
 <label class="form-label" for="vat_text">BTW-tekst op factuur</label>
 
-<textarea id="vat_text" class="form-textarea" rows="3">
-Kies eerst een btw-instelling.
-</textarea>
+<textarea id="vat_text" class="form-textarea" rows="3"></textarea>
 
 <div id="vatCustomerWrap" style="display:none;">
   <label class="form-label" for="vat_customer_number">
