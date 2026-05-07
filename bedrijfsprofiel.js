@@ -165,7 +165,11 @@ document.addEventListener("DOMContentLoaded", () => {
   init();
 
   const saveBtn = document.getElementById("saveBusinessProfileBtn");
-el("vat_status").addEventListener("change", updateVatText);
+
+  el("vat_status").addEventListener("change", updateVatText);
+
+  updateVatText();
+
   if (saveBtn) {
     saveBtn.addEventListener("click", saveBusinessProfile);
   }
