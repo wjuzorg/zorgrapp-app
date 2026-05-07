@@ -50,9 +50,17 @@ async function loadBusinessProfile() {
     console.error(error);
 
     companyInfo.innerHTML = `
-      Bedrijfsgegevens nog niet ingesteld.<br>
-      Voeg later bedrijfsnaam, KvK, btw-id en IBAN toe via Bedrijfsprofiel.
-    `;
+  <strong>${data.company_name || "Bedrijfsnaam niet ingevuld"}</strong><br>
+  KvK: ${data.kvk_number || "-"}<br>
+  BTW-ID: ${data.btw_number || "-"}<br>
+  IBAN: ${data.iban || "-"}<br><br>
+  <strong>Boekhouder</strong><br>
+  ${data.accountant_name || "Naam niet ingevuld"}<br>
+  ${data.bookkeeping_email || "E-mail niet ingevuld"}<br>
+  <button class="mini-btn" onclick="window.location.href='bedrijfsprofiel.html'">
+    Wijzig
+  </button>
+`;
 
     return;
   }
