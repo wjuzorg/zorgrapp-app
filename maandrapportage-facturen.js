@@ -41,7 +41,6 @@ function getMonthRange(monthValue) {
 }
 
 async function loadBusinessProfile() {
-
   const { data, error } = await supabaseClient
     .from("business_profiles")
     .select("*")
@@ -50,26 +49,23 @@ async function loadBusinessProfile() {
   if (error) {
     console.error(error);
 
-    currentProfile = data;
-    
     companyInfo.innerHTML = `
       Bedrijfsgegevens nog niet ingesteld.<br>
       Voeg later bedrijfsnaam, KvK, btw-id en IBAN toe via Bedrijfsprofiel.
     `;
-
     return;
   }
+
+  currentProfile = data;
 
   companyInfo.innerHTML = `
     <strong>${data.company_name || "Bedrijfsnaam niet ingevuld"}</strong><br>
     KvK: ${data.kvk_number || "-"}<br>
     BTW-ID: ${data.btw_number || "-"}<br>
     IBAN: ${data.iban || "-"}<br><br>
-
     <strong>Boekhouder</strong><br>
     ${data.accountant_name || "Naam niet ingevuld"}<br>
     ${data.bookkeeping_email || "E-mail niet ingevuld"}<br>
-
     <button class="mini-btn" onclick="window.location.href='bedrijfsprofiel.html'">
       Wijzig
     </button>
@@ -268,5 +264,9 @@ btnPrint.onclick = () => window.print();
 
 statusFilter.addEventListener("change", loadReport);
 
-loadBusinessProfile();
-loadReport();
+async function startPage() {
+  await loadBusinessProfile();
+  await loadReport();
+}
+
+startPage();

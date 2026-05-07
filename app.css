@@ -1996,3 +1996,18 @@ tbody tr {
   background: #f8fafc;
   border-color: #d1d5db;
 }
+
+@media (max-width: 768px) {
+
+  .top-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .top-actions button {
+    width: 100%;
+  }
+
+}
