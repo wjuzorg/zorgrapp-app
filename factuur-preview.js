@@ -94,11 +94,13 @@ async function loadInvoiceDraft() {
   const invoiceNumber = getInvoiceNumberFromUrl();
 
   const { data, error } = await supabaseClient
-    .from("invoice_drafts")
-    .select("*")
-    .eq("owner_id", currentUser.id)
-    .eq("invoice_number", invoiceNumber)
-    .maybeSingle();
+  .from("invoice_drafts")
+  .select("*")
+  .eq("owner_id", currentUser.id)
+  .eq("invoice_number", invoiceNumber)
+  .order("created_at", { ascending: false })
+  .limit(1)
+  .single();
 
   if (error) {
     alert("Factuur laden mislukt: " + error.message);
