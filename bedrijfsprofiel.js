@@ -161,8 +161,8 @@ async function saveBusinessProfile() {
   showMessage("Bedrijfsprofiel opgeslagen.");
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  init();
+document.addEventListener("DOMContentLoaded", async () => {
+  await init();
 
   const saveBtn = document.getElementById("saveBusinessProfileBtn");
 
