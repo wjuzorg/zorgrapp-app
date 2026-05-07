@@ -11,6 +11,8 @@ const btnPrint = document.getElementById("btnPrint");
 const reportBody = document.getElementById("reportBody");
 const companyInfo = document.getElementById("companyInfo");
 
+let currentProfile = null;
+
 let currentRows = [];
 
 function euro(value) {
@@ -129,7 +131,11 @@ function renderReport(rows) {
 
    return `
   <tr>
-    <td>${invoice.invoice_number || "-"}</td>
+    <td>
+  <a class="invoice-link" href="factuur-preview.html?invoice=${encodeURIComponent(invoice.invoice_number)}">
+    ${invoice.invoice_number || "-"}
+  </a>
+</td>
 
     <td>
       ${invoice.created_at
@@ -159,6 +165,8 @@ function renderReport(rows) {
 
     <td>${euro(invoice.parking_cost)}</td>
 
+    <td>${formatVatStatus(currentProfile?.vat_status)}</td>
+
     <td>
       <strong>
         ${euro(
@@ -174,6 +182,14 @@ function renderReport(rows) {
   }).join("");
 
   updateTotals(rows);
+}
+
+function formatVatStatus(status) {
+  if (status === "vrijgesteld") return "Vrijgesteld";
+  if (status === "kor") return "KOR";
+  if (status === "verlegd") return "Verlegd";
+  if (status === "btw_plichtig") return "BTW-plichtig";
+  return "-";
 }
 
 function updateTotals(rows) {
@@ -221,6 +237,7 @@ function downloadCsv() {
   Number(i.km_amount || 0).toFixed(2),
   Number(i.material_cost || 0).toFixed(2),
   Number(i.parking_cost || 0).toFixed(2),
+  formatVatStatus(currentProfile?.vat_status),
   (
     Number(i.amount || 0) +
     Number(i.km_amount || 0) +
@@ -230,7 +247,7 @@ function downloadCsv() {
 ]);
 
   const csv = [
-    ["Nr","Datum","Client","Status","Werk","Km","Materiaal","Parkeren","Totaal"].join(";"),
+    ["Nr","Datum","Client","Status","Werk","Km","Materiaal","Parkeren","BTW-status","Totaal"].join(";"),
     ...rows.map(r => r.join(";"))
   ].join("\n");
 

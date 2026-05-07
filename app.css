@@ -1941,3 +1941,9 @@ tbody tr {
   font-weight: 700;
   cursor: pointer;
 }
+
+.invoice-link {
+  font-weight: 700;
+  color: #111;
+  text-decoration: underline;
+}
