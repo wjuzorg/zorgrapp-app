@@ -1903,7 +1903,7 @@ tbody tr {
 
 .report-header p {
   margin: 0;
-  line-height: 1.35;
+  line-height: 1.28;
   color: #555;
 }
 
@@ -1919,4 +1919,14 @@ tbody tr {
 
 .report-header br {
   line-height: 1.2;
+}
+
+.company-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.report-company-card {
+  margin-bottom: 26px;
 }
