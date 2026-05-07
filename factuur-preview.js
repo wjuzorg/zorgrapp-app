@@ -232,6 +232,7 @@ function renderInvoiceLines() {
   const kmAmount = Number(currentInvoice.km_amount || 0);
   const materialCost = Number(currentInvoice.material_cost || 0);
   const parkingCost = Number(currentInvoice.parking_cost || 0);
+  const invoiceVatText = document.getElementById("invoiceVatText");
 
   let rows = `
     <tr>
@@ -270,6 +271,14 @@ function renderInvoiceLines() {
       </tr>
     `;
   }
+
+  if (invoiceVatText && currentProfile) {
+  invoiceVatText.innerHTML = getVatText(currentProfile);
+}
+
+if (invoiceVatText && currentProfile) {
+  invoiceVatText.innerHTML = getVatText(currentProfile);
+}
 
   tbody.innerHTML = rows;
 }
@@ -400,6 +409,7 @@ ${companyName}`
     alert("Status aanpassen mislukt: " + error.message);
     return;
   }
+
 
   alert("Gmail geopend. Factuur staat nu bij Wacht op betaling.");
 }
