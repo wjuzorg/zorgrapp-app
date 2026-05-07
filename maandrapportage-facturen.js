@@ -50,6 +50,8 @@ async function loadBusinessProfile() {
   if (error) {
     console.error(error);
 
+    currentProfile = data;
+    
     companyInfo.innerHTML = `
       Bedrijfsgegevens nog niet ingesteld.<br>
       Voeg later bedrijfsnaam, KvK, btw-id en IBAN toe via Bedrijfsprofiel.
