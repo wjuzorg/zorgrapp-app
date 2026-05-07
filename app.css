@@ -1947,3 +1947,34 @@ tbody tr {
   color: #111;
   text-decoration: underline;
 }
+
+.top-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+.top-actions button {
+  padding: 10px 16px;
+}
+
+.invoice-footer-note {
+  margin-top: 18px;
+  font-size: 13px;
+  color: #777;
+  text-align: center;
+}
+
+.invoice-footer-note a {
+  color: #555;
+  font-weight: 600;
+}
+
+@media print {
+  .invoice-footer-note,
+  .top-actions,
+  .invoice-actions {
+    display: none !important;
+  }
+}
