@@ -49,6 +49,32 @@ async function initInvoicePreview() {
   fillInvoicePreview();
 }
 
+function getVatText(profile) {
+
+  if (!profile) return "";
+
+  if (profile.vat_status === "vrijgesteld") {
+    return profile.vat_text || "BTW vrijgesteld van omzetbelasting volgens geldende vrijstelling.";
+  }
+
+  if (profile.vat_status === "kor") {
+    return "Er wordt geen btw berekend vanwege toepassing van de kleineondernemersregeling (KOR).";
+  }
+
+  if (profile.vat_status === "verlegd") {
+    return `
+      BTW verlegd naar afnemer.<br>
+      BTW-nummer afnemer: ${profile.vat_customer_number || "-"}
+    `;
+  }
+
+  if (profile.vat_status === "btw_plichtig") {
+    return "BTW-plichtig. Btw-berekening wordt later toegevoegd.";
+  }
+
+  return "";
+}
+
 async function loadBusinessProfile() {
   const { data, error } = await supabaseClient
     .from("business_profiles")
