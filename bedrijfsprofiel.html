@@ -59,20 +59,21 @@
     <label class="form-label" for="payment_term_days">Betaaltermijn in dagen</label>
     <input id="payment_term_days" class="form-input" type="number" required value="14">
 
-    <label class="form-label" for="vat_status">BTW-instelling</label>
-    <select id="vat_status" class="form-input" required>
-      <option value="">Kies btw-instelling</option>
-      <option value="vrijgesteld">BTW vrijgesteld</option>
-      <option value="verlegd">BTW verlegd</option>
-      <option value="geen">Geen btw vermelden</option>
-    </select>
+  <label class="form-label" for="vat_status">BTW-instelling</label>
 
-    <label class="form-label" for="vat_text">BTW-tekst op factuur</label>
-    <textarea id="vat_text" class="form-textarea" rows="3">
-BTW vrijgesteld van omzetbelasting volgens geldende vrijstelling.
-    </textarea>
-  </div>
-</section>
+<select id="vat_status" class="form-input" required>
+  <option value="">Kies btw-instelling</option>
+  <option value="btw_plichtig">BTW-plichtig</option>
+  <option value="kor">Kleineondernemersregeling / KOR</option>
+  <option value="vrijgesteld">BTW-vrijgesteld</option>
+  <option value="verlegd">BTW verlegd</option>
+</select>
+
+<label class="form-label" for="vat_text">BTW-tekst op factuur</label>
+
+<textarea id="vat_text" class="form-textarea" rows="3">
+Kies eerst een btw-instelling.
+</textarea>
 
 <label class="form-label" for="accountant_name">
   Naam boekhouder

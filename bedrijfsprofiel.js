@@ -82,6 +82,31 @@ async function saveBusinessProfile() {
     return;
   }
 
+  function updateVatText() {
+  const vatStatus = el("vat_status").value;
+  const vatText = el("vat_text");
+
+  if (vatStatus === "btw_plichtig") {
+    vatText.value = "BTW wordt berekend volgens het geldende tarief.";
+  }
+
+  if (vatStatus === "kor") {
+    vatText.value = "Er wordt geen btw berekend vanwege toepassing van de kleineondernemersregeling (KOR).";
+  }
+
+  if (vatStatus === "vrijgesteld") {
+    vatText.value = "BTW vrijgesteld van omzetbelasting volgens geldende vrijstelling.";
+  }
+
+  if (vatStatus === "verlegd") {
+    vatText.value = "BTW verlegd. De btw wordt verlegd naar de afnemer.";
+  }
+
+  if (!vatStatus) {
+    vatText.value = "Kies eerst een btw-instelling.";
+  }
+}
+
   const payload = {
     owner_id: currentUser.id,
 
@@ -129,7 +154,7 @@ document.addEventListener("DOMContentLoaded", () => {
   init();
 
   const saveBtn = document.getElementById("saveBusinessProfileBtn");
-
+el("vat_status").addEventListener("change", updateVatText);
   if (saveBtn) {
     saveBtn.addEventListener("click", saveBusinessProfile);
   }
