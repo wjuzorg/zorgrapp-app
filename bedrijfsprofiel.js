@@ -82,27 +82,38 @@ async function saveBusinessProfile() {
     return;
   }
 
-  function updateVatText() {
+ function updateVatText() {
+
   const vatStatus = el("vat_status").value;
   const vatText = el("vat_text");
+  const vatCustomerWrap = el("vatCustomerWrap");
 
-  if (vatStatus === "btw_plichtig") {
-    vatText.value = "BTW wordt berekend volgens het geldende tarief.";
-  }
-
-  if (vatStatus === "kor") {
-    vatText.value = "Er wordt geen btw berekend vanwege toepassing van de kleineondernemersregeling (KOR).";
-  }
+  vatCustomerWrap.style.display = "none";
 
   if (vatStatus === "vrijgesteld") {
-    vatText.value = "BTW vrijgesteld van omzetbelasting volgens geldende vrijstelling.";
+    vatText.value =
+      "BTW vrijgesteld van omzetbelasting volgens geldende vrijstelling.";
   }
 
-  if (vatStatus === "verlegd") {
-    vatText.value = "BTW verlegd. De btw wordt verlegd naar de afnemer.";
+  else if (vatStatus === "verlegd") {
+
+    vatText.value = "";
+
+    vatCustomerWrap.style.display = "block";
   }
 
-  if (!vatStatus) {
+  else if (vatStatus === "kor") {
+
+    vatText.value = "";
+  }
+
+  else if (vatStatus === "btw_plichtig") {
+
+    vatText.value = "";
+  }
+
+  else {
+
     vatText.value = "Kies eerst een btw-instelling.";
   }
 }
