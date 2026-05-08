@@ -225,16 +225,36 @@ function updateTotals(rows) {
 
 function getMonthNameForFile() {
   const [year, month] = monthPicker.value.split("-");
-  const monthNames = [
+  const months = [
     "januari", "februari", "maart", "april", "mei", "juni",
     "juli", "augustus", "september", "oktober", "november", "december"
   ];
+  return `${months[Number(month) - 1]}${year}`;
+}
 
-  return `${monthNames[Number(month) - 1]}${year}`;
+function cleanStatus(status) {
+  if (status === "klaar") return "Openstaand";
+  if (status === "betaald") return "Betaald";
+  if (status === "herinnering") return "Herinnering";
+  if (status === "open") return "Openstaand";
+  return status || "-";
 }
 
 function downloadCsv() {
   if (!currentRows.length) return alert("Geen data");
+
+  const headers = [
+    "Factuurnummer",
+    "Datum",
+    "Cliënt",
+    "Status",
+    "Werk",
+    "Km",
+    "Materiaal",
+    "Parkeren",
+    "BTW-status",
+    "Totaal"
+  ];
 
   const rows = currentRows.map(i => {
     const total =
@@ -247,30 +267,30 @@ function downloadCsv() {
       i.invoice_number || "-",
       i.created_at ? new Date(i.created_at).toLocaleDateString("nl-NL") : "",
       i.client_name || "Onbekend",
-      i.status === "klaar" ? "Openstaand" : i.status || "",
-      Number(i.amount || 0).toFixed(2).replace(".", ","),
-      Number(i.km_amount || 0).toFixed(2).replace(".", ","),
-      Number(i.material_cost || 0).toFixed(2).replace(".", ","),
-      Number(i.parking_cost || 0).toFixed(2).replace(".", ","),
+      cleanStatus(i.status),
+      euro(i.amount),
+      euro(i.km_amount),
+      euro(i.material_cost),
+      euro(i.parking_cost),
       formatVatStatus(currentProfile?.vat_status),
-      total.toFixed(2).replace(".", ",")
+      euro(total)
     ];
   });
 
-  const csv = [
-    ["Factuurnummer", "Datum", "Cliënt", "Status", "Werk", "Km", "Materiaal", "Parkeren", "BTW-status", "Totaal"].join(";"),
-    ...rows.map(r => r.join(";"))
+  const content = [
+    headers.join("\t"),
+    ...rows.map(row => row.join("\t"))
   ].join("\n");
 
-  const blob = new Blob(["\uFEFF" + csv], {
-    type: "text/csv;charset=utf-8;"
+  const blob = new Blob(["\uFEFF" + content], {
+    type: "application/vnd.ms-excel;charset=utf-8;"
   });
 
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
 
   a.href = url;
-  a.download = `maandrapportage-${getMonthNameForFile()}.csv`;
+  a.download = `maandrapportage-${getMonthNameForFile()}.xls`;
   a.click();
 
   URL.revokeObjectURL(url);
