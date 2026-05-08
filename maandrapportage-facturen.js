@@ -278,22 +278,22 @@ function downloadCsv() {
   });
 
   const content = [
-    headers.join("\t"),
-    ...rows.map(row => row.join("\t"))
-  ].join("\n");
+  headers.join("\t"),
+  ...rows.map(row => row.join("\t"))
+].join("\n");
 
-  const blob = new Blob(["\uFEFF" + content], {
+const blob = new Blob(["\uFEFF" + content], {
   type: "text/tab-separated-values;charset=utf-8;"
 });
 
+const url = URL.createObjectURL(blob);
+const a = document.createElement("a");
+
+a.href = url;
 a.download = `maandrapportage-${getMonthNameForFile()}.tsv`;
+a.click();
 
-  URL.revokeObjectURL(url);
-}
-
-btnLoadReport.onclick = loadReport;
-btnDownloadCsv.onclick = downloadCsv;
-btnPrint.onclick = () => window.print();
+URL.revokeObjectURL(url);
 
 statusFilter.addEventListener("change", loadReport);
 
