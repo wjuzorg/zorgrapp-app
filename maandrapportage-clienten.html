@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>ZorgInzicht - Maandrapportage cliënten</title>
+  <link rel="stylesheet" href="./app.css" />
+</head>
+
+<body>
+  <div class="container">
+    <header class="topbar">
+      <div>
+        <h1>ZorgInzicht</h1>
+        <p>Maandrapportage cliënten</p>
+        <a class="page-link" href="./index.html">← Terug naar dashboard</a>
+      </div>
+      <div class="userbox">Cliëntenrapportage</div>
+    </header>
+
+    <section class="form-card report-print-area">
+      <div class="form-header">
+        <div class="form-title-wrap">
+          <h2>Maandrapportage cliënten</h2>
+          <p>
+            Overzicht van cliënten, uren, afspraken en signaleringen per maand.
+          </p>
+        </div>
+      </div>
+
+      <div class="section no-print">
+        <h3>Maand kiezen</h3>
+
+        <label class="form-label" for="reportMonth">Kies maand</label>
+        <input id="reportMonth" type="month" class="form-input" />
+
+        <div class="action-stack" style="margin-top: 16px;">
+          <button type="button" class="btn btn-primary" id="loadReportBtn">
+            Rapport laden
+          </button>
+
+          <button type="button" class="btn btn-secondary" id="printReportBtn">
+            Opslaan als PDF
+          </button>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Samenvatting</h3>
+
+        <div class="info-grid">
+          <div class="info-box">
+            <span class="info-label">Cliënten geholpen</span>
+            <strong id="summaryClients">0</strong>
+          </div>
+
+          <div class="info-box">
+            <span class="info-label">Afspraken totaal</span>
+            <strong id="summaryAppointments">0</strong>
+          </div>
+
+          <div class="info-box">
+            <span class="info-label">Uren totaal</span>
+            <strong id="summaryHours">0 uur</strong>
+          </div>
+
+          <div class="info-box">
+            <span class="info-label">Signalen totaal</span>
+            <strong id="summarySignals">0</strong>
+          </div>
+
+          <div class="info-box">
+            <span class="info-label">Actieve signalen</span>
+            <strong id="summaryActiveSignals">0</strong>
+          </div>
+
+          <div class="info-box">
+            <span class="info-label">Rapportagemaand</span>
+            <strong id="summaryMonth">-</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Cliënten in één oogopslag</h3>
+        <div id="clientsReportList" class="report-list">
+          Laden...
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <style>
+    .report-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .client-report-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 18px;
+      background: #ffffff;
+      padding: 18px;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+    }
+
+    .client-report-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+
+    .client-report-name {
+      margin: 0;
+      font-size: 21px;
+      font-weight: 800;
+      color: #111827;
+    }
+
+    .client-report-sub {
+      margin-top: 6px;
+      color: #6b7280;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
+      background: #f3f4f6;
+      color: #111827;
+    }
+
+    .status-good {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status-watch {
+      background: #ffedd5;
+      color: #9a3412;
+    }
+
+    .status-alert {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .client-report-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 14px 0;
+    }
+
+    .small-stat {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      padding: 12px;
+    }
+
+    .small-stat span {
+      display: block;
+      color: #6b7280;
+      font-size: 13px;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    .small-stat strong {
+      font-size: 16px;
+      color: #111827;
+    }
+
+    .signal-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .signal-tag {
+      background: #f3f4f6;
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #374151;
+    }
+
+    .client-report-note {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 14px;
+      background: #f9fafb;
+      color: #374151;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .client-report-actions {
+      margin-top: 14px;
+    }
+
+    .client-report-actions a {
+      display: inline-block;
+      text-decoration: none;
+    }
+
+    @media (max-width: 760px) {
+      .client-report-top {
+        flex-direction: column;
+      }
+
+      .client-report-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .client-report-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media print {
+      .no-print,
+      .page-link,
+      .userbox,
+      .client-report-actions {
+        display: none !important;
+      }
+
+      body {
+        background: #ffffff !important;
+      }
+
+      .container {
+        max-width: 100%;
+        padding: 0;
+      }
+
+      .form-card,
+      .client-report-card {
+        box-shadow: none !important;
+      }
+    }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./maandrapportage-clienten.js"></script>
+</body>
+</html>
