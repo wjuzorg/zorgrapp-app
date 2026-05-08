@@ -2011,3 +2011,73 @@ tbody tr {
   }
 
 }
+
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  .topbar,
+  .form-row,
+  .actions,
+  button,
+  .btn,
+  #btnLoadReport,
+  #btnDownloadCsv,
+  #btnPrint {
+    display: none !important;
+  }
+
+  .container {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .card {
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin-bottom: 18px !important;
+  }
+
+  .stats {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 8px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .stats .card {
+    border: 1px solid #ddd !important;
+    padding: 10px !important;
+  }
+
+  .table-wrap {
+    overflow: visible !important;
+  }
+
+  table {
+    width: 100% !important;
+    min-width: 0 !important;
+    border-collapse: collapse !important;
+    font-size: 11px !important;
+  }
+
+  th,
+  td {
+    padding: 6px 5px !important;
+    border-bottom: 1px solid #ddd !important;
+  }
+
+  th {
+    text-align: left !important;
+    font-weight: 700 !important;
+  }
+
+  a {
+    color: black !important;
+    text-decoration: none !important;
+  }
+}
