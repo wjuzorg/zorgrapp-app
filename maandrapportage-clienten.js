@@ -52,7 +52,7 @@ async function loadClientMonthReport() {
   summaryMonth.textContent = formatMonthLabel(selectedMonth);
 
   const { data, error } = await supabase
-    .from("appointments")
+    .from("Appointments")
     .select("*")
     .gte("appointment_date", startDate)
     .lt("appointment_date", endDate)
@@ -111,8 +111,7 @@ function groupByClient(appointments) {
       result[clientId].active_signals += 1;
     }
 
-    const tags = normalizeSignalTags(item.signal_tags || item.signals || item.signal_options);
-    result[clientId].signal_tags.push(...tags);
+    const tags = normalizeSignalTags(item.internal_signals);
 
     if (!result[clientId].latest_visit || item.appointment_date > result[clientId].latest_visit) {
       result[clientId].latest_visit = item.appointment_date;
