@@ -243,19 +243,6 @@ function cleanStatus(status) {
 function downloadCsv() {
   if (!currentRows.length) return alert("Geen data");
 
-  const headers = [
-    "Factuurnummer",
-    "Datum",
-    "Cliënt",
-    "Status",
-    "Werk",
-    "Km",
-    "Materiaal",
-    "Parkeren",
-    "BTW-status",
-    "Totaal"
-  ];
-
   const rows = currentRows.map(i => {
     const total =
       Number(i.amount || 0) +
@@ -263,37 +250,39 @@ function downloadCsv() {
       Number(i.material_cost || 0) +
       Number(i.parking_cost || 0);
 
-    return [
-      i.invoice_number || "-",
-      i.created_at ? new Date(i.created_at).toLocaleDateString("nl-NL") : "",
-      i.client_name || "Onbekend",
-      cleanStatus(i.status),
-      euro(i.amount),
-      euro(i.km_amount),
-      euro(i.material_cost),
-      euro(i.parking_cost),
-      formatVatStatus(currentProfile?.vat_status),
-      euro(total)
-    ];
+    return {
+      Factuurnummer: i.invoice_number || "-",
+      Datum: i.created_at ? new Date(i.created_at).toLocaleDateString("nl-NL") : "",
+      Cliënt: i.client_name || "Onbekend",
+      Status: cleanStatus(i.status),
+      Werk: Number(i.amount || 0),
+      Km: Number(i.km_amount || 0),
+      Materiaal: Number(i.material_cost || 0),
+      Parkeren: Number(i.parking_cost || 0),
+      "BTW-status": formatVatStatus(currentProfile?.vat_status),
+      Totaal: total
+    };
   });
 
-const content = [
-  headers.join("\t"),
-  ...rows.map(row => row.join("\t"))
-].join("\n");
+  const worksheet = XLSX.utils.json_to_sheet(rows);
 
-const blob = new Blob(["\uFEFF" + content], {
-  type: "text/tab-separated-values;charset=utf-8;"
-});
+  worksheet["!cols"] = [
+    { wch: 18 },
+    { wch: 12 },
+    { wch: 24 },
+    { wch: 14 },
+    { wch: 12 },
+    { wch: 12 },
+    { wch: 14 },
+    { wch: 14 },
+    { wch: 16 },
+    { wch: 12 }
+  ];
 
-const url = URL.createObjectURL(blob);
-const a = document.createElement("a");
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Facturen");
 
-a.href = url;
-a.download = `maandrapportage-${getMonthNameForFile()}.tsv`;
-a.click();
-
-URL.revokeObjectURL(url);
+  XLSX.writeFile(workbook, `maandrapportage-${getMonthNameForFile()}.xlsx`);
 }
 
 btnLoadReport.onclick = loadReport;
