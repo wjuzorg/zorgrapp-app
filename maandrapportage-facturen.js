@@ -277,7 +277,7 @@ function downloadCsv() {
     ];
   });
 
-  const content = [
+const content = [
   headers.join("\t"),
   ...rows.map(row => row.join("\t"))
 ].join("\n");
@@ -294,6 +294,11 @@ a.download = `maandrapportage-${getMonthNameForFile()}.tsv`;
 a.click();
 
 URL.revokeObjectURL(url);
+}
+
+btnLoadReport.onclick = loadReport;
+btnDownloadCsv.onclick = downloadCsv;
+btnPrint.onclick = () => window.print();
 
 statusFilter.addEventListener("change", loadReport);
 
