@@ -6,9 +6,7 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_
 console.log("MAANDRAPPORTAGE CLIENTEN JS IS GELADEN");
 
 const reportMonthInput = document.getElementById("reportMonth");
-const loadReportBtn = document.getElementById("loadReportBtn");
 const printReportBtn = document.getElementById("printReportBtn");
-
 const summaryClients = document.getElementById("summaryClients");
 const summaryAppointments = document.getElementById("summaryAppointments");
 const summaryHours = document.getElementById("summaryHours");
@@ -20,9 +18,9 @@ const clientsReportList = document.getElementById("clientsReportList");
 document.addEventListener("DOMContentLoaded", async () => {
   setDefaultMonth();
 
-  if (loadReportBtn) {
-    loadReportBtn.addEventListener("click", loadClientMonthReport);
-  }
+  if (reportMonthInput) {
+  reportMonthInput.addEventListener("change", loadClientMonthReport);
+}
 
   if (printReportBtn) {
     printReportBtn.addEventListener("click", () => window.print());
@@ -162,7 +160,7 @@ function renderClients(grouped) {
             <h4 class="client-report-name">${escapeHtml(client.client_name)}</h4>
             <div class="client-report-sub">
               Laatste bezoek: ${formatDate(client.latest_visit)}<br>
-              Persoon: ${formatValue(client.latest_person_status)} · Huis: ${formatValue(client.latest_house_status)}
+              Laatste indruk: ${getLastImpression(client)}
             </div>
           </div>
 
@@ -370,4 +368,29 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+function getLastImpression(client) {
+  if (
+    client.latest_person_status === "zorgelijk" ||
+    client.latest_house_status === "zorgelijk"
+  ) {
+    return "zorgelijk";
+  }
+
+  if (
+    client.latest_person_status === "redelijk" ||
+    client.latest_house_status === "rommelig"
+  ) {
+    return "let op";
+  }
+
+  if (
+    client.latest_person_status === "goed" ||
+    client.latest_house_status === "netjes"
+  ) {
+    return "goed";
+  }
+
+  return "niet ingevuld";
 }

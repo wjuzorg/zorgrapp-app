@@ -2194,3 +2194,122 @@ tbody tr {
     text-decoration: none !important;
   }
 }
+
+@media print {
+  .no-print,
+  .page-link,
+  .userbox,
+  .client-report-actions {
+    display: none !important;
+  }
+
+  body {
+    background: #ffffff !important;
+    font-size: 11px;
+  }
+
+  .container {
+    max-width: 100%;
+    padding: 0;
+  }
+
+  .topbar h1 {
+    font-size: 22px;
+  }
+
+  .topbar p {
+    font-size: 11px;
+    margin: 4px 0 0;
+  }
+
+  .form-card,
+  .client-report-card {
+    box-shadow: none !important;
+    border: none !important;
+    padding: 8px !important;
+    margin-bottom: 6px !important;
+  }
+
+  .section {
+    padding: 8px 0 !important;
+  }
+
+  .section h3,
+  .section-title {
+    font-size: 15px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
+  }
+
+  .info-box {
+    padding: 7px !important;
+    border-radius: 8px !important;
+  }
+
+  .info-label {
+    font-size: 9px !important;
+  }
+
+  .info-box strong {
+    font-size: 11px !important;
+  }
+
+  .client-report-card {
+    page-break-inside: avoid;
+  }
+
+  .client-report-name {
+    font-size: 14px !important;
+  }
+
+  .client-report-sub {
+    font-size: 10px !important;
+    line-height: 1.3;
+  }
+
+  .client-report-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+    margin: 6px 0;
+  }
+
+  .small-stat {
+    padding: 6px !important;
+    border-radius: 8px !important;
+  }
+
+  .small-stat span {
+    font-size: 9px !important;
+    margin-bottom: 2px;
+  }
+
+  .small-stat strong {
+    font-size: 10px !important;
+  }
+
+  .status-badge {
+    padding: 4px 7px;
+    font-size: 9px;
+  }
+
+  .signal-tags {
+    gap: 4px;
+    margin-top: 5px;
+  }
+
+  .signal-tag {
+    padding: 4px 6px;
+    font-size: 9px;
+  }
+
+  .client-report-note {
+    font-size: 10px;
+    padding: 6px;
+    margin-top: 6px;
+  }
+}
