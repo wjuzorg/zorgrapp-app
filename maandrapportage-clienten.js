@@ -1,7 +1,7 @@
 const SUPABASE_URL = "https://bqqoxawgjxxvolljkqnp.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxcW94YXdnanh4dm9sbGprcW5wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODc0OTMsImV4cCI6MjA5MjA2MzQ5M30.WLTELxD32HFtyV1pbsB-60nF_k4Zq7DSvaR87-kj2es";
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 console.log("MAANDRAPPORTAGE CLIENTEN JS IS GELADEN");
 
@@ -53,7 +53,7 @@ async function loadClientMonthReport() {
 
   summaryMonth.textContent = formatMonthLabel(selectedMonth);
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from("Appointments")
     .select("*")
     .gte("appointment_date", startDate)
