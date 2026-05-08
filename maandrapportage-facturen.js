@@ -283,15 +283,10 @@ function downloadCsv() {
   ].join("\n");
 
   const blob = new Blob(["\uFEFF" + content], {
-    type: "application/vnd.ms-excel;charset=utf-8;"
-  });
+  type: "text/tab-separated-values;charset=utf-8;"
+});
 
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-
-  a.href = url;
-  a.download = `maandrapportage-${getMonthNameForFile()}.xls`;
-  a.click();
+a.download = `maandrapportage-${getMonthNameForFile()}.tsv`;
 
   URL.revokeObjectURL(url);
 }
