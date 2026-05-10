@@ -401,7 +401,7 @@ function getLastImpression(client) {
   }
 
   return "niet ingevuld";
-} // <--- Dit haakje sluit getLastImpression netjes af
+}
 
 async function loadProfileName() {
   try {
@@ -409,7 +409,9 @@ async function loadProfileName() {
     const user = userData?.user;
 
     if (!user) {
-      if (profileNameBox) profileNameBox.textContent = "Cliëntenrapportage";
+      if (profileNameBox) {
+        profileNameBox.textContent = "Cliëntenrapportage";
+      }
       return;
     }
 
@@ -419,18 +421,38 @@ async function loadProfileName() {
       .eq("owner_id", user.id)
       .limit(1);
 
+    if (error) {
+      console.error("business_profiles fout:", error);
+    }
+
     const profile = data && data.length ? data[0] : null;
 
     if (!profile) {
-      if (profileNameBox) profileNameBox.textContent = "Mijn bedrijf";
+      if (profileNameBox) {
+        profileNameBox.textContent = "Mijn bedrijf";
+      }
       return;
     }
 
-    const profileName = profile.company_name || profile.business_name || "Mijn bedrijf";
-    if (profileNameBox) profileNameBox.textContent = profileName;
+    const profileName =
+      profile.company_name ||
+      profile.business_name ||
+      profile.bedrijfsnaam ||
+      profile.name ||
+      profile.display_name ||
+      "Mijn bedrijf";
 
+    if (profileNameBox) {
+      profileNameBox.textContent = profileName;
+    }
   } catch (err) {
-    console.error("Fout:", err);
-    if (profileNameBox) profileNameBox.textContent = "Mijn bedrijf";
+    console.error("Fout bij laden profielnaam:", err);
+    if (profileNameBox) {
+      profileNameBox.textContent = "Mijn bedrijf";
+    }
   }
-} // <--- Dit haakje sluit loadProfileName netjes af
+}
+
+function printWithFileName() {
+  window.print();
+}
