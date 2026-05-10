@@ -1,0 +1,1 @@
+// Verwerkersovereenkomst heeft momenteel geen JavaScript nodig.
