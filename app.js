@@ -36,23 +36,44 @@ const weekRangeLabelEl = document.getElementById("weekRangeLabel");
 const weekdayCards = document.querySelectorAll(".weekday-card");
 const prevWeekBtn = document.getElementById("prevWeekBtn");
 const nextWeekBtn = document.getElementById("nextWeekBtn");
+const agreementWarning = document.getElementById("agreementWarning");
+const btnInvoices = document.getElementById("btnInvoices");
+const btnMonthReports = document.getElementById("btnMonthReports");
+
+let processorAgreementAccepted = false;
+
+function requireProcessorAgreement() {
+  if (processorAgreementAccepted) return true;
+
+  alert("Accepteer eerst de verwerkersovereenkomst in uw bedrijfsprofiel.");
+  window.location.href = "./bedrijfsprofiel.html";
+  return false;
+}
 
 if (btnNewClient) {
   btnNewClient.addEventListener("click", () => {
+    if (!requireProcessorAgreement()) return;
     window.location.href = "./new-client.html";
   });
 }
 
-if (btnUserProfile) {
-  btnUserProfile.addEventListener("click", (e) => {
-    e.stopPropagation();
-    profileDropdown?.classList.toggle("hidden");
+if (btnInvoices) {
+  btnInvoices.addEventListener("click", () => {
+    if (!requireProcessorAgreement()) return;
+    window.location.href = "./facturen.html";
+  });
+}
+
+if (btnMonthReports) {
+  btnMonthReports.addEventListener("click", () => {
+    if (!requireProcessorAgreement()) return;
+    window.location.href = "./maandrapportages.html";
   });
 }
 
 document.addEventListener("click", () => {
   profileDropdown?.classList.add("hidden");
-});
+})
 
 profileDropdown?.addEventListener("click", (e) => {
   e.stopPropagation();
@@ -507,10 +528,39 @@ async function setWelcomeText() {
   }
 }
 
+async function checkProcessorAgreement(userId) {
+  const { data, error } = await supabaseClient
+    .from("business_profiles")
+    .select("processor_agreement_accepted")
+    .eq("owner_id", userId)
+    .maybeSingle();
+
+  if (error) {
+    console.error("Verwerkersovereenkomst check mislukt:", error.message);
+    processorAgreementAccepted = false;
+  } else {
+    processorAgreementAccepted = Boolean(data?.processor_agreement_accepted);
+  }
+
+  if (agreementWarning) {
+    agreementWarning.classList.toggle("hidden", processorAgreementAccepted);
+  }
+
+  const blockedCards = [btnNewClient, btnInvoices, btnMonthReports];
+
+  blockedCards.forEach((item) => {
+    if (!item) return;
+
+    item.style.opacity = processorAgreementAccepted ? "1" : "0.45";
+    item.style.filter = processorAgreementAccepted ? "none" : "grayscale(0.5)";
+  });
+}
+
 async function startApp() {
   const user = await requireLogin();
   if (!user) return;
 
+  await checkProcessorAgreement(user.id);
   await setWelcomeText(user);
   await loadDashboard();
 }
