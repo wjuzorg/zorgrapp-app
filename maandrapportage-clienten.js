@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     printReportBtn.addEventListener("click", printWithFileName);
   }
 
-  await loadClientMonthReport();
+  // await loadClientMonthReport();
 });
 
 function setDefaultMonth() {
