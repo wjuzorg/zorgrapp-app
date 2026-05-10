@@ -17,6 +17,7 @@ const totalAppointments = document.getElementById("totalAppointments");
 const totalMinutes = document.getElementById("totalMinutes");
 const totalSignals = document.getElementById("totalSignals");
 const savePdfBtn = document.getElementById("savePdfBtn");
+const backToMonthReport = document.getElementById("backToMonthReport");
 
 async function requireLogin() {
   const { data } = await supabaseClient.auth.getSession();
@@ -194,6 +195,13 @@ async function loadClientHistory() {
   if (backToClientCard) {
     backToClientCard.href = `./clientkaart.html?id=${currentClient.id}`;
   }
+
+  if (backToMonthReport) {
+  const month = params.get("month");
+  backToMonthReport.href = month
+    ? `./maandrapportage-clienten.html?month=${month}`
+    : "./maandrapportage-clienten.html";
+}
 
   const normalizedClientName = normalizeName(selectedClient.full_name);
 
