@@ -339,10 +339,23 @@ function formatMonthLabel(value) {
 
 function formatValue(value) {
   if (!value) return "-";
-
   return String(value)
     .replaceAll("_", " ")
     .replace(/^./, letter => letter.toUpperCase());
+}
+
+function slugify(value) {
+  return String(value || "maand")
+    .toLowerCase()
+    .replaceAll(" ", "-")
+    .replaceAll("á", "a")
+    .replaceAll("é", "e")
+    .replaceAll("ë", "e")
+    .replaceAll("í", "i")
+    .replaceAll("ó", "o")
+    .replaceAll("ú", "u")
+    .replaceAll("ü", "u")
+    .replace(/[^a-z0-9-]/g, "");
 }
 
 function formatSignalTag(tag) {
@@ -454,5 +467,19 @@ async function loadProfileName() {
 }
 
 function printWithFileName() {
+  const selectedMonth = reportMonthInput.value || "";
+  const monthLabel = formatMonthLabel(selectedMonth); // bijvoorbeeld "mei 2026"
+
+  const fileName =
+    "maandrapportage-clienten-" +
+    slugify(monthLabel).replace("-", "") + ".pdf";
+
+  const oldTitle = document.title;
+  document.title = fileName.replace(".pdf", "");
+
   window.print();
+
+  setTimeout(() => {
+    document.title = oldTitle;
+  }, 1000);
 }
