@@ -38,6 +38,22 @@
 </div>
   </header>
 
+  <section id="agreementWarning" class="form-card hidden" style="border:2px solid #f59e0b; margin-bottom:18px;">
+  <h2 style="margin-top:0;">Verwerkersovereenkomst nog niet geaccepteerd</h2>
+  <p>
+    Om ZorgInzicht veilig en volgens de AVG te gebruiken, moet u eerst de
+    verwerkersovereenkomst accepteren in het bedrijfsprofiel.
+  </p>
+  <button
+    type="button"
+    class="btn btn-primary"
+    onclick="window.location.href='./bedrijfsprofiel.html'"
+    style="background:#0f172a; color:#fff; opacity:1;"
+  >
+    Ga naar bedrijfsprofiel
+  </button>
+</section>
+
  <section class="welcome">
   <h2 id="welcomeTitle">Goedemorgen</h2>
   <p id="welcomeText">Laden...</p>
@@ -59,7 +75,7 @@
   <span id="signalCount">0</span>
 </div>
 
-  <div class="card blue" onclick="window.location.href='./facturen.html'" style="cursor:pointer;">
+  <div class="card blue" id="btnInvoices" style="cursor:pointer;"></div>
     <h3>Facturen</h3>
     <span id="invoiceTotal">€0</span>
   </div>
@@ -129,7 +145,9 @@
     Privacy
   </button>
 
-  <button onclick="window.location.href='maandrapportages.html'">
+ <button id="btnMonthReports">
+  Maandrapportages
+</button>
   Maandrapportages
 </button>
 
