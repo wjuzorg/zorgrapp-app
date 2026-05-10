@@ -400,7 +400,7 @@ function getLastImpression(client) {
     return "goed";
   }
 
-  async function loadProfileName() {
+ async function loadProfileName() {
   try {
     const { data: userData } = await supabaseClient.auth.getUser();
     const user = userData?.user;
@@ -431,7 +431,7 @@ function getLastImpression(client) {
       return;
     }
 
-    const name =
+    const profileName =
       profile.company_name ||
       profile.business_name ||
       profile.bedrijfsnaam ||
@@ -440,7 +440,7 @@ function getLastImpression(client) {
       "Mijn bedrijf";
 
     if (profileNameBox) {
-      profileNameBox.textContent = name;
+      profileNameBox.textContent = profileName;
     }
   } catch (err) {
     console.error("Profielnaam kon niet geladen worden:", err);
