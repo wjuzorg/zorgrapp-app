@@ -58,6 +58,26 @@ function updateVatText() {
   }
 }
 
+function renderProcessorAgreementStatus(data) {
+  const statusBox = el("processorAgreementStatus");
+  if (!statusBox) return;
+
+  if (!data || !data.processor_agreement_accepted) {
+    statusBox.textContent = "Nog niet geaccepteerd";
+    statusBox.style.color = "#b91c1c";
+    return;
+  }
+
+  const acceptedAt = data.processor_agreement_accepted_at
+    ? new Date(data.processor_agreement_accepted_at).toLocaleString("nl-NL")
+    : "datum onbekend";
+
+  const version = data.processor_agreement_version || "versie onbekend";
+
+  statusBox.textContent = `Geaccepteerd op ${acceptedAt} (${version})`;
+  statusBox.style.color = "#166534";
+}
+
 async function init() {
   const { data: userData, error: userError } = await supabaseClient.auth.getUser();
 
@@ -75,10 +95,11 @@ async function init() {
     .single();
 
   if (error) {
-    console.log("Nog geen bedrijfsprofiel gevonden:", error.message);
-    updateVatText();
-    return;
-  }
+  console.log("Nog geen bedrijfsprofiel gevonden:", error.message);
+  updateVatText();
+  renderProcessorAgreementStatus(null);
+  return;
+}
 
   fields.forEach(field => {
     const input = el(field);
@@ -88,6 +109,7 @@ async function init() {
   });
 
   updateVatText();
+renderProcessorAgreementStatus(data);
 }
 
 async function saveBusinessProfile() {
