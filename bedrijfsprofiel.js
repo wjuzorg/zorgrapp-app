@@ -60,11 +60,18 @@ function updateVatText() {
 
 function renderProcessorAgreementStatus(data) {
   const statusBox = el("processorAgreementStatus");
+  const acceptWrap = el("processorAgreementAcceptWrap");
+
   if (!statusBox) return;
 
   if (!data || !data.processor_agreement_accepted) {
     statusBox.textContent = "Nog niet geaccepteerd";
     statusBox.style.color = "#b91c1c";
+
+    if (acceptWrap) {
+      acceptWrap.style.display = "block";
+    }
+
     return;
   }
 
@@ -76,6 +83,10 @@ function renderProcessorAgreementStatus(data) {
 
   statusBox.textContent = `Geaccepteerd op ${acceptedAt} (${version})`;
   statusBox.style.color = "#166534";
+
+  if (acceptWrap) {
+    acceptWrap.style.display = "none";
+  }
 }
 
 async function init() {
@@ -110,6 +121,47 @@ async function init() {
 
   updateVatText();
 renderProcessorAgreementStatus(data);
+}
+
+async function acceptProcessorAgreement() {
+  if (!currentUser) {
+    showMessage("Niet ingelogd. Log opnieuw in.", true);
+    return;
+  }
+
+  const checkbox = el("processorAgreementCheckbox");
+
+  if (!checkbox || !checkbox.checked) {
+    showMessage("Vink eerst aan dat u akkoord gaat met de verwerkersovereenkomst.", true);
+    return;
+  }
+
+  const acceptedAt = new Date().toISOString();
+  const version = "v1-2026-05-10";
+
+  const { data, error } = await supabaseClient
+    .from("business_profiles")
+    .upsert(
+      {
+        owner_id: currentUser.id,
+        processor_agreement_accepted: true,
+        processor_agreement_accepted_at: acceptedAt,
+        processor_agreement_version: version,
+        privacy_policy_version: version,
+        updated_at: acceptedAt
+      },
+      { onConflict: "owner_id" }
+    )
+    .select()
+    .single();
+
+  if (error) {
+    showMessage("Akkoord opslaan mislukt: " + error.message, true);
+    return;
+  }
+
+  renderProcessorAgreementStatus(data);
+  showMessage("Verwerkersovereenkomst geaccepteerd.");
 }
 
 async function saveBusinessProfile() {
@@ -168,6 +220,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const saveBtn = el("saveBusinessProfileBtn");
   const vatStatus = el("vat_status");
+
+  const acceptAgreementBtn = el("acceptProcessorAgreementBtn");
+
+if (acceptAgreementBtn) {
+  acceptAgreementBtn.addEventListener("click", acceptProcessorAgreement);
+}
 
   if (vatStatus) {
     vatStatus.addEventListener("change", updateVatText);
