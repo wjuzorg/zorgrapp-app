@@ -14,16 +14,24 @@ const summarySignals = document.getElementById("summarySignals");
 const summaryActiveSignals = document.getElementById("summaryActiveSignals");
 const summaryMonth = document.getElementById("summaryMonth");
 const clientsReportList = document.getElementById("clientsReportList");
+const loadReportBtn = document.getElementById("loadReportBtn");
+const includeNotesCheckbox = document.getElementById("includeNotesCheckbox");
+const profileNameBox = document.getElementById("profileNameBox");
 
 document.addEventListener("DOMContentLoaded", async () => {
   setDefaultMonth();
+  await loadProfileName();
 
-  if (reportMonthInput) {
-  reportMonthInput.addEventListener("change", loadClientMonthReport);
-}
+  if (loadReportBtn) {
+    loadReportBtn.addEventListener("click", loadClientMonthReport);
+  }
+
+  if (includeNotesCheckbox) {
+    includeNotesCheckbox.addEventListener("change", loadClientMonthReport);
+  }
 
   if (printReportBtn) {
-    printReportBtn.addEventListener("click", () => window.print());
+    printReportBtn.addEventListener("click", printWithFileName);
   }
 
   await loadClientMonthReport();
@@ -193,12 +201,12 @@ function renderClients(grouped) {
 
         ${renderSignalTags(client.signal_tags)}
 
-        ${client.latest_note ? `
-          <div class="client-report-note">
-            <strong>Laatste notitie:</strong><br>
-            ${escapeHtml(client.latest_note)}
-          </div>
-        ` : ""}
+        ${includeNotesCheckbox && includeNotesCheckbox.checked && client.latest_note ? `
+  <div class="client-report-note">
+    <strong>Laatste notitie:</strong><br>
+    ${escapeHtml(client.latest_note)}
+  </div>
+` : ""}
 
         <div class="client-report-actions no-print">
           <a class="btn btn-secondary" href="./client-geschiedenis.html?id=${client.client_id}">
@@ -391,6 +399,68 @@ function getLastImpression(client) {
   ) {
     return "goed";
   }
+
+  async function loadProfileName() {
+  try {
+    const { data: userData } = await supabaseClient.auth.getUser();
+    const user = userData?.user;
+
+    if (!user) {
+      if (profileNameBox) profileNameBox.textContent = "Cliëntenrapportage";
+      return;
+    }
+
+    const { data, error } = await supabaseClient
+      .from("business_profiles")
+      .select("*")
+      .eq("owner_id", user.id)
+      .maybeSingle();
+
+    if (error || !data) {
+      if (profileNameBox) profileNameBox.textContent = "Cliëntenrapportage";
+      return;
+    }
+
+    const profileName =
+      data.company_name ||
+      data.business_name ||
+      data.name ||
+      data.display_name ||
+      "ZZP-profiel";
+
+    if (profileNameBox) {
+      profileNameBox.textContent = profileName;
+    }
+  } catch (err) {
+    console.error("Profielnaam kon niet geladen worden:", err);
+  }
+}
+
+function printWithFileName() {
+  const selectedMonth = reportMonthInput.value || "";
+  const fileName = `clientrapportage-${slugify(formatMonthLabel(selectedMonth))}`;
+
+  const oldTitle = document.title;
+  document.title = fileName;
+
+  window.print();
+
+  setTimeout(() => {
+    document.title = oldTitle;
+  }, 1000);
+}
+
+function slugify(value) {
+  return String(value || "maand")
+    .toLowerCase()
+    .replaceAll(" ", "-")
+    .replaceAll("é", "e")
+    .replaceAll("ë", "e")
+    .replaceAll("ï", "i")
+    .replaceAll("ö", "o")
+    .replaceAll("ü", "u")
+    .replace(/[^a-z0-9-]/g, "");
+}
 
   return "niet ingevuld";
 }

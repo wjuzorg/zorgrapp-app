@@ -16,7 +16,7 @@
         <p>Maandrapportage cliënten</p>
         <a class="page-link" href="./index.html">← Terug naar dashboard</a>
       </div>
-      <div class="userbox">Cliëntenrapportage</div>
+      <div class="userbox" id="profileNameBox">Cliëntenrapportage</div>
     </header>
 
     <section class="form-card report-print-area">
@@ -36,6 +36,15 @@
         <input id="reportMonth" type="month" class="form-input" />
 
         <div class="action-stack" style="margin-top: 16px;">
+  <button type="button" class="btn btn-primary" id="loadReportBtn">
+    Rapport laden
+  </button>
+
+  <label class="signal-chip" style="justify-content:flex-start;">
+    <input type="checkbox" id="includeNotesCheckbox" checked>
+    Cliëntnotities meenemen in export
+  </label>
+
   <button type="button" class="btn btn-secondary" id="printReportBtn">
     Opslaan als PDF
   </button>
@@ -253,6 +262,6 @@
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="./maandrapportage-clienten.js?v=3"></script>
+  <script src="./maandrapportage-clienten.js?v=4"></script>
 </body>
 </html>
