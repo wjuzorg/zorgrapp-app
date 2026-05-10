@@ -406,7 +406,9 @@ function getLastImpression(client) {
     const user = userData?.user;
 
     if (!user) {
-      if (profileNameBox) profileNameBox.textContent = "Cliëntenrapportage";
+      if (profileNameBox) {
+        profileNameBox.textContent = "Cliëntenrapportage";
+      }
       return;
     }
 
@@ -414,52 +416,39 @@ function getLastImpression(client) {
       .from("business_profiles")
       .select("*")
       .eq("owner_id", user.id)
-      .maybeSingle();
+      .limit(1);
 
-    if (error || !data) {
-      if (profileNameBox) profileNameBox.textContent = "Cliëntenrapportage";
+    if (error) {
+      console.error("business_profiles fout:", error);
+    }
+
+    const profile = data && data.length ? data[0] : null;
+
+    if (!profile) {
+      if (profileNameBox) {
+        profileNameBox.textContent = "Mijn bedrijf";
+      }
       return;
     }
 
-    const profileName =
-      data.company_name ||
-      data.business_name ||
-      data.name ||
-      data.display_name ||
-      "ZZP-profiel";
+    const name =
+      profile.company_name ||
+      profile.business_name ||
+      profile.bedrijfsnaam ||
+      profile.name ||
+      profile.display_name ||
+      "Mijn bedrijf";
 
     if (profileNameBox) {
-      profileNameBox.textContent = profileName;
+      profileNameBox.textContent = name;
     }
   } catch (err) {
     console.error("Profielnaam kon niet geladen worden:", err);
+
+    if (profileNameBox) {
+      profileNameBox.textContent = "Mijn bedrijf";
+    }
   }
-}
-
-function printWithFileName() {
-  const selectedMonth = reportMonthInput.value || "";
-  const fileName = `clientrapportage-${slugify(formatMonthLabel(selectedMonth))}`;
-
-  const oldTitle = document.title;
-  document.title = fileName;
-
-  window.print();
-
-  setTimeout(() => {
-    document.title = oldTitle;
-  }, 1000);
-}
-
-function slugify(value) {
-  return String(value || "maand")
-    .toLowerCase()
-    .replaceAll(" ", "-")
-    .replaceAll("é", "e")
-    .replaceAll("ë", "e")
-    .replaceAll("ï", "i")
-    .replaceAll("ö", "o")
-    .replaceAll("ü", "u")
-    .replace(/[^a-z0-9-]/g, "");
 }
 
   return "niet ingevuld";
