@@ -543,17 +543,19 @@ async function setWelcomeText() {
 }
 
 async function checkProcessorAgreement(userId) {
+  processorAgreementAccepted = false;
+
   const { data, error } = await supabaseClient
     .from("business_profiles")
-    .select("processor_agreement_accepted, processor_agreement_accepted_at, updated_at")
+    .select("processor_agreement_accepted")
     .eq("owner_id", userId)
-    .order("updated_at", { ascending: false })
-    .limit(1)
     .maybeSingle();
 
   console.log("Agreement check:", data, error);
 
-  processorAgreementAccepted = Boolean(data?.processor_agreement_accepted);
+  if (!error && data?.processor_agreement_accepted === true) {
+    processorAgreementAccepted = true;
+  }
 
   if (agreementWarning) {
     agreementWarning.classList.toggle("hidden", processorAgreementAccepted);
@@ -563,10 +565,8 @@ async function checkProcessorAgreement(userId) {
 
   blockedItems.forEach((item) => {
     if (!item) return;
-
     item.style.opacity = processorAgreementAccepted ? "1" : "0.45";
     item.style.filter = processorAgreementAccepted ? "none" : "grayscale(0.5)";
-    item.style.pointerEvents = processorAgreementAccepted ? "auto" : "auto";
   });
 }
 
@@ -694,13 +694,7 @@ async function startApp() {
   const user = await requireLogin();
   if (!user) return;
 
-  // Tijdelijk blokkade uit, zodat dashboard weer stabiel laadt
-  processorAgreementAccepted = true;
-
-  if (agreementWarning) {
-    agreementWarning.classList.add("hidden");
-  }
-
+  await checkProcessorAgreement(user.id);
   await setWelcomeText();
   await loadDashboard();
 }
