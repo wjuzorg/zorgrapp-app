@@ -165,6 +165,7 @@ async function acceptProcessorAgreement() {
 }
 
 async function saveBusinessProfile() {
+  console.log("saveBusinessProfile gestart", currentUser);
   if (!currentUser) {
     showMessage("Niet ingelogd. Log opnieuw in.", true);
     return;
@@ -203,6 +204,8 @@ async function saveBusinessProfile() {
     updated_at: new Date().toISOString()
   };
 
+console.log("Payload bedrijfsprofiel:", payload);
+
   const { error } = await supabaseClient
     .from("business_profiles")
     .upsert(payload, { onConflict: "owner_id" });
@@ -220,24 +223,24 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const saveBtn = el("saveBusinessProfileBtn");
   const vatStatus = el("vat_status");
-
   const acceptAgreementBtn = el("acceptProcessorAgreementBtn");
-
-if (acceptAgreementBtn) {
-  acceptAgreementBtn.addEventListener("click", acceptProcessorAgreement);
-}
 
   if (vatStatus) {
     vatStatus.addEventListener("change", updateVatText);
   }
 
+  if (acceptAgreementBtn) {
+    acceptAgreementBtn.addEventListener("click", acceptProcessorAgreement);
+  }
+
   if (saveBtn) {
-  console.log("Opslaan-knop gevonden");
-  saveBtn.addEventListener("click", () => {
-    console.log("Opslaan-knop geklikt");
-    saveBusinessProfile();
-  });
-} else {
-  console.log("Opslaan-knop NIET gevonden");
-}
+    console.log("Opslaan-knop gevonden");
+
+    saveBtn.addEventListener("click", async () => {
+      console.log("Opslaan-knop geklikt");
+      await saveBusinessProfile();
+    });
+  } else {
+    console.log("Opslaan-knop NIET gevonden");
+  }
 });
