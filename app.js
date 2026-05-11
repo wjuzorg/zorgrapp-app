@@ -65,7 +65,7 @@ if (profileDropdown) {
 let processorAgreementAccepted = false;
 
 function requireProcessorAgreement() {
-  if (processorAgreementAccepted) return true;
+  if (processorAgreementAccepted === true) return true;
 
   alert("Accepteer eerst de verwerkersovereenkomst in uw bedrijfsprofiel.");
   window.location.href = "./bedrijfsprofiel.html";
@@ -95,11 +95,6 @@ if (btnMonthReports) {
 
 menuProfile?.addEventListener("click", () => {
   window.location.href = "./bedrijfsprofiel.html";
-});
-
-menuPassword?.addEventListener("click", () => {
-  profileDropdown?.classList.add("hidden");
-  alert("Wachtwoord wijzigen komt later.");
 });
 
 menuLogout?.addEventListener("click", async () => {
@@ -691,11 +686,17 @@ async function loadInvoiceDashboardTotal(userId) {
 }
 
 async function startApp() {
-  const user = await requireLogin();
-  if (!user) return;
+  const { data: sessionData } = await supabaseClient.auth.getSession();
+  const user = sessionData.session?.user;
+
+  if (!user) {
+    window.location.href = "./login.html";
+    return;
+  }
 
   await checkProcessorAgreement(user.id);
-  await setWelcomeText();
+
+  setWelcomeText();
   await loadDashboard();
 }
 
