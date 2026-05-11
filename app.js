@@ -64,8 +64,6 @@ if (profileDropdown) {
 
 let processorAgreementAccepted = false;
 
-let processorAgreementAccepted = false;
-
 function requireProcessorAgreement() {
   if (processorAgreementAccepted) return true;
 
