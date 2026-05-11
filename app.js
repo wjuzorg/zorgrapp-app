@@ -538,7 +538,7 @@ async function setWelcomeText() {
 }
 
 async function checkProcessorAgreement(userId) {
-  processorAgreementAccepted = false;
+  const warningEl = document.getElementById("processorWarning");
 
   const { data, error } = await supabaseClient
     .from("business_profiles")
@@ -548,21 +548,20 @@ async function checkProcessorAgreement(userId) {
 
   console.log("Agreement check:", data, error);
 
-  if (!error && data?.processor_agreement_accepted === true) {
-    processorAgreementAccepted = true;
+  // BELANGRIJK: zet de globale variabele
+  processorAgreementAccepted =
+    data?.processor_agreement_accepted === true;
+
+  // Toon of verberg waarschuwing
+  if (warningEl) {
+    warningEl.style.display =
+      processorAgreementAccepted ? "none" : "block";
   }
 
-  if (agreementWarning) {
-    agreementWarning.classList.toggle("hidden", processorAgreementAccepted);
-  }
-
-  const blockedItems = [btnNewClient, btnInvoices, btnMonthReports];
-
-  blockedItems.forEach((item) => {
-    if (!item) return;
-    item.style.opacity = processorAgreementAccepted ? "1" : "0.45";
-    item.style.filter = processorAgreementAccepted ? "none" : "grayscale(0.5)";
-  });
+  console.log(
+    "processorAgreementAccepted:",
+    processorAgreementAccepted
+  );
 }
 
 async function createInvoiceFromAppointment(appointmentId) {
