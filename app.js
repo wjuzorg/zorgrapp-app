@@ -40,6 +40,31 @@ const agreementWarning = document.getElementById("agreementWarning");
 const btnInvoices = document.getElementById("btnInvoices");
 const btnMonthReports = document.getElementById("btnMonthReports");
 
+const btnMonthReports = document.getElementById("btnMonthReports");
+
+// Profielmenu openen/sluiten
+if (btnUserProfile) {
+  btnUserProfile.addEventListener("click", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    profileDropdown?.classList.toggle("hidden");
+  });
+}
+
+// Klik buiten menu = sluiten
+document.addEventListener("click", function () {
+  profileDropdown?.classList.add("hidden");
+});
+
+// Klik in menu = menu open laten
+if (profileDropdown) {
+  profileDropdown.addEventListener("click", function (e) {
+    e.stopPropagation();
+  });
+}
+
+let processorAgreementAccepted = false;
+
 let processorAgreementAccepted = false;
 
 function requireProcessorAgreement() {
@@ -70,14 +95,6 @@ if (btnMonthReports) {
     window.location.href = "./maandrapportages.html";
   });
 }
-
-document.addEventListener("click", () => {
-  profileDropdown?.classList.add("hidden");
-})
-
-profileDropdown?.addEventListener("click", (e) => {
-  e.stopPropagation();
-});
 
 menuProfile?.addEventListener("click", () => {
   window.location.href = "./bedrijfsprofiel.html";
