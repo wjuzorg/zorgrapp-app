@@ -1332,6 +1332,7 @@ body {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 10px;
+  bottom: 12px;
 }
 
 .settings-nav button {
@@ -2311,5 +2312,29 @@ tbody tr {
     font-size: 10px;
     padding: 6px;
     margin-top: 6px;
+  }
+}
+
+@media (max-width: 640px) {
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .topbar h1 {
+    font-size: 38px;
+    line-height: 1.05;
+    word-break: break-word;
+  }
+
+  .topbar p {
+    max-width: 100%;
+  }
+
+  .userbox {
+    align-self: flex-start;
+    max-width: 100%;
+    white-space: normal;
   }
 }
