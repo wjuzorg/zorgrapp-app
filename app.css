@@ -2386,3 +2386,75 @@ tbody tr {
   }
 }
 
+.profile-menu-wrap {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  z-index: 1000;
+}
+
+.profile-trigger {
+  cursor: pointer;
+}
+
+.profile-card {
+  position: absolute;
+  top: 54px;
+  right: 0;
+  width: 260px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.14);
+  padding: 16px;
+  z-index: 9999;
+}
+
+.profile-card.hidden {
+  display: none;
+}
+
+.profile-card-label {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.profile-card-email {
+  font-size: 14px;
+  color: #111827;
+  font-weight: 700;
+  margin-bottom: 14px;
+  word-break: break-word;
+}
+
+.profile-card-item {
+  width: 100%;
+  display: block;
+  border: none;
+  background: #f3f4f6;
+  color: #111827;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.profile-card-item:hover {
+  background: #e5e7eb;
+}
+
+.profile-card-item.danger {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.profile-card-item.danger:hover {
+  background: #fecaca;
+}
