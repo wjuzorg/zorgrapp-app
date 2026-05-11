@@ -250,24 +250,23 @@ body {
 
 .profile-menu-wrap {
   position: relative;
-  display: inline-block;
+  z-index: 9999;
+  pointer-events: auto;
 }
 
 .profile-trigger {
+  position: relative;
+  z-index: 10000;
   cursor: pointer;
+  pointer-events: auto;
 }
 
 .profile-card {
   position: absolute;
-  top: calc(100% + 12px);
   right: 0;
-  width: 260px;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 18px;
-  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12);
-  padding: 14px;
-  z-index: 999;
+  top: 52px;
+  z-index: 10001;
+  pointer-events: auto;
 }
 
 .profile-card.hidden {
@@ -2315,7 +2314,7 @@ tbody tr {
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 480px) {
   .topbar {
     flex-direction: column;
     align-items: flex-start;
@@ -2358,3 +2357,32 @@ tbody tr {
   position: relative;
   z-index: 1;
 }
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.stats .card {
+  min-height: 120px;
+  overflow: hidden;
+}
+
+.stats .card h3,
+.stats .card span {
+  margin: 0;
+}
+
+@media (max-width: 760px) {
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 420px) {
+  .stats {
+    grid-template-columns: 1fr;
+  }
+}
+
