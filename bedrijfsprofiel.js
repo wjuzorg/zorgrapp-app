@@ -210,6 +210,8 @@ console.log("Payload bedrijfsprofiel:", payload);
     .from("business_profiles")
     .upsert(payload, { onConflict: "owner_id" });
 
+    console.log("Supabase error:", error);
+
   if (error) {
     showMessage("Opslaan mislukt: " + error.message, true);
     return;
