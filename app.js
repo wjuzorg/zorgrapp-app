@@ -538,7 +538,7 @@ async function setWelcomeText() {
 }
 
 async function checkProcessorAgreement(userId) {
-  const warningEl = document.getElementById("processorWarning");
+  const warningEl = document.getElementById("agreementWarning");
 
   const { data, error } = await supabaseClient
     .from("business_profiles")
