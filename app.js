@@ -545,51 +545,30 @@ async function setWelcomeText() {
 async function checkProcessorAgreement(userId) {
   const { data, error } = await supabaseClient
     .from("business_profiles")
-    .select("processor_agreement_accepted")
+    .select("processor_agreement_accepted, processor_agreement_accepted_at, updated_at")
     .eq("owner_id", userId)
+    .order("updated_at", { ascending: false })
+    .limit(1)
     .maybeSingle();
 
-  if (error) {
-    console.error("Verwerkersovereenkomst check mislukt:", error.message);
-    processorAgreementAccepted = false;
-  } else {
-    processorAgreementAccepted = Boolean(data?.processor_agreement_accepted);
-  }
+  console.log("Agreement check:", data, error);
+
+  processorAgreementAccepted = Boolean(data?.processor_agreement_accepted);
 
   if (agreementWarning) {
     agreementWarning.classList.toggle("hidden", processorAgreementAccepted);
   }
 
-  const blockedCards = [btnNewClient, btnInvoices, btnMonthReports];
+  const blockedItems = [btnNewClient, btnInvoices, btnMonthReports];
 
-  blockedCards.forEach((item) => {
+  blockedItems.forEach((item) => {
     if (!item) return;
 
     item.style.opacity = processorAgreementAccepted ? "1" : "0.45";
     item.style.filter = processorAgreementAccepted ? "none" : "grayscale(0.5)";
+    item.style.pointerEvents = processorAgreementAccepted ? "auto" : "auto";
   });
 }
-
-async function startApp() {
-  const user = await requireLogin();
-  if (!user) return;
-
-  await checkProcessorAgreement(user.id);
-  await setWelcomeText(user);
-  await loadDashboard();
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  const signalCard = document.getElementById("signalCard");
-
-  if (signalCard) {
-    signalCard.addEventListener("click", () => {
-      alert(
-        "Actiesignalen zijn aandachtspunten per cliënt.\n\nBijvoorbeeld als iemand achteruitgaat, vaker niet aanwezig is of extra ondersteuning nodig lijkt.\n\nBij verdere verslechtering kun je contact opnemen met bijvoorbeeld een mantelzorger, huisarts, buurtteam of wijkverpleegkundige."
-      );
-    });
-  }
-});
 
 async function createInvoiceFromAppointment(appointmentId) {
   try {
