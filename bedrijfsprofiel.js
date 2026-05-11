@@ -232,6 +232,12 @@ if (acceptAgreementBtn) {
   }
 
   if (saveBtn) {
-    saveBtn.addEventListener("click", saveBusinessProfile);
-  }
+  console.log("Opslaan-knop gevonden");
+  saveBtn.addEventListener("click", () => {
+    console.log("Opslaan-knop geklikt");
+    saveBusinessProfile();
+  });
+} else {
+  console.log("Opslaan-knop NIET gevonden");
+}
 });
