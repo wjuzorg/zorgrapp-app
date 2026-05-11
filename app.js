@@ -690,4 +690,19 @@ async function loadInvoiceDashboardTotal(userId) {
   invoiceTotalEl.textContent = `€${total.toFixed(2).replace(".", ",")}`;
 }
 
+async function startApp() {
+  const user = await requireLogin();
+  if (!user) return;
+
+  // Tijdelijk blokkade uit, zodat dashboard weer stabiel laadt
+  processorAgreementAccepted = true;
+
+  if (agreementWarning) {
+    agreementWarning.classList.add("hidden");
+  }
+
+  await setWelcomeText();
+  await loadDashboard();
+}
+
 startApp();
