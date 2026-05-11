@@ -38,7 +38,6 @@ const prevWeekBtn = document.getElementById("prevWeekBtn");
 const nextWeekBtn = document.getElementById("nextWeekBtn");
 const agreementWarning = document.getElementById("agreementWarning");
 const btnInvoices = document.getElementById("btnInvoices");
-const btnMonthReports = document.getElementById("btnMonthReports");
 
 const btnMonthReports = document.getElementById("btnMonthReports");
 
