@@ -2338,3 +2338,23 @@ tbody tr {
     white-space: normal;
   }
 }
+
+.profile-menu-wrap {
+  position: relative;
+  z-index: 9999;
+}
+
+.profile-trigger {
+  position: relative;
+  z-index: 10000;
+  cursor: pointer;
+}
+
+.profile-card {
+  z-index: 10001;
+}
+
+#agreementWarning {
+  position: relative;
+  z-index: 1;
+}
