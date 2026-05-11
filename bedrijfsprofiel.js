@@ -156,9 +156,12 @@ async function acceptProcessorAgreement() {
     .single();
 
   if (error) {
-    showMessage("Akkoord opslaan mislukt: " + error.message, true);
-    return;
-  }
+  showMessage("Opslaan mislukt: " + error.message, true);
+  return;
+}
+
+showMessage("Bedrijfsprofiel opgeslagen.");
+alert("Bedrijfsprofiel opgeslagen.");
 
   renderProcessorAgreementStatus(data);
   showMessage("Verwerkersovereenkomst geaccepteerd.");
