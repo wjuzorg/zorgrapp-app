@@ -713,3 +713,20 @@ async function startApp() {
 }
 
 startApp();
+document.addEventListener("click", function (e) {
+  const blocked = e.target.closest(
+    "#btnNewClient, #btnInvoices, #btnMonthReports"
+  );
+
+  if (!blocked) return;
+
+  if (processorAgreementAccepted !== true) {
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+
+    alert("Accepteer eerst de verwerkersovereenkomst in uw bedrijfsprofiel.");
+    window.location.href = "./bedrijfsprofiel.html";
+    return false;
+  }
+}, true);
