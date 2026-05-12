@@ -4,6 +4,39 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let currentUser = null;
 
+async function enforceProcessorAgreement() {
+  const { data: sessionData } = await supabaseClient.auth.getSession();
+  const user = sessionData.session?.user;
+
+  if (!user) {
+    window.location.href = "./login.html";
+    return false;
+  }
+
+  const { data, error } = await supabaseClient
+    .from("business_profiles")
+    .select("processor_agreement_accepted")
+    .eq("owner_id", user.id)
+    .maybeSingle();
+
+  if (error) {
+    console.error("Verwerkersovereenkomst check mislukt:", error);
+    alert("Controle van bedrijfsprofiel mislukt. Probeer opnieuw.");
+    window.location.href = "./bedrijfsprofiel.html";
+    return false;
+  }
+
+  const accepted = data?.processor_agreement_accepted === true;
+
+  if (!accepted) {
+    alert("Accepteer eerst de verwerkersovereenkomst in uw bedrijfsprofiel.");
+    window.location.href = "./bedrijfsprofiel.html";
+    return false;
+  }
+
+  return true;
+}
+
 function euro(value) {
   return `€${Number(value || 0).toFixed(2).replace(".", ",")}`;
 }
@@ -233,4 +266,9 @@ async function markAsPaid(invoiceNumber) {
   loadFacturen();
 }
 
-document.addEventListener("DOMContentLoaded", loadFacturen);
+document.addEventListener("DOMContentLoaded", async () => {
+  const ok = await enforceProcessorAgreement();
+  if (!ok) return;
+
+  loadFacturen();
+});

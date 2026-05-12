@@ -5,6 +5,39 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_
 
 let selectedClientId = null;
 
+async function enforceProcessorAgreement() {
+  const { data: sessionData } = await supabaseClient.auth.getSession();
+  const user = sessionData.session?.user;
+
+  if (!user) {
+    window.location.href = "./login.html";
+    return false;
+  }
+
+  const { data, error } = await supabaseClient
+    .from("business_profiles")
+    .select("processor_agreement_accepted")
+    .eq("owner_id", user.id)
+    .maybeSingle();
+
+  if (error) {
+    console.error("Verwerkersovereenkomst check mislukt:", error);
+    alert("Controle van bedrijfsprofiel mislukt. Probeer opnieuw.");
+    window.location.href = "./bedrijfsprofiel.html";
+    return false;
+  }
+
+  const accepted = data?.processor_agreement_accepted === true;
+
+  if (!accepted) {
+    alert("Accepteer eerst de verwerkersovereenkomst in uw bedrijfsprofiel.");
+    window.location.href = "./bedrijfsprofiel.html";
+    return false;
+  }
+
+  return true;
+}
+
 /* ---------------- HELPERS ---------------- */
 
 function el(id) {
@@ -265,13 +298,9 @@ clientId = data.id;
 
 /* ---------------- INIT ---------------- */
 
-document.addEventListener("DOMContentLoaded", () => {
-  el("searchClientBtn")?.addEventListener("click", searchClients);
-  el("saveClientBtn")?.addEventListener("click", saveClient);
-
-  el("recurrence_type")?.addEventListener("change", toggleRecurrenceFields);
-  el("invoice_delivery_method")?.addEventListener("change", toggleInvoiceFields);
-  el("invoice_same_as_client_address")?.addEventListener("change", toggleInvoiceFields);
+document.addEventListener("DOMContentLoaded", async () => {
+  const ok = await enforceProcessorAgreement();
+  if (!ok) return;
 
   toggleRecurrenceFields();
   toggleInvoiceFields();
