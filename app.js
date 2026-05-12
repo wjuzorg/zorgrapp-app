@@ -554,9 +554,14 @@ async function checkProcessorAgreement(userId) {
 
   // Toon of verberg waarschuwing
   if (warningEl) {
-    warningEl.style.display =
-      processorAgreementAccepted ? "none" : "block";
+  if (processorAgreementAccepted === true) {
+    warningEl.classList.add("hidden");
+    warningEl.style.display = "none";
+  } else {
+    warningEl.classList.remove("hidden");
+    warningEl.style.display = "block";
   }
+}
 
   console.log(
     "processorAgreementAccepted:",
