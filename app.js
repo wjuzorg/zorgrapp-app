@@ -72,26 +72,23 @@ function requireProcessorAgreement() {
   return false;
 }
 
-if (btnNewClient) {
-  btnNewClient.addEventListener("click", () => {
-    if (!requireProcessorAgreement()) return;
-    window.location.href = "./new-client.html";
-  });
-}
+btnNewClient?.addEventListener("click", (e) => {
+  e.preventDefault();
+  if (!requireProcessorAgreement()) return;
+  window.location.href = "./new-client.html";
+});
 
-if (btnInvoices) {
-  btnInvoices.addEventListener("click", () => {
-    if (!requireProcessorAgreement()) return;
-    window.location.href = "./facturen.html";
-  });
-}
+btnInvoices?.addEventListener("click", (e) => {
+  e.preventDefault();
+  if (!requireProcessorAgreement()) return;
+  window.location.href = "./facturen.html";
+});
 
-if (btnMonthReports) {
-  btnMonthReports.addEventListener("click", () => {
-    if (!requireProcessorAgreement()) return;
-    window.location.href = "./maandrapportages.html";
-  });
-}
+btnMonthReports?.addEventListener("click", (e) => {
+  e.preventDefault();
+  if (!requireProcessorAgreement()) return;
+  window.location.href = "./maandrapportages.html";
+});
 
 menuProfile?.addEventListener("click", () => {
   window.location.href = "./bedrijfsprofiel.html";
