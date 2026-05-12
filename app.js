@@ -539,7 +539,6 @@ async function setWelcomeText() {
 
 async function checkProcessorAgreement(userId) {
   const warningEl = document.getElementById("agreementWarning");
-
   if (!warningEl) return;
 
   const { data, error } = await supabaseClient
@@ -565,11 +564,6 @@ async function checkProcessorAgreement(userId) {
   }
 }
 
-  console.log(
-    "processorAgreementAccepted:",
-    processorAgreementAccepted
-  );
-}
 
 async function createInvoiceFromAppointment(appointmentId) {
   try {
