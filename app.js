@@ -110,6 +110,21 @@ nextWeekBtn?.addEventListener("click", () => {
   renderWeekPlanning(allAppointmentsCache);
 });
 
+document.addEventListener("click", (e) => {
+  if (processorAgreementAccepted === true) return;
+
+  const blockedButton = e.target.closest(
+    "#btnNewClient, #btnInvoices, #btnMonthReports"
+  );
+
+  if (blockedButton) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    alert("Accepteer eerst de verwerkersovereenkomst in uw bedrijfsprofiel.");
+    window.location.href = "./bedrijfsprofiel.html";
+  }
+}, true);
+
 function formatDutchDate(date) {
   return new Intl.DateTimeFormat("nl-NL", {
     weekday: "long",
