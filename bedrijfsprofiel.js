@@ -199,7 +199,7 @@ async function saveBusinessProfile() {
     updated_at: new Date().toISOString()
   };
 
-cconsole.log("Payload bedrijfsprofiel:", payload);
+console.log("Payload bedrijfsprofiel:", payload);
 
 const { error } = await supabaseClient
   .from("business_profiles")
