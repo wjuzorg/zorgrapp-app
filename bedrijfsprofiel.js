@@ -155,14 +155,6 @@ async function acceptProcessorAgreement() {
     .select()
     .single();
 
-  if (error) {
-  showMessage("Opslaan mislukt: " + error.message, true);
-  return;
-}
-
-showMessage("Bedrijfsprofiel opgeslagen.");
-alert("Bedrijfsprofiel opgeslagen.");
-
   renderProcessorAgreementStatus(data);
   showMessage("Verwerkersovereenkomst geaccepteerd.");
 }
@@ -207,20 +199,23 @@ async function saveBusinessProfile() {
     updated_at: new Date().toISOString()
   };
 
-console.log("Payload bedrijfsprofiel:", payload);
+cconsole.log("Payload bedrijfsprofiel:", payload);
 
-  const { error } = await supabaseClient
-    .from("business_profiles")
-    .upsert(payload, { onConflict: "owner_id" });
+const { error } = await supabaseClient
+  .from("business_profiles")
+  .upsert(payload, { onConflict: "owner_id" });
 
-    console.log("Supabase error:", error);
+console.log("Supabase error:", error);
 
-  if (error) {
-    showMessage("Opslaan mislukt: " + error.message, true);
-    return;
-  }
+if (error) {
+  showMessage("Opslaan mislukt: " + error.message, true);
+  return;
+}
 
-  showMessage("Bedrijfsprofiel opgeslagen.");
+showMessage("Bedrijfsprofiel opgeslagen.");
+alert("Bedrijfsprofiel opgeslagen.");
+
+await loadBusinessProfile();
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
