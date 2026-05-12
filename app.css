@@ -2458,3 +2458,43 @@ tbody tr {
 .profile-card-item.danger:hover {
   background: #fecaca;
 }
+
+/* Waarschuwing verwerkersovereenkomst */
+.agreement-warning {
+  margin: 2rem 0 2.5rem 0;   /* extra ruimte boven en onder */
+  padding: 1.75rem;
+  background: #fff7ed;
+  border: 2px solid #f59e0b;
+  border-radius: 24px;
+}
+
+.agreement-warning h2 {
+  margin: 0 0 1rem 0;
+}
+
+.agreement-warning p {
+  margin: 0 0 1.5rem 0;      /* meer ruimte tussen tekst en knop */
+  line-height: 1.6;
+}
+
+/* Donkere, duidelijke knop */
+.agreement-warning .btn-primary {
+  background: #0f172a !important;
+  color: #ffffff !important;
+  border: none !important;
+  opacity: 1 !important;
+  font-weight: 600;
+  padding: 0.9rem 1.4rem;
+  border-radius: 14px;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.15);
+}
+
+/* Hover-effect */
+.agreement-warning .btn-primary:hover {
+  background: #1e293b !important;
+}
+
+/* Extra ruimte onder de knop */
+.agreement-warning .btn-primary {
+  margin-top: 0.5rem;
+}
