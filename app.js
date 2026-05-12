@@ -540,6 +540,8 @@ async function setWelcomeText() {
 async function checkProcessorAgreement(userId) {
   const warningEl = document.getElementById("agreementWarning");
 
+  if (!warningEl) return;
+
   const { data, error } = await supabaseClient
     .from("business_profiles")
     .select("processor_agreement_accepted")
@@ -548,18 +550,18 @@ async function checkProcessorAgreement(userId) {
 
   console.log("Agreement check:", data, error);
 
-  // BELANGRIJK: zet de globale variabele
   processorAgreementAccepted =
     data?.processor_agreement_accepted === true;
 
-  // Toon of verberg waarschuwing
-  if (warningEl) {
+  console.log(
+    "processorAgreementAccepted:",
+    processorAgreementAccepted
+  );
+
   if (processorAgreementAccepted === true) {
-    warningEl.classList.add("hidden");
-    warningEl.style.display = "none";
+    warningEl.style.setProperty("display", "none", "important");
   } else {
-    warningEl.classList.remove("hidden");
-    warningEl.style.display = "block";
+    warningEl.style.setProperty("display", "block", "important");
   }
 }
 
