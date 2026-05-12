@@ -73,21 +73,46 @@ function getMonthRange(monthValue) {
   };
 }
 
-async function loadBusinessProfile() {
+async function loadBusinessProfile(userId) {
+  const companyInfo = document.getElementById("companyInfo");
+
+  if (!companyInfo) {
+    console.error("Element #companyInfo niet gevonden.");
+    return;
+  }
+
   const { data, error } = await supabaseClient
     .from("business_profiles")
     .select("*")
-    .single();
+    .eq("owner_id", userId)
+    .maybeSingle();
 
   if (error) {
-    console.error(error);
-
+    console.error("Bedrijfsprofiel laden mislukt:", error);
     companyInfo.innerHTML = `
       Bedrijfsgegevens nog niet ingesteld.<br>
       Voeg later bedrijfsnaam, KvK, btw-id en IBAN toe via Bedrijfsprofiel.
     `;
     return;
   }
+
+  if (!data) {
+    companyInfo.innerHTML = `
+      Bedrijfsgegevens nog niet ingesteld.<br>
+      Voeg later bedrijfsnaam, KvK, btw-id en IBAN toe via Bedrijfsprofiel.
+    `;
+    return;
+  }
+
+  companyInfo.innerHTML = `
+    <strong>${data.company_name || "Bedrijfsnaam niet ingevuld"}</strong><br>
+    ${data.address || "Adres niet ingevuld"}<br>
+    ${(data.postal_code || "")} ${(data.city || "")}<br>
+    KvK: ${data.kvk_number || "Niet ingevuld"}<br>
+    Btw-id: ${data.vat_number || "Niet ingevuld"}<br>
+    IBAN: ${data.iban || "Niet ingevuld"}
+  `;
+}
 
   currentProfile = data;
 
@@ -103,7 +128,6 @@ async function loadBusinessProfile() {
       Wijzig
     </button>
   `;
-}
 
 async function loadReport() {
   const { start, end } = getMonthRange(monthPicker.value);
@@ -325,7 +349,7 @@ btnPrint.onclick = () => window.print();
 statusFilter.addEventListener("change", loadReport);
 
 async function startPage() {
-  await loadBusinessProfile();
+  await loadBusinessProfile(user.id);
   await loadReport();
 }
 

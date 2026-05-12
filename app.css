@@ -2498,3 +2498,52 @@ tbody tr {
 .agreement-warning .btn-primary {
   margin-top: 0.5rem;
 }
+
+/* =========================
+   MAANDRAPPORTAGE - MOBIELE TITEL FIX
+========================= */
+
+@media (max-width: 768px) {
+  .page-header,
+  .report-header,
+  .topbar {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: nowrap;
+  }
+
+  .page-header h1,
+  .report-header h1,
+  .topbar h1 {
+    font-size: 2.4rem;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin: 0;
+    flex: 1;
+    min-width: 0;
+
+    /* Zorg dat woorden niet raar afbreken */
+    word-break: keep-all;
+    overflow-wrap: normal;
+    hyphens: none;
+  }
+
+  .page-header .btn,
+  .report-header .btn,
+  .topbar .btn {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+}
+
+/* Extra kleine telefoons */
+@media (max-width: 480px) {
+  .page-header h1,
+  .report-header h1,
+  .topbar h1 {
+    font-size: 2rem;
+    line-height: 1.08;
+  }
+}
