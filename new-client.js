@@ -324,4 +324,5 @@ document.addEventListener("DOMContentLoaded", async () => {
   el("recurrence_type")?.addEventListener("change", toggleRecurrenceFields);
   el("invoice_delivery_method")?.addEventListener("change", toggleInvoiceFields);
   el("invoice_same_as_client_address")?.addEventListener("change", toggleInvoiceFields);
+  window.saveClient = saveClient;
 });
