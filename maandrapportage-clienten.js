@@ -18,6 +18,37 @@ const loadReportBtn = document.getElementById("loadReportBtn");
 const includeNotesCheckbox = document.getElementById("includeNotesCheckbox");
 const profileNameBox = document.getElementById("profileNameBox");
 
+async function enforceProcessorAgreement() {
+  const { data: sessionData } = await supabaseClient.auth.getSession();
+  const user = sessionData.session?.user;
+
+  if (!user) {
+    window.location.href = "./login.html";
+    return false;
+  }
+
+  const { data, error } = await supabaseClient
+    .from("business_profiles")
+    .select("processor_agreement_accepted")
+    .eq("owner_id", user.id)
+    .maybeSingle();
+
+  if (error) {
+    console.error("Verwerkersovereenkomst check mislukt:", error);
+    alert("Controle van bedrijfsprofiel mislukt.");
+    window.location.href = "./bedrijfsprofiel.html";
+    return false;
+  }
+
+  if (data?.processor_agreement_accepted !== true) {
+    alert("Accepteer eerst de verwerkersovereenkomst in uw bedrijfsprofiel.");
+    window.location.href = "./bedrijfsprofiel.html";
+    return false;
+  }
+
+  return true;
+}
+
 let currentUser = null;
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -37,20 +68,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   setDefaultMonth();
   await loadProfileName();
 
-  if (loadReportBtn) {
-    loadReportBtn.addEventListener("click", loadClientMonthReport);
-  }
-
-  if (includeNotesCheckbox) {
-    includeNotesCheckbox.addEventListener("change", loadClientMonthReport);
-  }
-
-  if (printReportBtn) {
-    printReportBtn.addEventListener("click", printWithFileName);
-  }
+  loadReportBtn?.addEventListener("click", loadClientMonthReport);
+  includeNotesCheckbox?.addEventListener("change", loadClientMonthReport);
+  printReportBtn?.addEventListener("click", printWithFileName);
 
   await loadClientMonthReport();
 });
+
+
 
 function setDefaultMonth() {
   const now = new Date();
