@@ -18,7 +18,22 @@ const loadReportBtn = document.getElementById("loadReportBtn");
 const includeNotesCheckbox = document.getElementById("includeNotesCheckbox");
 const profileNameBox = document.getElementById("profileNameBox");
 
+let currentUser = null;
+
 document.addEventListener("DOMContentLoaded", async () => {
+  const ok = await enforceProcessorAgreement();
+  if (!ok) return;
+
+  const { data: sessionData } = await supabaseClient.auth.getSession();
+  const user = sessionData.session?.user;
+
+  if (!user) {
+    window.location.href = "./login.html";
+    return;
+  }
+
+  currentUser = user;
+
   setDefaultMonth();
   await loadProfileName();
 
@@ -34,7 +49,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     printReportBtn.addEventListener("click", printWithFileName);
   }
 
-  // await loadClientMonthReport();
+  await loadClientMonthReport();
 });
 
 function setDefaultMonth() {
@@ -59,12 +74,13 @@ async function loadClientMonthReport() {
 
   summaryMonth.textContent = formatMonthLabel(selectedMonth);
 
-  const { data, error } = await supabaseClient
-    .from("Appointments")
-    .select("*")
-    .gte("appointment_date", startDate)
-    .lt("appointment_date", endDate)
-    .order("appointment_date", { ascending: false });
+ const { data, error } = await supabaseClient
+  .from("Appointments")
+  .select("*")
+  .eq("owner_id", currentUser.id)
+  .gte("appointment_date", startDate)
+  .lt("appointment_date", endDate)
+  .order("appointment_date", { ascending: false });
 
   if (error) {
     console.error(error);
@@ -120,7 +136,7 @@ function groupByClient(appointments) {
     }
 
     const tags = normalizeSignalTags(item.internal_signals);
-
+result[clientId].signal_tags.push(...tags);
     if (!result[clientId].latest_visit || item.appointment_date > result[clientId].latest_visit) {
       result[clientId].latest_visit = item.appointment_date;
       result[clientId].latest_person_status = item.person_status || "";
