@@ -87,7 +87,7 @@ async function loadBusinessProfile(userId) {
     .eq("owner_id", userId)
     .maybeSingle();
 
-  if (error) {
+  if (error || !data) {
     console.error("Bedrijfsprofiel laden mislukt:", error);
     companyInfo.innerHTML = `
       Bedrijfsgegevens nog niet ingesteld.<br>
@@ -96,38 +96,25 @@ async function loadBusinessProfile(userId) {
     return;
   }
 
-  if (!data) {
-    companyInfo.innerHTML = `
-      Bedrijfsgegevens nog niet ingesteld.<br>
-      Voeg later bedrijfsnaam, KvK, btw-id en IBAN toe via Bedrijfsprofiel.
-    `;
-    return;
-  }
+  currentProfile = data;
 
   companyInfo.innerHTML = `
     <strong>${data.company_name || "Bedrijfsnaam niet ingevuld"}</strong><br>
     ${data.address || "Adres niet ingevuld"}<br>
     ${(data.postal_code || "")} ${(data.city || "")}<br>
-    KvK: ${data.kvk_number || "Niet ingevuld"}<br>
-    Btw-id: ${data.vat_number || "Niet ingevuld"}<br>
-    IBAN: ${data.iban || "Niet ingevuld"}
-  `;
-}
+    KvK: ${data.kvk_number || "-" }<br>
+    BTW-ID: ${data.btw_number || data.vat_number || "-" }<br>
+    IBAN: ${data.iban || "-" }<br><br>
 
-  currentProfile = data;
-
-  companyInfo.innerHTML = `
-    <strong>${data.company_name || "Bedrijfsnaam niet ingevuld"}</strong><br>
-    KvK: ${data.kvk_number || "-"}<br>
-    BTW-ID: ${data.btw_number || "-"}<br>
-    IBAN: ${data.iban || "-"}<br><br>
     <strong>Boekhouder</strong><br>
     ${data.accountant_name || "Naam niet ingevuld"}<br>
     ${data.bookkeeping_email || "E-mail niet ingevuld"}<br>
+
     <button class="mini-btn" onclick="window.location.href='bedrijfsprofiel.html'">
       Wijzig
     </button>
   `;
+}
 
 async function loadReport() {
   const { start, end } = getMonthRange(monthPicker.value);
@@ -138,19 +125,19 @@ async function loadReport() {
     </tr>
   `;
 
-let query = supabaseClient
-  .from("invoice_drafts")
-  .select("*")
-  .gte("created_at", start)
-  .lt("created_at", end);
+  let query = supabaseClient
+    .from("invoice_drafts")
+    .select("*")
+    .gte("created_at", start)
+    .lt("created_at", end);
 
- if (statusFilter.value !== "all") {
-  query = query.eq("status", statusFilter.value);
-}
+  if (statusFilter.value !== "all") {
+    query = query.eq("status", statusFilter.value);
+  }
 
-const { data, error } = await query.order("created_at", {
-  ascending: true
-});
+  const { data, error } = await query.order("created_at", {
+    ascending: true
+  });
 
   if (error) {
     console.error(error);
@@ -166,16 +153,6 @@ const { data, error } = await query.order("created_at", {
   renderReport(currentRows);
 }
 
-function renderReport(rows) {
-  if (!rows.length) {
-    reportBody.innerHTML = `
-      <tr>
-        <td colspan="9">Geen facturen gevonden</td>
-      </tr>
-    `;
-    updateTotals([]);
-    return;
-  }
 
   reportBody.innerHTML = rows.map(invoice => {
     const clientName =
