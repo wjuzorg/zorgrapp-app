@@ -304,4 +304,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   toggleRecurrenceFields();
   toggleInvoiceFields();
+
+  const saveBtn = document.getElementById("saveClientBtn");
+  if (saveBtn) {
+    saveBtn.addEventListener("click", saveClient);
+  } else {
+    console.error("Opslaan-knop niet gevonden. Controleer id='saveClientBtn' in new-client.html");
+  }
+
+  el("searchClientBtn")?.addEventListener("click", searchClients);
+  el("recurrence_type")?.addEventListener("change", toggleRecurrenceFields);
+  el("invoice_delivery_method")?.addEventListener("change", toggleInvoiceFields);
+  el("invoice_same_as_client_address")?.addEventListener("change", toggleInvoiceFields);
 });
