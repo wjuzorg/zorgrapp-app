@@ -51,7 +51,7 @@ let currentUser = null;
 function euro(value) {
   return Number(value || 0).toLocaleString("nl-NL", {
     style: "currency",
-    currency: "EUR",
+    currency: "EUR"
   });
 }
 
@@ -223,6 +223,46 @@ function formatVatStatus(status) {
   if (status === "verlegd") return "Verlegd";
   if (status === "btw_plichtig") return "BTW-plichtig";
   return "-";
+}
+
+function renderReport(rows) {
+  if (!rows.length) {
+    reportBody.innerHTML = `
+      <tr>
+        <td colspan="9">Geen facturen gevonden</td>
+      </tr>
+    `;
+    updateTotals([]);
+    return;
+  }
+
+  reportBody.innerHTML = rows.map(i => {
+    const total =
+      Number(i.amount || 0) +
+      Number(i.km_amount || 0) +
+      Number(i.material_cost || 0) +
+      Number(i.parking_cost || 0);
+
+    return `
+      <tr>
+        <td>${i.invoice_number || "-"}</td>
+        <td>${
+          i.created_at
+            ? new Date(i.created_at).toLocaleDateString("nl-NL")
+            : "-"
+        }</td>
+        <td>${i.client_name || "-"}</td>
+        <td>${i.status || "-"}</td>
+        <td>${euro(i.amount || 0)}</td>
+        <td>${euro(i.km_amount || 0)}</td>
+        <td>${euro(i.material_cost || 0)}</td>
+        <td>${euro(i.parking_cost || 0)}</td>
+        <td>${euro(total)}</td>
+      </tr>
+    `;
+  }).join("");
+
+  updateTotals(rows);
 }
 
 function updateTotals(rows) {
