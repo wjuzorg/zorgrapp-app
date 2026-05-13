@@ -121,16 +121,16 @@ async function loadReport() {
 
   reportBody.innerHTML = `
     <tr>
-      <td colspan="9">Laden...</td>
+      <td colspan="10">Laden...</td>
     </tr>
   `;
 
   let query = supabaseClient
-  .from("invoice_drafts")
-  .select("*")
-  .eq("owner_id", currentUser.id)
-  .gte("created_at", start)
-  .lt("created_at", end);
+    .from("invoice_drafts")
+    .select("*")
+    .eq("owner_id", currentUser.id)
+    .gte("created_at", start)
+    .lt("created_at", end);
 
   if (statusFilter.value !== "all") {
     query = query.eq("status", statusFilter.value);
@@ -144,7 +144,7 @@ async function loadReport() {
     console.error(error);
     reportBody.innerHTML = `
       <tr>
-        <td colspan="9">Fout bij laden</td>
+        <td colspan="10">Fout bij laden</td>
       </tr>
     `;
     return;
@@ -153,69 +153,6 @@ async function loadReport() {
   currentRows = data || [];
   renderReport(currentRows);
 }
-
-
-  reportBody.innerHTML = rows.map(invoice => {
-    const clientName =
-      invoice.client_name ||
-      invoice.full_name ||
-      invoice.name ||
-      "Onbekend";
-
-   return `
-  <tr>
-    <td>
-  <a class="invoice-link" href="factuur-preview.html?invoice=${encodeURIComponent(invoice.invoice_number)}">
-    ${invoice.invoice_number || "-"}
-  </a>
-</td>
-
-    <td>
-      ${invoice.created_at
-        ? new Date(invoice.created_at).toLocaleDateString("nl-NL")
-        : "-"}
-    </td>
-
-   <td>
-  ${
-    invoice.status === "klaar"
-      ? "Openstaand"
-      : invoice.status === "herinnering"
-      ? "Herinnering"
-      : invoice.status === "betaald"
-      ? "Betaald"
-      : invoice.status || "-"
-  }
-</td>
-
-    <td>${invoice.status || "-"}</td>
-
-    <td>${euro(invoice.amount)}</td>
-
-    <td>${euro(invoice.km_amount)}</td>
-
-    <td>${euro(invoice.material_cost)}</td>
-
-    <td>${euro(invoice.parking_cost)}</td>
-
-    <td>${formatVatStatus(currentProfile?.vat_status)}</td>
-
-    <td>
-      <strong>
-        ${euro(
-          Number(invoice.amount || 0) +
-          Number(invoice.km_amount || 0) +
-          Number(invoice.material_cost || 0) +
-          Number(invoice.parking_cost || 0)
-        )}
-      </strong>
-    </td>
-  </tr>
-`;
-  }).join("");
-
-  updateTotals(rows);
-
 
 function formatVatStatus(status) {
   if (status === "vrijgesteld") return "Vrijgesteld";
@@ -229,35 +166,51 @@ function renderReport(rows) {
   if (!rows.length) {
     reportBody.innerHTML = `
       <tr>
-        <td colspan="9">Geen facturen gevonden</td>
+        <td colspan="10">Geen facturen gevonden</td>
       </tr>
     `;
     updateTotals([]);
     return;
   }
 
-  reportBody.innerHTML = rows.map(i => {
+  reportBody.innerHTML = rows.map(invoice => {
     const total =
-      Number(i.amount || 0) +
-      Number(i.km_amount || 0) +
-      Number(i.material_cost || 0) +
-      Number(i.parking_cost || 0);
+      Number(invoice.amount || 0) +
+      Number(invoice.km_amount || 0) +
+      Number(invoice.material_cost || 0) +
+      Number(invoice.parking_cost || 0);
+
+    const statusLabel =
+      invoice.status === "klaar"
+        ? "Openstaand"
+        : invoice.status === "herinnering"
+        ? "Herinnering"
+        : invoice.status === "betaald"
+        ? "Betaald"
+        : invoice.status || "-";
 
     return `
       <tr>
-        <td>${i.invoice_number || "-"}</td>
-        <td>${
-          i.created_at
-            ? new Date(i.created_at).toLocaleDateString("nl-NL")
-            : "-"
-        }</td>
-        <td>${i.client_name || "-"}</td>
-        <td>${i.status || "-"}</td>
-        <td>${euro(i.amount || 0)}</td>
-        <td>${euro(i.km_amount || 0)}</td>
-        <td>${euro(i.material_cost || 0)}</td>
-        <td>${euro(i.parking_cost || 0)}</td>
-        <td>${euro(total)}</td>
+        <td>
+          <a class="invoice-link" href="factuur-preview.html?invoice=${encodeURIComponent(invoice.invoice_number || "")}">
+            ${invoice.invoice_number || "-"}
+          </a>
+        </td>
+        <td>
+          ${
+            invoice.created_at
+              ? new Date(invoice.created_at).toLocaleDateString("nl-NL")
+              : "-"
+          }
+        </td>
+        <td>${invoice.client_name || "Onbekend"}</td>
+        <td>${statusLabel}</td>
+        <td>${euro(invoice.amount || 0)}</td>
+        <td>${euro(invoice.km_amount || 0)}</td>
+        <td>${euro(invoice.material_cost || 0)}</td>
+        <td>${euro(invoice.parking_cost || 0)}</td>
+        <td>${formatVatStatus(currentProfile?.vat_status)}</td>
+        <td><strong>${euro(total)}</strong></td>
       </tr>
     `;
   }).join("");
@@ -266,28 +219,26 @@ function renderReport(rows) {
 }
 
 function updateTotals(rows) {
-  let total = 0, paid = 0, open = 0, reminder = 0;
+  let total = 0;
+  let paid = 0;
+  let open = 0;
+  let reminder = 0;
 
-  rows.forEach(i => {
+  rows.forEach(invoice => {
     const amount =
-  Number(i.amount || 0) +
-  Number(i.km_amount || 0) +
-  Number(i.material_cost || 0) +
-  Number(i.parking_cost || 0);
+      Number(invoice.amount || 0) +
+      Number(invoice.km_amount || 0) +
+      Number(invoice.material_cost || 0) +
+      Number(invoice.parking_cost || 0);
 
     total += amount;
 
-    if (i.status === "betaald") {
-
+    if (invoice.status === "betaald") {
       paid += amount;
-
-    } else if (i.status === "herinnering") {
-
+    } else if (invoice.status === "herinnering") {
       reminder += amount;
       open += amount;
-
     } else {
-
       open += amount;
     }
   });
