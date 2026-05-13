@@ -45,8 +45,8 @@ const reportBody = document.getElementById("reportBody");
 const companyInfo = document.getElementById("companyInfo");
 
 let currentProfile = null;
-
 let currentRows = [];
+let currentUser = null;
 
 function euro(value) {
   return Number(value || 0).toLocaleString("nl-NL", {
@@ -126,10 +126,11 @@ async function loadReport() {
   `;
 
   let query = supabaseClient
-    .from("invoice_drafts")
-    .select("*")
-    .gte("created_at", start)
-    .lt("created_at", end);
+  .from("invoice_drafts")
+  .select("*")
+  .eq("owner_id", currentUser.id)
+  .gte("created_at", start)
+  .lt("created_at", end);
 
   if (statusFilter.value !== "all") {
     query = query.eq("status", statusFilter.value);
@@ -214,7 +215,7 @@ async function loadReport() {
   }).join("");
 
   updateTotals(rows);
-}
+
 
 function formatVatStatus(status) {
   if (status === "vrijgesteld") return "Vrijgesteld";
@@ -322,17 +323,29 @@ function downloadCsv() {
 btnLoadReport.onclick = loadReport;
 btnDownloadCsv.onclick = downloadCsv;
 btnPrint.onclick = () => window.print();
-
 statusFilter.addEventListener("change", loadReport);
 
-async function startPage() {
-  await loadBusinessProfile(user.id);
-  await loadReport();
-}
-
-(async () => {
+document.addEventListener("DOMContentLoaded", async () => {
   const ok = await enforceProcessorAgreement();
   if (!ok) return;
 
-  startApp();
-})();
+  const { data: sessionData } = await supabaseClient.auth.getSession();
+  const user = sessionData.session?.user;
+
+  if (!user) {
+    window.location.href = "./login.html";
+    return;
+  }
+
+  currentUser = user;
+
+  if (monthPicker && !monthPicker.value) {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    monthPicker.value = `${year}-${month}`;
+  }
+
+  await loadBusinessProfile(user.id);
+  await loadReport();
+});
