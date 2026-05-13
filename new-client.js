@@ -297,19 +297,27 @@ clientId = data.id;
 }
 
 /* ---------------- INIT ---------------- */
-
 document.addEventListener("DOMContentLoaded", async () => {
+  console.log("NEW CLIENT JS GELADEN");
+
   const ok = await enforceProcessorAgreement();
+  console.log("Agreement ok:", ok);
+
   if (!ok) return;
 
   toggleRecurrenceFields();
   toggleInvoiceFields();
 
   const saveBtn = document.getElementById("saveClientBtn");
+  console.log("saveBtn gevonden:", saveBtn);
+
   if (saveBtn) {
-    saveBtn.addEventListener("click", saveClient);
+    saveBtn.addEventListener("click", async () => {
+      console.log("OPSLAAN GEKLIKT");
+      await saveClient();
+    });
   } else {
-    console.error("Opslaan-knop niet gevonden. Controleer id='saveClientBtn' in new-client.html");
+    console.error("Opslaan-knop niet gevonden.");
   }
 
   el("searchClientBtn")?.addEventListener("click", searchClients);
