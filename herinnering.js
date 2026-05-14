@@ -144,7 +144,7 @@ function fillReminderPage() {
   const signName =
     currentProfile?.owner_name ||
     currentProfile?.company_name ||
-    "ZorgInzicht";
+    "ZorgRapp";
 
   const iban = currentProfile?.iban || "";
   const kvk = currentProfile?.kvk_number || "";
