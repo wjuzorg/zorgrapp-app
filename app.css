@@ -2547,3 +2547,69 @@ tbody tr {
     line-height: 1.08;
   }
 }
+
+.invoice-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 12px;
+  align-items: start;
+  width: 100%;
+}
+
+.invoice-main {
+  min-width: 0;
+}
+
+.invoice-minutes,
+.invoice-amount {
+  white-space: nowrap;
+}
+
+.invoice-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.invoice-actions button {
+  flex: 1;
+  min-width: 140px;
+}
+
+.invoice-meta {
+  margin-top: 6px;
+  font-size: 0.85rem;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+.bookkeeper-ok {
+  color: #166534;
+  font-weight: 600;
+}
+
+.bookkeeper-wait {
+  color: #92400e;
+  font-weight: 600;
+}
+
+@media (max-width: 700px) {
+  .invoice-row {
+    grid-template-columns: 1fr;
+  }
+
+  .invoice-minutes,
+  .invoice-amount {
+    white-space: normal;
+  }
+
+  .invoice-actions {
+    flex-direction: column;
+  }
+
+  .invoice-actions button {
+    width: 100%;
+  }
+}

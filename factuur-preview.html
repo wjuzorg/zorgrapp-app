@@ -158,25 +158,64 @@ function euro(value) {
   return `€${Number(value || 0).toFixed(2).replace(".", ",")}`;
 }
 
+function enableInvoiceEdit() {
+  const ids = [
+    "invoiceNumber",
+    "invoiceClientName",
+    "invoiceDescription",
+    "invoiceMinutes",
+    "invoiceAmount",
+    "invoiceTotal"
+  ];
+
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.contentEditable = true;
+  });
+
+  alert("Factuur staat nu in bewerkmodus.");
+}
+
+function euro(value) {
+  return `€${Number(value || 0).toFixed(2).replace(".", ",")}`;
+}
+
 async function sendInvoiceEmail() {
   if (!currentInvoice) {
     alert("Geen factuur geladen.");
     return;
   }
 
-  const companyName = currentProfile?.company_name || "Uw zorgonderneming";
+  const companyName = currentProfile?.company_name || "ZorgRapp";
   const clientName = currentInvoice.client_name || "cliënt";
-  const email = currentInvoice.client_email || "";
   const invoiceNumber = currentInvoice.invoice_number || "";
   const amount = euro(currentInvoice.total || currentInvoice.amount || 0);
 
-  if (!email) {
-    alert("Geen e-mailadres gevonden bij deze cliënt.");
+  const visibleEmail =
+    document.getElementById("invoiceClientEmail")?.textContent?.trim();
+
+  const email =
+    currentInvoice.client_email ||
+    currentInvoice.email ||
+    currentInvoice.invoice_email ||
+    currentInvoice.billing_email ||
+    visibleEmail ||
+    "";
+
+  if (!email || !email.includes("@")) {
+    alert("Geen geldig e-mailadres gevonden bij deze cliënt.");
     return;
   }
 
-  const subject = encodeURIComponent(`Factuur ${invoiceNumber}`);
+  const sendAccountingCopy =
+    document.getElementById("sendAccountingCopy")?.checked === true;
 
+  const bookkeeperEmail =
+    currentProfile?.bookkeeper_email ||
+    currentProfile?.boekhouder_email ||
+    "";
+
+  const subject = encodeURIComponent(`Factuur ${invoiceNumber}`);
   const body = encodeURIComponent(
 `Beste ${clientName},
 
@@ -192,18 +231,30 @@ Met vriendelijke groet,
 ${companyName}`
   );
 
-  window.open(
-    `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(email)}&su=${subject}&body=${body}`,
-    "_blank"
-  );
+  let gmailUrl =
+    `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(email)}&su=${subject}&body=${body}`;
+
+  if (sendAccountingCopy && bookkeeperEmail) {
+    gmailUrl += `&cc=${encodeURIComponent(bookkeeperEmail)}`;
+  }
+
+  window.open(gmailUrl, "_blank");
+
+  const updateData = {
+    status: "open",
+    sent_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+
+  if (sendAccountingCopy && bookkeeperEmail) {
+    updateData.bookkeeper_copy_sent_at = new Date().toISOString();
+    updateData.bookkeeper_email = bookkeeperEmail;
+    updateData.send_bookkeeper_copy = true;
+  }
 
   const { error } = await supabaseClient
     .from("invoice_drafts")
-    .update({
-      status: "open",
-      sent_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    })
+    .update(updateData)
     .eq("owner_id", currentUser.id)
     .eq("invoice_number", invoiceNumber);
 

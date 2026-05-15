@@ -118,13 +118,28 @@ function formatDateTime(dateString) {
 }
 
 function makeInvoiceRow(factuur, buttons) {
-  const bedrag = Number(factuur.amount || 0);
+  const bedrag = Number(factuur.amount || factuur.total || 0);
+
+  const boekhouderStatus = factuur.bookkeeper_copy_sent_at
+    ? `
+      <div class="invoice-meta bookkeeper-ok">
+        Boekhouderkopie verzonden naar: ${factuur.bookkeeper_email || "boekhouder"}<br>
+        Datum: ${formatDateTime(factuur.bookkeeper_copy_sent_at)}
+      </div>
+    `
+    : factuur.send_bookkeeper_copy
+      ? `
+        <div class="invoice-meta bookkeeper-wait">
+          Boekhouderkopie staat klaar om te verzenden
+        </div>
+      `
+      : "";
 
   const row = document.createElement("div");
   row.className = "invoice-row";
 
   row.innerHTML = `
-    <div>
+    <div class="invoice-main">
       <strong>${factuur.client_name || "Onbekende cliënt"}</strong><br>
       <small>${factuur.invoice_number || ""}</small>
 
@@ -135,11 +150,16 @@ function makeInvoiceRow(factuur, buttons) {
             </div>`
           : ""
       }
+
+      ${boekhouderStatus}
     </div>
 
-    <span>${factuur.minutes || 0} minuten</span>
-    <strong>${euro(bedrag)}</strong>
-    ${buttons}
+    <div class="invoice-minutes">${factuur.minutes || 0} minuten</div>
+    <div class="invoice-amount">${euro(bedrag)}</div>
+
+    <div class="invoice-actions">
+      ${buttons}
+    </div>
   `;
 
   return row;
