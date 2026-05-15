@@ -351,16 +351,35 @@ async function sendInvoiceEmail() {
     return;
   }
 
-  const companyName = currentProfile?.company_name || "Uw zorgonderneming";
+  const companyName = currentProfile?.company_name || "ZorgRapp";
   const clientName = currentInvoice.client_name || "cliënt";
-  const email = currentInvoice.client_email || "";
   const invoiceNumber = currentInvoice.invoice_number || "";
   const amount = euro(currentInvoice.total || currentInvoice.amount || 0);
 
-  if (!email) {
-    alert("Geen e-mailadres gevonden bij deze cliënt.");
+  const visibleEmail =
+    document.getElementById("invoiceClientEmail")?.textContent?.trim();
+
+  const email =
+    currentInvoice.client_email ||
+    currentInvoice.email ||
+    currentInvoice.invoice_email ||
+    currentInvoice.billing_email ||
+    visibleEmail ||
+    "";
+
+  if (!email || !email.includes("@")) {
+    alert("Geen geldig e-mailadres gevonden bij deze cliënt.");
     return;
   }
+
+  const sendCopy =
+    document.getElementById("sendAccountingCopy")?.checked === true;
+
+  const bookkeepingEmail =
+    currentProfile?.bookkeeping_email ||
+    currentProfile?.bookkeeper_email ||
+    currentProfile?.boekhouder_email ||
+    "";
 
   const subject = encodeURIComponent(`Factuur ${invoiceNumber}`);
 
@@ -379,31 +398,33 @@ Met vriendelijke groet,
 ${companyName}`
   );
 
-  // 👉 checkbox uitlezen (JOUW ID)
-  const sendCopy = document.getElementById("sendAccountingCopy")?.checked;
-  const bookkeepingEmail = currentProfile?.bookkeeping_email || "";
-
   let gmailUrl =
     `https://mail.google.com/mail/?view=cm` +
     `&to=${encodeURIComponent(email)}` +
     `&su=${subject}` +
     `&body=${body}`;
 
-  // 👉 BCC toevoegen als vinkje aan staat
   if (sendCopy && bookkeepingEmail) {
     gmailUrl += `&bcc=${encodeURIComponent(bookkeepingEmail)}`;
   }
 
   window.open(gmailUrl, "_blank");
 
-  // 👉 status aanpassen
+  const updateData = {
+    status: "open",
+    sent_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+
+  if (sendCopy && bookkeepingEmail) {
+    updateData.bookkeeper_copy_sent_at = new Date().toISOString();
+    updateData.bookkeeper_email = bookkeepingEmail;
+    updateData.send_bookkeeper_copy = true;
+  }
+
   const { error } = await supabaseClient
     .from("invoice_drafts")
-    .update({
-      status: "open",
-      sent_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    })
+    .update(updateData)
     .eq("owner_id", currentUser.id)
     .eq("invoice_number", invoiceNumber);
 
@@ -411,7 +432,6 @@ ${companyName}`
     alert("Status aanpassen mislukt: " + error.message);
     return;
   }
-
 
   alert("Gmail geopend. Factuur staat nu bij Wacht op betaling.");
 }
