@@ -355,7 +355,7 @@ async function sendInvoiceEmail() {
     return;
   }
 
-  const companyName = currentProfile?.company_name || "ZorgRapp";
+  const companyIban = currentProfile?.iban || "";
   const clientName = currentInvoice.client_name || "cliënt";
   const invoiceNumber = currentInvoice.invoice_number || "";
   const amount = euro(currentInvoice.total || currentInvoice.amount || 0);
@@ -400,7 +400,8 @@ Wij verzoeken u vriendelijk het bedrag binnen ${currentProfile?.payment_term_day
 
 Met vriendelijke groet,
 
-${companyName}`
+${companyName}
+${companyIban ? `IBAN: ${companyIban}` : ""}
   );
 
   let gmailUrl =
