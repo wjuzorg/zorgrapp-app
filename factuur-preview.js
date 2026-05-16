@@ -345,6 +345,10 @@ async function saveInvoiceDraft() {
   alert("Wijzigingen opgeslagen.");
 }
 
+function getInvoiceId() {
+  return currentInvoice?.id || null;
+}
+
 async function sendInvoiceEmail() {
   if (!currentInvoice) {
     alert("Geen factuur geladen.");
@@ -366,6 +370,7 @@ async function sendInvoiceEmail() {
     currentInvoice.billing_email ||
     visibleEmail ||
     "";
+
 
   if (!email || !email.includes("@")) {
     alert("Geen geldig e-mailadres gevonden bij deze cliënt.");
@@ -408,6 +413,11 @@ ${companyName}`
     gmailUrl += `&bcc=${encodeURIComponent(bookkeepingEmail)}`;
   }
 
+  if (sendCopy && currentInvoice.bookkeeper_copy_sent === true) {
+  alert("Deze factuur is al eerder naar de boekhouder gestuurd.");
+  return;
+}
+
   window.open(gmailUrl, "_blank");
 
   const updateData = {
@@ -417,16 +427,24 @@ ${companyName}`
   };
 
   if (sendCopy && bookkeepingEmail) {
-    updateData.bookkeeper_copy_sent_at = new Date().toISOString();
-    updateData.bookkeeper_email = bookkeepingEmail;
-    updateData.send_bookkeeper_copy = true;
-  }
+  updateData.bookkeeper_copy_sent = true;
+  updateData.bookkeeper_copy_sent_at = new Date().toISOString();
+  updateData.bookkeeper_email = bookkeepingEmail;
+  updateData.invoice_changed_after_bookkeeper_sent = false;
+}
 
-  const { error } = await supabaseClient
-    .from("invoice_drafts")
-    .update(updateData)
-    .eq("owner_id", currentUser.id)
-    .eq("invoice_number", invoiceNumber);
+ let query = supabaseClient
+  .from("invoice_drafts")
+  .update(updateData)
+  .eq("owner_id", currentUser.id);
+
+if (getInvoiceId()) {
+  query = query.eq("id", getInvoiceId());
+} else {
+  query = query.eq("invoice_number", invoiceNumber);
+}
+
+const { error } = await query;
 
   if (error) {
     alert("Status aanpassen mislukt: " + error.message);
