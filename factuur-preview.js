@@ -237,12 +237,12 @@ function renderInvoiceLines() {
   const invoiceVatText = document.getElementById("invoiceVatText");
 
   let rows = `
-    <tr>
-      <td>${currentInvoice.description || "Praktische ondersteuning"}</td>
-      <td>${minutes} minuten</td>
-      <td>${formatEuro(laborAmount)}</td>
-    </tr>
-  `;
+  <tr>
+    <td><span id="invoiceDescription">${currentInvoice.description || "Praktische ondersteuning"}</span></td>
+    <td><span id="invoiceMinutes">${minutes}</span> minuten</td>
+    <td><span id="invoiceAmount">${formatEuro(laborAmount)}</span></td>
+  </tr>
+`;
 
   if (km > 0 || kmAmount > 0) {
     rows += `
@@ -315,7 +315,6 @@ async function saveInvoiceDraft() {
   const payload = {
     invoice_number: invoiceNumber,
     client_name: getText("invoiceClientName"),
-    client_email: getText("invoiceClientEmail"),
     description: getText("invoiceDescription"),
     minutes: Number(getText("invoiceMinutes")) || null,
     amount: amountNumber,
