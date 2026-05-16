@@ -301,41 +301,44 @@ function enableInvoiceEdit() {
 }
 
 async function saveInvoiceDraft() {
-  if (!currentUser) {
-    alert("Geen ingelogde gebruiker gevonden.");
+  if (!currentUser || !currentInvoice) {
+    alert("Geen factuur geladen.");
     return;
   }
 
-  const invoiceNumber = getText("invoiceNumber") || getInvoiceNumberFromUrl();
-
+  const invoiceNumber = getText("invoiceNumber") || currentInvoice.invoice_number;
   const amountNumber =
     Number(getText("invoiceAmount").replace("€", "").replace(",", ".").trim()) || 0;
-
   const totalNumber =
     Number(getText("invoiceTotal").replace("€", "").replace(",", ".").trim()) || amountNumber;
 
   const payload = {
-    owner_id: currentUser.id,
     invoice_number: invoiceNumber,
-    client_id: currentInvoice?.client_id || null,
-
     client_name: getText("invoiceClientName"),
-    client_address: getText("invoiceClientAddress"),
-    client_postcode: getText("invoiceClientPostcode"),
-    client_city: getText("invoiceClientCity"),
     client_email: getText("invoiceClientEmail"),
-
     description: getText("invoiceDescription"),
     minutes: Number(getText("invoiceMinutes")) || null,
     amount: amountNumber,
     total: totalNumber,
-
     updated_at: new Date().toISOString()
   };
 
-  const { error } = await supabaseClient
+  if (currentInvoice.bookkeeper_copy_sent === true) {
+    payload.invoice_changed_after_bookkeeper_sent = true;
+  }
+
+  let query = supabaseClient
     .from("invoice_drafts")
-    .upsert(payload, { onConflict: "owner_id,invoice_number" });
+    .update(payload)
+    .eq("owner_id", currentUser.id);
+
+  if (getInvoiceId()) {
+    query = query.eq("id", getInvoiceId());
+  } else {
+    query = query.eq("invoice_number", currentInvoice.invoice_number);
+  }
+
+  const { error } = await query;
 
   if (error) {
     alert("Opslaan mislukt: " + error.message);
@@ -343,6 +346,11 @@ async function saveInvoiceDraft() {
   }
 
   alert("Wijzigingen opgeslagen.");
+
+  currentInvoice = {
+    ...currentInvoice,
+    ...payload
+  };
 }
 
 function getInvoiceId() {
