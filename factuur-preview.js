@@ -300,6 +300,19 @@ function enableInvoiceEdit() {
   alert("Factuur staat nu in bewerkmodus.");
 }
 
+function disableInvoiceEdit() {
+  const fields = document.querySelectorAll(
+    "#invoiceNumber, #invoiceClientName, #invoiceClientAddress, #invoiceClientPostcode, #invoiceClientCity, #invoiceClientEmail, #invoiceDescription, #invoiceMinutes, #invoiceAmount, #invoiceTotal"
+  );
+
+  fields.forEach((field) => {
+    field.contentEditable = "false";
+    field.style.background = "";
+    field.style.padding = "";
+    field.style.borderRadius = "";
+  });
+}
+
 async function saveInvoiceDraft() {
   if (!currentUser || !currentInvoice) {
     alert("Geen factuur geladen.");
@@ -345,6 +358,7 @@ async function saveInvoiceDraft() {
   }
 
   alert("Wijzigingen opgeslagen.");
+  disableInvoiceEdit();
 
   currentInvoice = {
     ...currentInvoice,
