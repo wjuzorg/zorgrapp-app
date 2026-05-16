@@ -424,7 +424,11 @@ ${companyIban ? `IBAN: ${companyIban}` : ""}`
   }
 }
 
-  window.open(gmailUrl, "_blank");
+  const gmailWindow = window.open(gmailUrl, "_blank");
+
+if (!gmailWindow) {
+  window.location.href = gmailUrl;
+}
 
   const updateData = {
     status: "open",
