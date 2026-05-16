@@ -415,9 +415,14 @@ ${companyIban ? `IBAN: ${companyIban}` : ""}`
   }
 
   if (sendCopy && currentInvoice.bookkeeper_copy_sent === true) {
-    alert("Deze factuur is al eerder naar de boekhouder gestuurd.");
+  const opnieuw = confirm(
+    "Deze factuur is al eerder naar de boekhouder gestuurd.\n\nWilt u opnieuw een kopie naar de boekhouder sturen?"
+  );
+
+  if (!opnieuw) {
     return;
   }
+}
 
   window.open(gmailUrl, "_blank");
 
