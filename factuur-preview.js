@@ -431,11 +431,11 @@ ${companyIban ? `IBAN: ${companyIban}` : ""}`
     `&su=${subject}` +
     `&body=${body}`;
 
-  if (sendCopy && bookkeepingEmail) {
-    gmailUrl += `&bcc=${encodeURIComponent(bookkeepingEmail)}`;
-  }
+  const alreadySent =
+  currentInvoice.bookkeeper_copy_sent === true ||
+  !!currentInvoice.bookkeeper_copy_sent_at;
 
-  if (sendCopy && currentInvoice.bookkeeper_copy_sent === true) {
+if (sendCopy && alreadySent) {
   const opnieuw = confirm(
     "Deze factuur is al eerder naar de boekhouder gestuurd.\n\nWilt u opnieuw een kopie naar de boekhouder sturen?"
   );
