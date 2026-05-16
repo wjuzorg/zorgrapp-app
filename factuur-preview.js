@@ -355,6 +355,7 @@ async function sendInvoiceEmail() {
     return;
   }
 
+  const companyName = currentProfile?.company_name || "ZorgRapp";
   const companyIban = currentProfile?.iban || "";
   const clientName = currentInvoice.client_name || "cliënt";
   const invoiceNumber = currentInvoice.invoice_number || "";
@@ -370,7 +371,6 @@ async function sendInvoiceEmail() {
     currentInvoice.billing_email ||
     visibleEmail ||
     "";
-
 
   if (!email || !email.includes("@")) {
     alert("Geen geldig e-mailadres gevonden bij deze cliënt.");
@@ -401,7 +401,7 @@ Wij verzoeken u vriendelijk het bedrag binnen ${currentProfile?.payment_term_day
 Met vriendelijke groet,
 
 ${companyName}
-${companyIban ? `IBAN: ${companyIban}` : ""}
+${companyIban ? `IBAN: ${companyIban}` : ""}`
   );
 
   let gmailUrl =
@@ -415,9 +415,9 @@ ${companyIban ? `IBAN: ${companyIban}` : ""}
   }
 
   if (sendCopy && currentInvoice.bookkeeper_copy_sent === true) {
-  alert("Deze factuur is al eerder naar de boekhouder gestuurd.");
-  return;
-}
+    alert("Deze factuur is al eerder naar de boekhouder gestuurd.");
+    return;
+  }
 
   window.open(gmailUrl, "_blank");
 
@@ -428,24 +428,24 @@ ${companyIban ? `IBAN: ${companyIban}` : ""}
   };
 
   if (sendCopy && bookkeepingEmail) {
-  updateData.bookkeeper_copy_sent = true;
-  updateData.bookkeeper_copy_sent_at = new Date().toISOString();
-  updateData.bookkeeper_email = bookkeepingEmail;
-  updateData.invoice_changed_after_bookkeeper_sent = false;
-}
+    updateData.bookkeeper_copy_sent = true;
+    updateData.bookkeeper_copy_sent_at = new Date().toISOString();
+    updateData.bookkeeper_email = bookkeepingEmail;
+    updateData.invoice_changed_after_bookkeeper_sent = false;
+  }
 
- let query = supabaseClient
-  .from("invoice_drafts")
-  .update(updateData)
-  .eq("owner_id", currentUser.id);
+  let query = supabaseClient
+    .from("invoice_drafts")
+    .update(updateData)
+    .eq("owner_id", currentUser.id);
 
-if (getInvoiceId()) {
-  query = query.eq("id", getInvoiceId());
-} else {
-  query = query.eq("invoice_number", invoiceNumber);
-}
+  if (getInvoiceId()) {
+    query = query.eq("id", getInvoiceId());
+  } else {
+    query = query.eq("invoice_number", invoiceNumber);
+  }
 
-const { error } = await query;
+  const { error } = await query;
 
   if (error) {
     alert("Status aanpassen mislukt: " + error.message);
