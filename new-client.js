@@ -351,15 +351,23 @@ async function searchExistingClients() {
       <span>${client.address || ""}</span><br>
       <span>${client.phone || ""}</span><br><br>
 
-      <button type="button" class="btn btn-dark"
-        onclick="window.location.href='plan-afspraak.html?client_id=${client.id}'"
-        Nieuwe afspraak plannen
-      </button>
+      <div style="display:flex; gap:10px; margin:12px 0 18px 0; flex-wrap:wrap;">
+  <button
+    type="button"
+    class="btn btn-dark"
+    onclick="window.location.href='plan-afspraak.html?client_id=${client.id}'"
+  >
+    Nieuwe afspraak plannen
+  </button>
 
-      <button type="button" class="btn btn-secondary"
-        onclick="window.location.href='clientkaart.html?id=${client.id}'">
-        Cliëntenkaart openen
-      </button>
+  <button
+    type="button"
+    class="btn btn-secondary"
+    onclick="window.location.href='clientkaart.html?id=${client.id}'"
+  >
+    Cliëntenkaart openen
+  </button>
+</div>
     </div>
   `).join("");
 }
