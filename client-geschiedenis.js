@@ -117,12 +117,38 @@ function renderHistoryItems(appointments) {
     return;
   }
 
-  historyList.innerHTML = appointments.map((item) => {
-    const momentText = formatDateTime(item.appointment_date || item.created_at, item.appointment_time || "");
+  let signalClosedHtml = "";
+
+  if (currentClient?.signal_closed_at) {
+    const closedDate = new Date(
+      currentClient.signal_closed_at
+    ).toLocaleDateString("nl-NL");
+
+    signalClosedHtml = `
+      <div class="history-item">
+        <div class="history-title">Signaal afgesloten</div>
+        <div class="history-meta">${escapeHtml(closedDate)}</div>
+        <div class="history-block">
+          <strong>Reden</strong><br>
+          ${escapeHtml(
+            currentClient.signal_closed_note || "Geen toelichting"
+          )}
+        </div>
+      </div>
+    `;
+  }
+
+  const appointmentsHtml = appointments.map((item) => {
+    const momentText = formatDateTime(
+      item.appointment_date || item.created_at,
+      item.appointment_time || ""
+    );
 
     return `
       <div class="history-item">
-        <div class="history-title">${escapeHtml(item.service_type || "Afspraak")}</div>
+        <div class="history-title">
+          ${escapeHtml(item.service_type || "Afspraak")}
+        </div>
 
         <div class="history-meta">
           ${escapeHtml(momentText)}
@@ -130,12 +156,16 @@ function renderHistoryItems(appointments) {
 
         <div class="history-block">
           <strong>Status</strong><br>
-          <span class="status-pill">${escapeHtml(item.status || "-")}</span>
+          <span class="status-pill">
+            ${escapeHtml(item.status || "-")}
+          </span>
         </div>
 
         <div class="history-block">
           <strong>Duur</strong><br>
-          ${escapeHtml(item.worked_minutes || item.duration_minutes || 0)} minuten
+          ${escapeHtml(
+            item.worked_minutes || item.duration_minutes || 0
+          )} minuten
         </div>
 
         <div class="history-block">
@@ -160,6 +190,8 @@ function renderHistoryItems(appointments) {
       </div>
     `;
   }).join("");
+
+  historyList.innerHTML = signalClosedHtml + appointmentsHtml;
 }
 
 async function loadClientHistory() {
@@ -257,6 +289,21 @@ async function loadClientHistory() {
   totalAppointments.textContent = String(appointmentsCount);
   totalMinutes.textContent = String(minutesCount);
   totalSignals.textContent = String(signalsCount);
+
+  const signalClosedStatus = document.getElementById("signalClosedStatus");
+
+if (signalClosedStatus) {
+  if (currentClient?.signal_closed_at) {
+    const date = new Date(currentClient.signal_closed_at).toLocaleDateString("nl-NL");
+
+    signalClosedStatus.innerHTML = `
+      Ja<br>
+      <small>${date}</small>
+    `;
+  } else {
+    signalClosedStatus.textContent = "Nee";
+  }
+}
 
   renderHistoryItems(appointmentList);
 }
