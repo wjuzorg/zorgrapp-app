@@ -117,8 +117,8 @@ async function loadClientMonthReport() {
   }
 
   window.clientsDataForReport = clientsData || [];
-  window.reportStartDate = startDate;
-  window.reportEndDate = endDate;
+window.reportStartDate = startDate + "T00:00:00";
+window.reportEndDate = endDate + "T00:00:00";
 
   if (error) {
     console.error(error);
@@ -212,14 +212,16 @@ function renderSummary(grouped, allAppointments) {
 }
 
 function countClosedSignalsForReport() {
-  return (window.clientsDataForReport || []).filter((client) => {
+  const clients = window.clientsDataForReport || [];
+  const start = new Date(window.reportStartDate);
+  const end = new Date(window.reportEndDate);
+
+  return clients.filter((client) => {
     if (!client.signal_closed_at) return false;
 
     const closedDate = new Date(client.signal_closed_at);
-    const start = new Date(window.reportStartDate);
-    const end = new Date(window.reportEndDate);
 
-    return closedDate >= start && closedDate < end;
+    return !isNaN(closedDate) && closedDate >= start && closedDate < end;
   }).length;
 }
 
