@@ -367,10 +367,43 @@ async function searchExistingClients() {
   >
     Cliëntenkaart openen
   </button>
+
+  <button
+  type="button"
+  class="btn btn-secondary"
+  onclick="window.location.href='clientgeschiedenis.html?id=${client.id}'"
+>
+  Cliëntgeschiedenis
+</button>
 </div>
     </div>
   `).join("");
 }
+
+function newClientFormHasData() {
+  const fields = document.querySelectorAll(
+    "#clientForm input, #clientForm select, #clientForm textarea"
+  );
+
+  return Array.from(fields).some((field) => {
+    if (field.type === "checkbox") return field.checked;
+    return field.value && field.value.trim() !== "";
+  });
+}
+
+function confirmLeaveNewClient(url) {
+  if (newClientFormHasData()) {
+    const ok = confirm(
+      "U heeft gegevens ingevuld maar nog niet opgeslagen.\n\nWilt u deze pagina toch verlaten?"
+    );
+
+    if (!ok) return;
+  }
+
+  window.location.href = url;
+}
+
+window.confirmLeaveNewClient = confirmLeaveNewClient;
 
 /* ---------------- INIT ---------------- */
 document.addEventListener("DOMContentLoaded", async () => {

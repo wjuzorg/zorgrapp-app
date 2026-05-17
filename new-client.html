@@ -289,7 +289,9 @@
       <div>
         <h1>ZorgRapp</h1>
         <p>Meer overzicht. Minder administratie.</p>
-        <a class="page-link" href="./index.html">← Terug naar dashboard</a>
+        <a class="page-link" href="#" onclick="confirmLeaveNewClient('./index.html')">
+  ← Terug naar dashboard
+</a>
       </div>
     </header>
 
@@ -326,11 +328,20 @@
 
         <div class="save-wrap">
           <button type="button" class="btn btn-dark" id="saveClientBtn">
-            Opslaan
-          </button>
-          <div id="saveMessage" class="save-message"></div>
-        </div>
-      </div>
+  Opslaan
+</button>
+
+<button
+  type="button"
+  class="btn btn-secondary"
+  onclick="confirmLeaveNewClient('./index.html')"
+  style="margin-top: 10px;"
+>
+  Terug naar dashboard
+</button>
+
+<div id="saveMessage" class="save-message"></div>
+</div>
 
       <section id="newClientFormBox">
         <form id="clientForm">
