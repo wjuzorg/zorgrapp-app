@@ -2889,3 +2889,22 @@ tbody tr {
     font-size: 1rem;
   }
 }
+
+button.finish-btn,
+.btn-finish,
+#afrondenBtn,
+#finishBtn {
+  background: #16a34a !important;
+  color: #ffffff !important;
+  border: none !important;
+  opacity: 1 !important;
+}
+
+button.finish-btn:disabled,
+.btn-finish:disabled,
+#afrondenBtn:disabled,
+#finishBtn:disabled {
+  background: #d1d5db !important;
+  color: #ffffff !important;
+  opacity: 0.8 !important;
+}
