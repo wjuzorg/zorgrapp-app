@@ -352,7 +352,7 @@ async function searchExistingClients() {
       <span>${client.phone || ""}</span><br><br>
 
       <button type="button" class="dark-btn"
-        onclick="window.location.href='invullen.html?client_id=${client.id}'">
+        onclick="window.location.href='plan-afspraak.html?client_id=${client.id}'"
         Nieuwe afspraak plannen
       </button>
 

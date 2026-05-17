@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Afspraak plannen - ZorgRapp</title>
+  <link rel="stylesheet" href="app.css?v=156" />
+</head>
+
+<body>
+  <main class="container">
+    <header class="topbar">
+      <div>
+        <h1>ZorgRapp</h1>
+        <p>Nieuwe afspraak plannen voor bestaande cliënt.</p>
+        <a class="page-link" href="./new-client.html">← Terug naar cliënten</a>
+      </div>
+    </header>
+
+    <section class="card">
+      <h2>Afspraak plannen</h2>
+
+      <div class="info-box">
+        <strong>Cliënt</strong><br>
+        <span id="clientName">Laden...</span><br>
+        <span id="clientAddress"></span><br>
+        <span id="clientPhone"></span>
+      </div>
+
+      <form id="appointmentForm">
+        <div class="section">
+          <h3>Afspraakgegevens</h3>
+
+          <label for="appointment_date">Datum</label>
+          <input type="date" id="appointment_date" class="input" required />
+
+          <label for="appointment_time">Tijd</label>
+          <input type="time" id="appointment_time" class="input" required />
+
+          <label for="service_type">Dienst</label>
+          <select id="service_type" class="input" required>
+            <option value="">Kies een dienst</option>
+            <option value="zorgafspraak">Zorgafspraak</option>
+            <option value="boodschappen">Boodschappen</option>
+            <option value="klusjes">Klusjes</option>
+            <option value="gezelschap">Gezelschap</option>
+            <option value="administratie">Administratie</option>
+            <option value="anders">Anders</option>
+          </select>
+
+          <label for="duration_minutes">Duur</label>
+          <select id="duration_minutes" class="input" required>
+            <option value="">Kies duur</option>
+            <option value="30">30 minuten</option>
+            <option value="60">60 minuten</option>
+            <option value="90">90 minuten</option>
+            <option value="120">120 minuten</option>
+          </select>
+
+          <label for="notes">Opmerking</label>
+          <textarea
+            id="notes"
+            class="input"
+            rows="4"
+            placeholder="Bijvoorbeeld: ophalen, extra aandachtspunt, adresdetails..."
+          ></textarea>
+        </div>
+
+        <button type="submit" class="dark-btn">
+          Afspraak opslaan
+        </button>
+
+        <p id="saveMessage" class="save-message"></p>
+      </form>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    const SUPABASE_URL = "https://bqqoxawgjxxvolljkqnp.supabase.co";
+    const SUPABASE_ANON_KEY = "VUL_HIER_JE_ANON_KEY_IN";
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let currentUser = null;
+    let currentClient = null;
+
+    function getClientIdFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("client_id");
+    }
+
+    function setText(id, value) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = value || "";
+    }
+
+    async function loadClient() {
+      const { data: sessionData } = await supabaseClient.auth.getSession();
+      currentUser = sessionData.session?.user;
+
+      if (!currentUser) {
+        alert("U bent niet ingelogd.");
+        window.location.href = "./login.html";
+        return;
+      }
+
+      const clientId = getClientIdFromUrl();
+
+      if (!clientId) {
+        alert("Geen cliënt gekozen.");
+        window.location.href = "./new-client.html";
+        return;
+      }
+
+      const { data, error } = await supabaseClient
+        .from("Clients")
+        .select("*")
+        .eq("id", clientId)
+        .eq("owner_id", currentUser.id)
+        .maybeSingle();
+
+      if (error || !data) {
+        alert("Cliënt laden mislukt.");
+        window.location.href = "./new-client.html";
+        return;
+      }
+
+      currentClient = data;
+
+      setText("clientName", data.full_name || "Naam onbekend");
+      setText("clientAddress", data.address || "");
+      setText("clientPhone", data.phone || "");
+    }
+
+    async function saveAppointment(event) {
+      event.preventDefault();
+
+      if (!currentUser || !currentClient) {
+        alert("Cliënt of gebruiker ontbreekt.");
+        return;
+      }
+
+      const saveMessage = document.getElementById("saveMessage");
+      saveMessage.textContent = "Afspraak opslaan...";
+
+      const appointment = {
+        owner_id: currentUser.id,
+        client_id: currentClient.id,
+        client_name: currentClient.full_name || "",
+        appointment_date: document.getElementById("appointment_date").value,
+        appointment_time: document.getElementById("appointment_time").value,
+        service_type: document.getElementById("service_type").value,
+        duration_minutes: Number(document.getElementById("duration_minutes").value) || null,
+        notes: document.getElementById("notes").value || "",
+        status: "open",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      const { error } = await supabaseClient
+        .from("Appointments")
+        .insert([appointment]);
+
+      if (error) {
+        saveMessage.textContent = "Opslaan mislukt: " + error.message;
+        return;
+      }
+
+      alert("Afspraak opgeslagen.");
+      window.location.href = "./index.html";
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      await loadClient();
+      document.getElementById("appointmentForm").addEventListener("submit", saveAppointment);
+    });
+  </script>
+</body>
+</html>
