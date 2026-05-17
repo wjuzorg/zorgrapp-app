@@ -371,7 +371,7 @@ async function searchExistingClients() {
   <button
   type="button"
   class="btn btn-secondary"
-  onclick="window.location.href='clientgeschiedenis.html?id=${client.id}'"
+  onclick="window.location.href='client-geschiedenis.html?id=${client.id}'"
 >
   Cliëntgeschiedenis
 </button>
