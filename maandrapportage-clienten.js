@@ -107,22 +107,46 @@ async function loadClientMonthReport() {
   .lt("appointment_date", endDate)
   .order("appointment_date", { ascending: false });
 
+  const { data: clientsData, error: clientsError } = await supabaseClient
+  .from("Clients")
+  .select("id, full_name, signal_closed_at, signal_closed_note")
+  .eq("owner_id", currentUser.id);
+
+if (clientsError) {
+  console.error("Cliënten laden mislukt:", clientsError);
+}
+
   if (error) {
     console.error(error);
     clientsReportList.innerHTML = "Rapport kon niet geladen worden.";
     return;
   }
 
-  if (!data || data.length === 0) {
-    resetSummary();
-    clientsReportList.innerHTML = "Geen afgeronde afspraken gevonden voor deze maand.";
-    return;
+ if (!data || data.length === 0) {
+  resetSummary();
+
+  const summaryClosedSignals = document.getElementById("summaryClosedSignals");
+  if (summaryClosedSignals) {
+    const closedSignals = (window.clientsDataForReport || []).filter((client) => {
+      if (!client.signal_closed_at) return false;
+
+      const closedDate = new Date(client.signal_closed_at);
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+
+      return closedDate >= start && closedDate < end;
+    }).length;
+
+    summaryClosedSignals.textContent = closedSignals;
   }
 
-  const grouped = groupByClient(data);
-  renderSummary(grouped, data);
-  renderClients(grouped);
+  clientsReportList.innerHTML = "Geen afgeronde afspraken gevonden voor deze maand.";
+  return;
 }
+
+const grouped = groupByClient(data);
+renderSummary(grouped, data);
+renderClients(grouped);
 
 function groupByClient(appointments) {
   const result = {};
@@ -189,6 +213,22 @@ function renderSummary(grouped, allAppointments) {
   summaryHours.textContent = formatMinutesToHours(totalMinutes);
   summarySignals.textContent = totalSignals;
   summaryActiveSignals.textContent = activeSignals;
+}
+
+const summaryClosedSignals = document.getElementById("summaryClosedSignals");
+
+const closedSignals = (window.clientsDataForReport || []).filter((client) => {
+  if (!client.signal_closed_at) return false;
+
+  const closedDate = new Date(client.signal_closed_at);
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+
+  return closedDate >= start && closedDate < end;
+}).length;
+
+if (summaryClosedSignals) {
+  summaryClosedSignals.textContent = closedSignals;
 }
 
 function renderClients(grouped) {
