@@ -2821,3 +2821,71 @@ tbody tr {
   font-weight: 800;
   border: none;
 }
+
+/* PLAN-AFSPRAAK PAGINA */
+.info-box {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  padding: 20px;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.info-box strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+#clientName {
+  display: block;
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+#clientAddress,
+#clientPhone {
+  display: block;
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* Alle invoervelden dezelfde ZorgRapp-stijl */
+.plan-form input,
+.plan-form select,
+.plan-form textarea {
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 16px;
+  padding: 14px 16px;
+  font-size: 1rem;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+/* Specifiek datum en tijd ook modern maken */
+.plan-form input[type="date"],
+.plan-form input[type="time"] {
+  min-height: 52px;
+}
+
+/* Mobiel iets compacter */
+@media (max-width: 768px) {
+  #clientName {
+    font-size: 1.6rem;
+  }
+
+  #clientAddress,
+  #clientPhone {
+    font-size: 1rem;
+  }
+}
