@@ -2613,3 +2613,48 @@ tbody tr {
     width: 100%;
   }
 }
+
+@media (max-width: 768px) {
+  .invoice-wrapper,
+  .invoice-card,
+  .invoice-preview,
+  .invoice-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 16px !important;
+    box-sizing: border-box;
+  }
+
+  body {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+}
+
+@media print {
+  .page-header,
+  .actions,
+  .action-buttons,
+  .no-print {
+    display: none !important;
+  }
+
+  .invoice-wrapper,
+  .invoice-card,
+  .invoice-preview,
+  .invoice-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+
+  body {
+    background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+}
