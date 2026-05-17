@@ -66,15 +66,36 @@
       ></textarea>
     </div>
 
-    <button type="submit" class="btn btn-dark">
-      Afspraak opslaan
-    </button>
+    <div class="save-wrap">
+  <button type="submit" class="btn btn-dark" style="width: 100%;">
+    Afspraak opslaan
+  </button>
 
-    <p id="saveMessage" class="save-message"></p>
+  <button
+    type="button"
+    class="btn btn-secondary"
+    style="width: 100%; margin-top: 10px;"
+    onclick="confirmLeave('./index.html')"
+  >
+    Terug naar dashboard
+  </button>
+
+  <button
+    type="button"
+    class="btn btn-secondary"
+    style="width: 100%; margin-top: 10px;"
+    onclick="confirmLeave('./maandrapportages.html')"
+  >
+    Terug naar maandrapportages
+  </button>
+
+  <div id="saveMessage" class="save-message"></div>
+</div>
   </form>
 </section>
  
 </main>
+
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./plan-afspraak.js?v=1"></script>

@@ -132,6 +132,27 @@ async function saveAppointment(event) {
   window.location.href = "./index.html";
 }
 
+function confirmLeave(url) {
+  const hasData =
+    el("appointment_date")?.value ||
+    el("appointment_time")?.value ||
+    el("service_type")?.value ||
+    el("duration_minutes")?.value ||
+    el("notes")?.value;
+
+  if (hasData) {
+    const ok = confirm(
+      "U heeft gegevens ingevuld maar nog niet opgeslagen.\n\nWilt u deze pagina toch verlaten?"
+    );
+
+    if (!ok) return;
+  }
+
+  window.location.href = url;
+}
+
+window.confirmLeave = confirmLeave;
+
 document.addEventListener("DOMContentLoaded", async () => {
   await loadClient();
 
