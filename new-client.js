@@ -4,6 +4,7 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let selectedClientId = null;
+let clientSaved = false;
 
 async function enforceProcessorAgreement() {
   const { data: sessionData } = await supabaseClient.auth.getSession();
@@ -93,24 +94,22 @@ function toggleRecurrenceFields() {
 }
 
 function toggleInvoiceFields() {
-  const method = val("invoice_delivery_method");
+  const delivery = el("invoice_delivery_method")?.value;
+  const sameAddress = el("invoice_same_as_client_address")?.value;
 
-  el("invoiceEmailWrap")?.classList.add("hidden");
-  el("invoiceAddressModeWrap")?.classList.add("hidden");
-  el("invoiceAddressFields")?.classList.add("hidden");
+  const choiceBox = el("invoiceAddressChoiceBox");
+  const addressFields = el("invoiceAddressFields");
 
-  if (method === "email") {
-    el("invoiceEmailWrap")?.classList.remove("hidden");
+  if (choiceBox) {
+    choiceBox.style.display = delivery === "address" ? "block" : "none";
   }
 
-  if (method === "address") {
-    el("invoiceAddressModeWrap")?.classList.remove("hidden");
-
-    if (val("invoice_same_as_client_address") === "false") {
-      el("invoiceAddressFields")?.classList.remove("hidden");
-    }
+  if (addressFields) {
+    addressFields.style.display =
+      delivery === "address" && sameAddress === "false" ? "block" : "none";
   }
 }
+
 
 /* ---------------- SEARCH ---------------- */
 
@@ -289,7 +288,7 @@ clientId = data.id;
       await supabaseClient.from("Appointments").insert(appointments);
     }
     clientSaved = true;
-    showSaveMessage("Cliënt opgeslagen ✅");
+showSaveMessage("Cliënt opgeslagen ✅");
   } catch (err) {
     console.error(err);
     showSaveMessage(err.message, true);
@@ -392,6 +391,11 @@ function newClientFormHasData() {
 }
 
 function confirmLeaveNewClient(url) {
+   if (clientSaved) {
+  window.location.href = url;
+  return;
+}
+
   if (newClientFormHasData()) {
     const ok = confirm(
       "U heeft gegevens ingevuld maar nog niet opgeslagen.\n\nWilt u deze pagina toch verlaten?"
@@ -399,11 +403,6 @@ function confirmLeaveNewClient(url) {
 
     if (!ok) return;
   }
-
-  if (clientSaved) {
-  window.location.href = url;
-  return;
-}
 
   window.location.href = url;
 }
@@ -433,6 +432,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   } else {
     console.error("Opslaan-knop niet gevonden.");
   }
+
+  el("invoice_delivery_method")?.addEventListener("change", toggleInvoiceFields);
+el("invoice_same_as_client_address")?.addEventListener("change", toggleInvoiceFields);
+toggleInvoiceFields();
 
  window.showNewClientForm = showNewClientForm;
 window.showExistingClientSearch = showExistingClientSearch;

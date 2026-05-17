@@ -471,54 +471,36 @@
   <div class="helper">Kan later worden ingevuld.</div>
 </div>
         </div>
+<div class="section">
+  <h3>Factuurvoorkeur</h3>
 
-        <div class="section">
-          <h3>Factuurvoorkeur</h3>
+  <label for="invoice_delivery_method">Factuur ontvangen via</label>
+  <select id="invoice_delivery_method" class="input">
+    <option value="">Nog niet afgesproken</option>
+    <option value="email">Per e-mail</option>
+    <option value="address">Per adres</option>
+  </select>
 
-          <div class="field">
-            <label class="label" for="invoice_delivery_method">Factuur ontvangen via</label>
-            <select id="invoice_delivery_method" class="select">
-              <option value="nog_niet_afgesproken">Nog niet afgesproken</option>
-              <option value="email">Per e-mail</option>
-              <option value="address">Per adres</option>
-            </select>
-          </div>
+  <div id="invoiceAddressChoiceBox" style="display: none;">
+    <label for="invoice_same_as_client_address">Factuuradres</label>
+    <select id="invoice_same_as_client_address" class="input">
+      <option value="true">Zelfde adres als cliënt</option>
+      <option value="false">Ander factuuradres</option>
+    </select>
+  </div>
 
-          <div class="field hidden" id="invoiceEmailWrap">
-            <label class="label" for="invoice_email">Factuur e-mail</label>
-            <input
-              type="email"
-              id="invoice_email"
-              class="input"
-              placeholder="Bijvoorbeeld: dochter@voorbeeld.nl"
-            />
-          </div>
+  <div id="invoiceAddressFields" style="display: none;">
+    <label for="invoice_address">Factuuradres</label>
+    <input id="invoice_address" class="input" type="text" />
 
-          <div class="field hidden" id="invoiceAddressModeWrap">
-            <label class="label" for="invoice_same_as_client_address">Factuuradres</label>
-            <select id="invoice_same_as_client_address" class="select">
-              <option value="true">Zelfde als cliëntadres</option>
-              <option value="false">Ander factuuradres invullen</option>
-            </select>
-          </div>
+    <label for="invoice_postal_code">Postcode factuuradres</label>
+    <input id="invoice_postal_code" class="input" type="text" />
 
-          <div id="invoiceAddressFields" class="hidden">
-            <div class="field">
-              <label class="label" for="invoice_address">Factuuradres</label>
-              <input type="text" id="invoice_address" class="input" />
-            </div>
-
-            <div class="field">
-              <label class="label" for="invoice_postal_code">Factuur postcode</label>
-              <input type="text" id="invoice_postal_code" class="input" />
-            </div>
-
-            <div class="field">
-              <label class="label" for="invoice_city">Factuur plaats</label>
-              <input type="text" id="invoice_city" class="input" />
-            </div>
-          </div>
-        </div>
+    <label for="invoice_city">Plaats factuuradres</label>
+    <input id="invoice_city" class="input" type="text" />
+  </div>
+   </div>
+    </div>
 
       </form>
     </section>
