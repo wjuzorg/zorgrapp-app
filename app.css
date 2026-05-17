@@ -2732,10 +2732,16 @@ tbody tr {
   }
 
   .invoice-table td {
-    padding: 6px 0 !important;
-    font-size: 15px !important;
-    text-align: left !important;
-  }
+  padding: 6px 0 !important;
+  font-size: 15px !important;
+  text-align: left !important;
+  margin: 0 !important;
+}
+
+.invoice-table td:nth-child(2),
+.invoice-table td:nth-child(3) {
+  text-align: left !important;
+}
 
   .invoice-table td:nth-child(1)::before {
     content: "Omschrijving: ";
