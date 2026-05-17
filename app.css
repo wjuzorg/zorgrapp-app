@@ -2655,27 +2655,27 @@ tbody tr {
   }
 
   .invoice-table th:nth-child(1),
-  .invoice-table td:nth-child(1) {
-    width: 44% !important;
-  }
+.invoice-table td:nth-child(1) {
+  width: 50% !important;
+}
 
-  .invoice-table th:nth-child(2),
-  .invoice-table td:nth-child(2) {
-    width: 26% !important;
-    text-align: center !important;
-  }
+.invoice-table th:nth-child(2),
+.invoice-table td:nth-child(2) {
+  width: 22% !important;
+  text-align: center !important;
+}
 
-  .invoice-table th:nth-child(3),
-  .invoice-table td:nth-child(3) {
-    width: 30% !important;
-    text-align: right !important;
-  }
+.invoice-table th:nth-child(3),
+.invoice-table td:nth-child(3) {
+  width: 28% !important;
+  text-align: right !important;
+}
 
   #invoiceMinutes,
-  #invoiceAmount {
-    font-size: 11px !important;
-    white-space: nowrap !important;
-  }
+#invoiceAmount {
+  font-size: 10px !important;
+  white-space: normal !important;
+}
 
   .invoice-total {
     width: 100% !important;
