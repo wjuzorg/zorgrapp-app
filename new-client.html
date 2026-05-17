@@ -285,7 +285,6 @@
 </head>
 <body>
   <div class="container">
-
     <header class="topbar">
       <div>
         <h1>ZorgRapp</h1>
@@ -294,44 +293,28 @@
       </div>
     </header>
 
-   <section class="client-choice-box">
-  <button
-  type="button"
-  class="btn btn-secondary"
-  onclick="showExistingClientSearch()"
-  style="margin-bottom: 20px;"
->
-  Bestaande cliënt zoeken
-</button>
-</section>
+    <section id="existingClientSearchBox" class="card">
+      <div class="search-title">Bestaande cliënt zoeken</div>
 
-<section id="existingClientSearchBox" class="card"></section>
-  <div class="search-title">Bestaande cliënt zoeken</div>
+      <div class="search-row">
+        <input
+          type="text"
+          id="existingClientSearch"
+          class="input"
+          placeholder="Bijvoorbeeld: Jansen, 06..., of straatnaam"
+        />
+      </div>
 
-  <div class="search-row">
-    <input
-      type="text"
-      id="existingClientSearch"
-      class="input"
-      placeholder="Bijvoorbeeld: Jansen, 06..., of straatnaam"
-    />
-  </div>
+      <button
+        type="button"
+        class="btn btn-dark"
+        onclick="searchExistingClients()"
+        style="margin-top: 12px;"
+      >
+        Zoeken
+      </button>
 
-  <button
-    type="button"
-    class="btn btn-dark"
-    onclick="searchExistingClients()"
-    style="margin-top: 12px;"
-  >
-    Zoeken
-  </button>
-
-  <div id="existingClientResults" style="margin-top: 16px;"></div>
-</section>
-
-<div id="searchInfo" class="helper"></div>
-
-      <div id="searchResults" class="results"></div>
+      <div id="existingClientResults" style="margin-top: 16px;"></div>
     </section>
 
     <section class="card">
@@ -342,13 +325,15 @@
         </div>
 
         <div class="save-wrap">
-          <button type="button" class="btn btn-dark" id="saveClientBtn">Opslaan</button>
+          <button type="button" class="btn btn-dark" id="saveClientBtn">
+            Opslaan
+          </button>
           <div id="saveMessage" class="save-message"></div>
         </div>
       </div>
 
       <section id="newClientFormBox">
-      <form id="clientForm">
+        <form id="clientForm">
 
         <div class="section">
   <h3>Basisgegevens</h3>
