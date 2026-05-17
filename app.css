@@ -2719,6 +2719,10 @@ tbody tr {
   .invoice-table td {
     display: block !important;
     width: 100% !important;
+    max-width: 100% !important;
+    text-align: left !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
   }
 
   .invoice-table thead {
@@ -2732,16 +2736,18 @@ tbody tr {
   }
 
   .invoice-table td {
-  padding: 6px 0 !important;
-  font-size: 15px !important;
-  text-align: left !important;
-  margin: 0 !important;
-}
+    padding: 6px 0 !important;
+    font-size: 15px !important;
+    white-space: normal !important;
+    text-align: left !important;
+  }
 
-.invoice-table td:nth-child(2),
-.invoice-table td:nth-child(3) {
-  text-align: left !important;
-}
+  .invoice-table td:nth-child(1),
+  .invoice-table td:nth-child(2),
+  .invoice-table td:nth-child(3) {
+    width: 100% !important;
+    text-align: left !important;
+  }
 
   .invoice-table td:nth-child(1)::before {
     content: "Omschrijving: ";
