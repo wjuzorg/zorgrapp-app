@@ -296,6 +296,74 @@ clientId = data.id;
   }
 }
 
+
+function showNewClientForm() {
+  document.getElementById("newClientFormBox").style.display = "block";
+  document.getElementById("existingClientSearchBox").style.display = "none";
+}
+
+function showExistingClientSearch() {
+  document.getElementById("newClientFormBox").style.display = "none";
+  document.getElementById("existingClientSearchBox").style.display = "block";
+}
+
+async function searchExistingClients() {
+  const searchValue = document.getElementById("existingClientSearch").value.trim();
+  const resultsBox = document.getElementById("existingClientResults");
+
+  if (!searchValue) {
+    resultsBox.innerHTML = "<p>Vul eerst een naam, telefoonnummer of adres in.</p>";
+    return;
+  }
+
+  resultsBox.innerHTML = "<p>Cliënten zoeken...</p>";
+
+  const { data: sessionData } = await supabaseClient.auth.getSession();
+  const user = sessionData.session?.user;
+
+  if (!user) {
+    resultsBox.innerHTML = "<p>U bent niet ingelogd.</p>";
+    return;
+  }
+
+  const { data, error } = await supabaseClient
+    .from("Clients")
+    .select("*")
+    .eq("owner_id", user.id)
+    .or(
+      `full_name.ilike.%${searchValue}%,phone.ilike.%${searchValue}%,address.ilike.%${searchValue}%`
+    )
+    .limit(10);
+
+  if (error) {
+    resultsBox.innerHTML = `<p>Zoeken mislukt: ${error.message}</p>`;
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    resultsBox.innerHTML = "<p>Geen cliënt gevonden.</p>";
+    return;
+  }
+
+  resultsBox.innerHTML = data.map(client => `
+    <div class="client-result-card">
+      <strong>${client.full_name || "Naam onbekend"}</strong><br>
+      <span>${client.address || ""}</span><br>
+      <span>${client.phone || ""}</span><br><br>
+
+      <button type="button" class="dark-btn"
+        onclick="window.location.href='invullen.html?client_id=${client.id}'">
+        Nieuwe afspraak plannen
+      </button>
+
+      <button type="button" class="light-btn"
+        onclick="window.location.href='clientkaart.html?id=${client.id}'">
+        Cliëntenkaart openen
+      </button>
+    </div>
+  `).join("");
+}
+
 /* ---------------- INIT ---------------- */
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("NEW CLIENT JS GELADEN");
@@ -320,9 +388,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.error("Opslaan-knop niet gevonden.");
   }
 
-  el("searchClientBtn")?.addEventListener("click", searchClients);
-  el("recurrence_type")?.addEventListener("change", toggleRecurrenceFields);
-  el("invoice_delivery_method")?.addEventListener("change", toggleInvoiceFields);
-  el("invoice_same_as_client_address")?.addEventListener("change", toggleInvoiceFields);
-  window.saveClient = saveClient;
+ window.showNewClientForm = showNewClientForm;
+window.showExistingClientSearch = showExistingClientSearch;
+window.searchExistingClients = searchExistingClients;
+window.saveClient = saveClient;
 });

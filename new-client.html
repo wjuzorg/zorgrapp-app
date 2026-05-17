@@ -294,17 +294,39 @@
       </div>
     </header>
 
-    <section class="card">
-      <div class="search-title">Zoek cliënt op naam om aan te passen</div>
+   <section class="client-choice-box">
+  <button type="button" class="dark-btn" onclick="showNewClientForm()">
+    Nieuwe cliënt invoeren
+  </button>
 
-      <div class="search-row">
-  <input
-    type="text"
-    id="searchClient"
-    class="input"
-    placeholder="Bijvoorbeeld: Jansen"
-  />
-</div>
+  <button type="button" class="light-btn" onclick="showExistingClientSearch()">
+    Bestaande cliënt zoeken
+  </button>
+</section>
+
+<section id="existingClientSearchBox" class="card" style="display: none;">
+  <div class="search-title">Bestaande cliënt zoeken</div>
+
+  <div class="search-row">
+    <input
+      type="text"
+      id="existingClientSearch"
+      class="input"
+      placeholder="Bijvoorbeeld: Jansen, 06..., of straatnaam"
+    />
+  </div>
+
+  <button
+    type="button"
+    class="btn btn-dark"
+    onclick="searchExistingClients()"
+    style="margin-top: 12px;"
+  >
+    Zoeken
+  </button>
+
+  <div id="existingClientResults" style="margin-top: 16px;"></div>
+</section>
 
 <div id="searchInfo" class="helper"></div>
 
@@ -324,6 +346,7 @@
         </div>
       </div>
 
+      <section id="newClientFormBox"></section>
       <form id="clientForm">
 
         <div class="section">
