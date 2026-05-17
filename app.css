@@ -2771,3 +2771,16 @@ tbody tr {
     white-space: normal !important;
   }
 }
+
+@media (min-width: 900px) {
+  .bottom-nav {
+    max-width: 720px;
+    margin-left: auto;
+    margin-right: auto;
+    gap: 14px;
+  }
+
+  .bottom-nav button {
+    min-width: 200px;
+  }
+}

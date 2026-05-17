@@ -69,15 +69,15 @@
     <span id="todayCount">0</span>
   </div>
 
-  <div class="card orange" id="signalCard" style="cursor:pointer;">
-  <h3>Actiesignalen</h3>
-  <span id="signalCount">0</span>
-</div>
+  <div class="card orange" onclick="showSignalInfo()" style="cursor: pointer;">
+    <h3>Actiesignalen</h3>
+    <span id="signalCount">0</span>
+  </div>
 
-  <div class="card blue" id="btnInvoices" style="cursor:pointer;">
-  <h3>Facturen</h3>
-  <span id="invoiceTotal">€0</span>
-</div>
+  <div class="card blue" id="btnInvoices" style="cursor: pointer;">
+    <h3>Facturen</h3>
+    <span id="invoiceTotal">€0</span>
+  </div>
 </section>
 
 <section class="today">
@@ -152,6 +152,16 @@
     Bedrijfsprofiel
   </button>
 </nav>
+
+<script>
+function showSignalInfo() {
+  alert(
+    "Actiesignalen zijn herinneringen om extra rekening te houden met cliënten bij wie iets is opgevallen.\n\n" +
+    "Meer informatie vindt u op de cliëntenkaart en in de cliëntgeschiedenis.\n\n" +
+    "Een signaal kunt u afsluiten bij het invullen of afronden van een afspraak."
+  );
+}
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./app.js?v=10"></script>
