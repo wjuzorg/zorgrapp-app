@@ -27,7 +27,7 @@
     <span id="clientPhone"></span>
   </div>
 
-  <form id="appointmentForm">
+  <form id="appointmentForm" class="plan-form">
     <div class="section">
       <h3>Afspraakgegevens</h3>
 
@@ -66,28 +66,30 @@
       ></textarea>
     </div>
 
-    <div class="save-wrap">
-  <button type="submit" class="btn btn-dark" style="width: 100%;">
-    Afspraak opslaan
-  </button>
+ <div class="plan-actions">
+    <button type="submit" class="btn btn-dark">
+      Afspraak opslaan
+    </button>
 
-  <button
-    type="button"
-    class="btn btn-secondary"
-    style="width: 100%; margin-top: 10px;"
-    onclick="confirmLeave('./index.html')"
-  >
-    Terug naar dashboard
-  </button>
+    <button
+      type="button"
+      class="btn btn-secondary"
+      onclick="confirmLeave('./index.html')"
+    >
+      Terug naar dashboard
+    </button>
 
-  <button
-    type="button"
-    class="btn btn-secondary"
-    style="width: 100%; margin-top: 10px;"
-    onclick="confirmLeave('./maandrapportages.html')"
-  >
-    Terug naar maandrapportages
-  </button>
+    <button
+      type="button"
+      class="btn btn-secondary"
+      onclick="confirmLeave('./maandrapportages.html')"
+    >
+      Terug naar maandrapportages
+    </button>
+  </div>
+
+  <p id="saveMessage" class="save-message"></p>
+</form>
 
   <div id="saveMessage" class="save-message"></div>
 </div>
