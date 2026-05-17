@@ -112,22 +112,36 @@
       </div>
 
       <div class="section">
-        <h3>Signalen</h3>
-        <div class="info-grid">
-          <div class="info-box">
-            <span class="info-label">Signalen totaal</span>
-            <strong id="signalTotal">0</strong>
-          </div>
+  <h3>Signalen</h3>
 
-          <div class="info-box">
-            <span class="info-label">Laatste signaal</span>
-            <strong id="lastSignal">-</strong>
-          </div>
+  <div class="info-grid">
+    <div class="info-box">
+      <span class="info-label">Signalen totaal</span>
+      <strong id="signalTotal">0</strong>
+    </div>
 
-          <div class="info-box" id="alertBox">
-            <span class="info-label">Actiestatus</span>
-            <strong id="alertStatus">Normaal</strong>
-          </div>
+    <div class="info-box">
+      <span class="info-label">Laatste signaal</span>
+      <strong id="lastSignal">-</strong>
+    </div>
+
+    <div class="info-box" id="alertBox">
+      <span class="info-label">Actiestatus</span>
+      <strong id="alertStatus">Normaal</strong>
+    </div>
+  </div>
+
+  <button
+    type="button"
+    id="closeSignalBtn"
+    class="btn btn-secondary"
+    style="margin-top: 16px; display: none; width: 100%;"
+  >
+    Signaal afsluiten
+  </button>
+
+  <div id="closeSignalMessage" class="save-message"></div>
+</div>
         </div>
       </div>
 

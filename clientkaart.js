@@ -147,13 +147,22 @@ function getLatestSignalText(appointments) {
 }
 
 function setAlertStatus(signalTotal, alertBoxEl, alertStatusEl) {
+  const closeBtn = document.getElementById("closeSignalBtn");
+
   alertBoxEl.style.background = "#f9fafb";
   alertBoxEl.style.borderColor = "#e5e7eb";
+
+  if (currentClient?.signal_closed_at) {
+    alertStatusEl.textContent = "Signaal afgesloten";
+    if (closeBtn) closeBtn.style.display = "none";
+    return;
+  }
 
   if (signalTotal >= 3) {
     alertStatusEl.textContent = "Actiesignaal actief";
     alertBoxEl.style.background = "#fef2f2";
     alertBoxEl.style.borderColor = "#fecaca";
+    if (closeBtn) closeBtn.style.display = "block";
     return;
   }
 
@@ -161,10 +170,56 @@ function setAlertStatus(signalTotal, alertBoxEl, alertStatusEl) {
     alertStatusEl.textContent = "Let op";
     alertBoxEl.style.background = "#fff7ed";
     alertBoxEl.style.borderColor = "#fed7aa";
+    if (closeBtn) closeBtn.style.display = "block";
     return;
   }
 
   alertStatusEl.textContent = "Normaal";
+  if (closeBtn) closeBtn.style.display = "none";
+}
+
+async function closeClientSignal() {
+  if (!currentUser || !currentClient?.id) {
+    alert("Geen cliënt geladen.");
+    return;
+  }
+
+  const note = prompt(
+    "Waarom sluit u het signaal af?\n\nBijvoorbeeld: situatie verbeterd, cliënt gestopt, contact gehad met mantelzorger."
+  );
+
+  if (note === null) return;
+
+  const ok = confirm("Wilt u het actieve signaal afsluiten?");
+  if (!ok) return;
+
+  const { error } = await supabaseClient
+    .from("Clients")
+    .update({
+      signal_closed_at: new Date().toISOString(),
+      signal_closed_note: note || "Signaal handmatig afgesloten",
+      updated_at: new Date().toISOString()
+    })
+    .eq("id", currentClient.id)
+    .eq("owner_id", currentUser.id);
+
+  if (error) {
+    document.getElementById("closeSignalMessage").textContent =
+      "Afsluiten mislukt: " + error.message;
+    return;
+  }
+
+  currentClient.signal_closed_at = new Date().toISOString();
+  currentClient.signal_closed_note = note || "Signaal handmatig afgesloten";
+
+  document.getElementById("closeSignalMessage").textContent =
+    "Signaal afgesloten ✅";
+
+  const alertBoxEl = document.getElementById("alertBox");
+  const alertStatusEl = document.getElementById("alertStatus");
+  const total = Number(document.getElementById("signalTotal")?.textContent || 0);
+
+  setAlertStatus(total, alertBoxEl, alertStatusEl);
 }
 
 async function saveContactNote() {
@@ -359,5 +414,8 @@ const saveContactNoteBtn = document.getElementById("saveContactNoteBtn");
 
   saveContactNoteBtn?.addEventListener("click", saveContactNote);
 }
+
+document.getElementById("closeSignalBtn")?.addEventListener("click", closeClientSignal);
+window.closeClientSignal = closeClientSignal;
 
 loadClientCard();
