@@ -2658,3 +2658,48 @@ tbody tr {
     padding: 0 !important;
   }
 }
+
+@media (max-width: 768px) {
+  .invoice-preview-card {
+    width: calc(100vw - 32px) !important;
+    max-width: calc(100vw - 32px) !important;
+    margin: 16px auto !important;
+    padding: 22px !important;
+    overflow: hidden !important;
+  }
+
+  .invoice-table {
+    width: 100% !important;
+    table-layout: fixed !important;
+    font-size: 0.82rem !important;
+  }
+
+  .invoice-table th,
+  .invoice-table td {
+    padding: 10px 6px !important;
+    word-break: break-word !important;
+    white-space: normal !important;
+  }
+
+  .invoice-table th:nth-child(1),
+  .invoice-table td:nth-child(1) {
+    width: 48% !important;
+  }
+
+  .invoice-table th:nth-child(2),
+  .invoice-table td:nth-child(2) {
+    width: 25% !important;
+    text-align: center !important;
+  }
+
+  .invoice-table th:nth-child(3),
+  .invoice-table td:nth-child(3) {
+    width: 27% !important;
+    text-align: right !important;
+  }
+
+  .invoice-total {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+}
