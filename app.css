@@ -2703,3 +2703,58 @@ tbody tr {
     box-sizing: border-box !important;
   }
 }
+
+@media (max-width: 768px) {
+  .page-shell {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 14px !important;
+    overflow-x: hidden !important;
+  }
+
+  .invoice-preview-card,
+  .content-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 auto !important;
+    padding: 20px !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  .invoice-table {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    table-layout: fixed !important;
+    border-collapse: collapse !important;
+  }
+
+  .invoice-table th,
+  .invoice-table td {
+    font-size: 13px !important;
+    padding: 8px 4px !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .invoice-table th:nth-child(1),
+  .invoice-table td:nth-child(1) {
+    width: 45% !important;
+  }
+
+  .invoice-table th:nth-child(2),
+  .invoice-table td:nth-child(2) {
+    width: 27% !important;
+    text-align: center !important;
+  }
+
+  .invoice-table th:nth-child(3),
+  .invoice-table td:nth-child(3) {
+    width: 28% !important;
+    text-align: right !important;
+  }
+}
