@@ -320,31 +320,23 @@
     </section>
 
     <section class="card">
-      <div class="form-header">
-        <div class="form-title-wrap">
-          <h2>Cliënt toevoegen</h2>
-          <p>Voeg een nieuwe cliënt toe of werk bestaande gegevens bij.</p>
-        </div>
+  <div class="form-header">
+    <div class="form-title-wrap">
+      <h2>Cliënt toevoegen</h2>
+      <p>Voeg een nieuwe cliënt toe of werk bestaande gegevens bij.</p>
+    </div>
 
-        <div class="save-wrap">
-          <button type="button" class="btn btn-dark" id="saveClientBtn">
-  Opslaan
-</button>
+    <div class="save-wrap">
+      <button type="button" class="btn btn-dark" id="saveClientBtn">
+        Opslaan
+      </button>
 
-<button
-  type="button"
-  class="btn btn-secondary"
-  onclick="confirmLeaveNewClient('./index.html')"
-  style="margin-top: 10px;"
->
-  Terug naar dashboard
-</button>
+      <div id="saveMessage" class="save-message"></div>
+    </div>
+  </div>
 
-<div id="saveMessage" class="save-message"></div>
-</div>
-
-      <section id="newClientFormBox">
-        <form id="clientForm">
+  <section id="newClientFormBox">
+    <form id="clientForm">
 
         <div class="section">
   <h3>Basisgegevens</h3>
