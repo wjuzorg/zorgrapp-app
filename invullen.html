@@ -199,27 +199,33 @@
         </div>
 
         <div id="saveMessage" class="helper-text" style="margin: 12px 0 18px;"></div>
+<div class="action-stack">
+  <button
+    type="button"
+    class="btn btn-outline danger-outline"
+    id="deleteAppointmentBtn"
+  >
+    Afspraak verwijderen
+  </button>
 
-        <div class="action-stack">
-          <button type="button" class="btn btn-outline danger-outline" id="deleteAppointmentBtn">
-            Afspraak verwijderen
-          </button>
-          <button type="button" class="btn btn-secondary" id="saveDraftBtn">
-            Opslaan concept
-          </button>
-          <button
-  id="finishBtn"
-  type="button"
-  class="btn"
-  style="background:#16a34a; color:#ffffff; border:none;"
->
-  Afronden
-</button>
-        </div>
-      </form>
-    </section>
-  </div>
+  <button
+    type="button"
+    class="btn btn-secondary"
+    id="saveDraftBtn"
+  >
+    Opslaan concept
+  </button>
 
+  <button
+    type="button"
+    id="finishBtn"
+    class="btn"
+    style="background:#16a34a; color:#ffffff; border:none;"
+  >
+    Afronden
+  </button>
+</div>
+        
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="./invullen.js?v=2"></script>
 </body>
