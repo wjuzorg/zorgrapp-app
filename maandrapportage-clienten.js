@@ -99,22 +99,26 @@ async function loadClientMonthReport() {
 
   summaryMonth.textContent = formatMonthLabel(selectedMonth);
 
- const { data, error } = await supabaseClient
-  .from("Appointments")
-  .select("*")
-  .eq("owner_id", currentUser.id)
-  .gte("appointment_date", startDate)
-  .lt("appointment_date", endDate)
-  .order("appointment_date", { ascending: false });
+  const { data, error } = await supabaseClient
+    .from("Appointments")
+    .select("*")
+    .eq("owner_id", currentUser.id)
+    .gte("appointment_date", startDate)
+    .lt("appointment_date", endDate)
+    .order("appointment_date", { ascending: false });
 
   const { data: clientsData, error: clientsError } = await supabaseClient
-  .from("Clients")
-  .select("id, full_name, signal_closed_at, signal_closed_note")
-  .eq("owner_id", currentUser.id);
+    .from("Clients")
+    .select("id, full_name, signal_closed_at, signal_closed_note")
+    .eq("owner_id", currentUser.id);
 
-if (clientsError) {
-  console.error("Cliënten laden mislukt:", clientsError);
-}
+  if (clientsError) {
+    console.error("Cliënten laden mislukt:", clientsError);
+  }
+
+  window.clientsDataForReport = clientsData || [];
+  window.reportStartDate = startDate;
+  window.reportEndDate = endDate;
 
   if (error) {
     console.error(error);
@@ -122,31 +126,19 @@ if (clientsError) {
     return;
   }
 
- if (!data || data.length === 0) {
-  resetSummary();
+  if (!data || data.length === 0) {
+    resetSummary();
 
-  const summaryClosedSignals = document.getElementById("summaryClosedSignals");
-  if (summaryClosedSignals) {
-    const closedSignals = (window.clientsDataForReport || []).filter((client) => {
-      if (!client.signal_closed_at) return false;
 
-      const closedDate = new Date(client.signal_closed_at);
-      const start = new Date(startDate);
-      const end = new Date(endDate);
-
-      return closedDate >= start && closedDate < end;
-    }).length;
-
-    summaryClosedSignals.textContent = closedSignals;
+    clientsReportList.innerHTML = "Geen afgeronde afspraken gevonden voor deze maand.";
+    return;
   }
 
-  clientsReportList.innerHTML = "Geen afgeronde afspraken gevonden voor deze maand.";
-  return;
-}
+  const grouped = groupByClient(data);
 
-const grouped = groupByClient(data);
-renderSummary(grouped, data);
-renderClients(grouped);
+  renderSummary(grouped, data);
+  renderClients(grouped);
+}
 
 function groupByClient(appointments) {
   const result = {};
@@ -203,7 +195,6 @@ result[clientId].signal_tags.push(...tags);
 
 function renderSummary(grouped, allAppointments) {
   const clients = Object.values(grouped);
-
   const totalMinutes = clients.reduce((sum, client) => sum + client.total_minutes, 0);
   const totalSignals = clients.reduce((sum, client) => sum + client.total_signals, 0);
   const activeSignals = clients.reduce((sum, client) => sum + client.active_signals, 0);
@@ -213,22 +204,23 @@ function renderSummary(grouped, allAppointments) {
   summaryHours.textContent = formatMinutesToHours(totalMinutes);
   summarySignals.textContent = totalSignals;
   summaryActiveSignals.textContent = activeSignals;
+
+  const summaryClosedSignals = document.getElementById("summaryClosedSignals");
+  if (summaryClosedSignals) {
+    summaryClosedSignals.textContent = countClosedSignalsForReport();
+  }
 }
 
-const summaryClosedSignals = document.getElementById("summaryClosedSignals");
+function countClosedSignalsForReport() {
+  return (window.clientsDataForReport || []).filter((client) => {
+    if (!client.signal_closed_at) return false;
 
-const closedSignals = (window.clientsDataForReport || []).filter((client) => {
-  if (!client.signal_closed_at) return false;
+    const closedDate = new Date(client.signal_closed_at);
+    const start = new Date(window.reportStartDate);
+    const end = new Date(window.reportEndDate);
 
-  const closedDate = new Date(client.signal_closed_at);
-  const start = new Date(startDate);
-  const end = new Date(endDate);
-
-  return closedDate >= start && closedDate < end;
-}).length;
-
-if (summaryClosedSignals) {
-  summaryClosedSignals.textContent = closedSignals;
+    return closedDate >= start && closedDate < end;
+  }).length;
 }
 
 function renderClients(grouped) {
