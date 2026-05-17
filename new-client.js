@@ -297,14 +297,14 @@ clientId = data.id;
 }
 
 
-function showNewClientForm() {
-  document.getElementById("newClientFormBox").style.display = "block";
-  document.getElementById("existingClientSearchBox").style.display = "none";
+function showExistingClientSearch() {
+  const box = document.getElementById("existingClientSearchBox");
+  if (box) box.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-function showExistingClientSearch() {
-  document.getElementById("newClientFormBox").style.display = "none";
-  document.getElementById("existingClientSearchBox").style.display = "block";
+function showNewClientForm() {
+  const box = document.getElementById("newClientFormBox");
+  if (box) box.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 async function searchExistingClients() {
@@ -351,12 +351,12 @@ async function searchExistingClients() {
       <span>${client.address || ""}</span><br>
       <span>${client.phone || ""}</span><br><br>
 
-      <button type="button" class="dark-btn"
+      <button type="button" class="btn btn-dark"
         onclick="window.location.href='plan-afspraak.html?client_id=${client.id}'"
         Nieuwe afspraak plannen
       </button>
 
-      <button type="button" class="light-btn"
+      <button type="button" class="btn btn-secondary"
         onclick="window.location.href='clientkaart.html?id=${client.id}'">
         Cliëntenkaart openen
       </button>

@@ -295,16 +295,17 @@
     </header>
 
    <section class="client-choice-box">
-  <button type="button" class="dark-btn" onclick="showNewClientForm()">
-    Nieuwe cliënt invoeren
-  </button>
-
-  <button type="button" class="light-btn" onclick="showExistingClientSearch()">
-    Bestaande cliënt zoeken
-  </button>
+  <button
+  type="button"
+  class="btn btn-secondary"
+  onclick="showExistingClientSearch()"
+  style="margin-bottom: 20px;"
+>
+  Bestaande cliënt zoeken
+</button>
 </section>
 
-<section id="existingClientSearchBox" class="card" style="display: none;">
+<section id="existingClientSearchBox" class="card"></section>
   <div class="search-title">Bestaande cliënt zoeken</div>
 
   <div class="search-row">
@@ -346,7 +347,7 @@
         </div>
       </div>
 
-      <section id="newClientFormBox"></section>
+      <section id="newClientFormBox">
       <form id="clientForm">
 
         <div class="section">
