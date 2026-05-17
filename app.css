@@ -2709,3 +2709,53 @@ tbody tr {
     border: none !important;
   }
 }
+
+@media (max-width: 768px) {
+  .invoice-table,
+  .invoice-table thead,
+  .invoice-table tbody,
+  .invoice-table tr,
+  .invoice-table th,
+  .invoice-table td {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  .invoice-table thead {
+    display: none !important;
+  }
+
+  .invoice-table tr {
+    border-top: 1px solid #e5e7eb !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    padding: 10px 0 !important;
+  }
+
+  .invoice-table td {
+    padding: 6px 0 !important;
+    font-size: 15px !important;
+    text-align: left !important;
+  }
+
+  .invoice-table td:nth-child(1)::before {
+    content: "Omschrijving: ";
+    font-weight: 700;
+  }
+
+  .invoice-table td:nth-child(2)::before {
+    content: "Minuten: ";
+    font-weight: 700;
+  }
+
+  .invoice-table td:nth-child(3)::before {
+    content: "Bedrag: ";
+    font-weight: 700;
+  }
+
+  #invoiceMinutes,
+  #invoiceAmount,
+  #invoiceDescription {
+    font-size: 15px !important;
+    white-space: normal !important;
+  }
+}
