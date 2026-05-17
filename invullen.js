@@ -299,10 +299,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     showMessage("Afronden...");
 
-    const ok = await saveAppointment("voltooid");
+    const ok = await saveAppointment("ingevuld");
     if (!ok) return;
 
-    showMessage("Afspraak afgerond.");
+    showMessage("Afspraak ingevuld. U kunt nu afronden op het dashboard.");
 
     setTimeout(() => {
       window.location.href = "./index.html";
