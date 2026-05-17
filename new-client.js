@@ -288,7 +288,7 @@ clientId = data.id;
 
       await supabaseClient.from("Appointments").insert(appointments);
     }
-
+    clientSaved = true;
     showSaveMessage("Cliënt opgeslagen ✅");
   } catch (err) {
     console.error(err);
@@ -399,6 +399,11 @@ function confirmLeaveNewClient(url) {
 
     if (!ok) return;
   }
+
+  if (clientSaved) {
+  window.location.href = url;
+  return;
+}
 
   window.location.href = url;
 }
