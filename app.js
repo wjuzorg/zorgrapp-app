@@ -302,7 +302,12 @@ function renderAppointments(items, clients = []) {
 
   appointmentsListEl.innerHTML = items.map(item => {
     const client = clients.find(c => c.id === item.client_id);
-    const filled = isAppointmentFilled(item);
+    const filled =
+  item.status === "ingevuld" ||
+  item.status === "voltooid" ||
+  !!item.work_done ||
+  !!item.worked_minutes ||
+  !!item.signal_notes;
 
     const addressLine = client
       ? [client.address, client.postal_code, client.city].filter(Boolean).join(", ")
