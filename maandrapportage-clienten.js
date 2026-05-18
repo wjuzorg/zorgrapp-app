@@ -323,12 +323,6 @@ function getClosedSignalBadge(clientId) {
   `;
 }
 
-function isClientSignalClosed(clientId) {
-  return (window.clientsDataForReport || []).some(
-    client => client.id === clientId && client.signal_closed_at
-  );
-}
-
 function renderClosedSignalText(clientId) {
   const clientRecord = (window.clientsDataForReport || []).find(
     client => client.id === clientId
@@ -379,12 +373,6 @@ function renderSignalTags(tags, client = {}) {
 
 
 function getClientStatus(client) {
-  const signalClosed = isClientSignalClosed(client.client_id);
-
-  if (signalClosed) {
-    return "Signaal afgesloten";
-  }
-
   const latestPerson = client.latest_person_status;
   const latestHouse = client.latest_house_status;
 
@@ -405,6 +393,12 @@ function getClientStatus(client) {
   }
 
   return "Gaat goed";
+}
+
+function getStatusClass(status) {
+  if (status === "Actie nodig") return "status-alert";
+  if (status === "Let op") return "status-watch";
+  return "status-good";
 }
 
 function getStatusClass(status) {
