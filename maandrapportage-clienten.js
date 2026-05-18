@@ -274,7 +274,7 @@ function renderClients(grouped) {
           </div>
         </div>
 
-        ${renderSignalTags(client.signal_tags)}
+        ${renderSignalTags(client.signal_tags, client)}
 
         ${includeNotesCheckbox && includeNotesCheckbox.checked && client.latest_note ? `
   <div class="client-report-note">
@@ -293,14 +293,34 @@ function renderClients(grouped) {
   }).join("");
 }
 
-function renderSignalTags(tags) {
+function renderSignalTags(tags, client = {}) {
   if (!tags || tags.length === 0) {
+    const fallbackSignals = [
+      client.latest_person_status,
+      client.latest_house_status
+    ].filter(Boolean);
+
     return `
       <div class="signal-tags">
-        <span class="signal-tag">Geen specifieke signalen</span>
+        <span class="signal-tag">
+          ${
+            fallbackSignals.length
+              ? escapeHtml(fallbackSignals.join(", "))
+              : "Geen specifieke signalen"
+          }
+        </span>
       </div>
     `;
   }
+
+  return `
+    <div class="signal-tags">
+      ${tags
+        .map(tag => `<span class="signal-tag">${escapeHtml(tag)}</span>`)
+        .join("")}
+    </div>
+  `;
+}
 
   return `
     <div class="signal-tags">
@@ -309,7 +329,7 @@ function renderSignalTags(tags) {
       `).join("")}
     </div>
   `;
-}
+
 
 function getClientStatus(client) {
   const latestPerson = client.latest_person_status;
