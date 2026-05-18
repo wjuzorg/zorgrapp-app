@@ -322,13 +322,6 @@ function renderSignalTags(tags, client = {}) {
   `;
 }
 
-  return `
-    <div class="signal-tags">
-      ${tags.map(tag => `
-        <span class="signal-tag">${formatSignalTag(tag)}</span>
-      `).join("")}
-    </div>
-  `;
 
 
 function getClientStatus(client) {
