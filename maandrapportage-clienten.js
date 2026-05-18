@@ -172,9 +172,21 @@ function groupByClient(appointments) {
       result[clientId].total_signals += 1;
     }
 
-    if (item.signal_status === "actief") {
-      result[clientId].active_signals += 1;
-    }
+    const clientRecord = (window.clientsDataForReport || []).find(
+  client => client.id === clientId
+);
+
+const signalIsClosed = !!clientRecord?.signal_closed_at;
+
+const clientRecord = (window.clientsDataForReport || []).find(
+  client => client.id === clientId
+);
+
+const signalIsClosed = !!clientRecord?.signal_closed_at;
+
+if (item.signal_status === "actief" && !signalIsClosed) {
+  result[clientId].active_signals += 1;
+}
 
     const tags = normalizeSignalTags(item.internal_signals);
 result[clientId].signal_tags.push(...tags);
@@ -274,7 +286,9 @@ function renderClients(grouped) {
           </div>
         </div>
 
-        ${renderSignalTags(client.signal_tags, client)}
+        ${isClientSignalClosed(client.client_id)
+  ? renderClosedSignalText(client.client_id)
+  : renderSignalTags(client.signal_tags, client)}
 
         ${includeNotesCheckbox && includeNotesCheckbox.checked && client.latest_note ? `
   <div class="client-report-note">
@@ -291,6 +305,46 @@ function renderClients(grouped) {
       </article>
     `;
   }).join("");
+}
+
+function getClosedSignalBadge(clientId) {
+  const clientRecord = (window.clientsDataForReport || []).find(
+    client => client.id === clientId
+  );
+
+  if (!clientRecord?.signal_closed_at) return "";
+
+  const date = new Date(clientRecord.signal_closed_at).toLocaleDateString("nl-NL");
+
+  return `
+    <span class="status-badge">
+      Signaal afgesloten ${date}
+    </span>
+  `;
+}
+
+function isClientSignalClosed(clientId) {
+  return (window.clientsDataForReport || []).some(
+    client => client.id === clientId && client.signal_closed_at
+  );
+}
+
+function renderClosedSignalText(clientId) {
+  const clientRecord = (window.clientsDataForReport || []).find(
+    client => client.id === clientId
+  );
+
+  if (!clientRecord?.signal_closed_at) return "";
+
+  const date = new Date(clientRecord.signal_closed_at).toLocaleDateString("nl-NL");
+
+  return `
+    <div class="client-report-note">
+      <strong>Signaal afgesloten:</strong><br>
+      ${date}<br>
+      ${escapeHtml(clientRecord.signal_closed_note || "Geen toelichting")}
+    </div>
+  `;
 }
 
 function renderSignalTags(tags, client = {}) {
@@ -325,6 +379,12 @@ function renderSignalTags(tags, client = {}) {
 
 
 function getClientStatus(client) {
+  const signalClosed = isClientSignalClosed(client.client_id);
+
+  if (signalClosed) {
+    return "Signaal afgesloten";
+  }
+
   const latestPerson = client.latest_person_status;
   const latestHouse = client.latest_house_status;
 
@@ -350,6 +410,7 @@ function getClientStatus(client) {
 function getStatusClass(status) {
   if (status === "Actie nodig") return "status-alert";
   if (status === "Let op") return "status-watch";
+  if (status === "Signaal afgesloten") return "status-good";
   return "status-good";
 }
 
