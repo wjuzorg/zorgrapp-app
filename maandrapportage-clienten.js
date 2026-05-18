@@ -286,16 +286,22 @@ function renderClients(grouped) {
           </div>
         </div>
 
-        ${isClientSignalClosed(client.client_id)
-  ? renderClosedSignalText(client.client_id)
-  : renderSignalTags(client.signal_tags, client)}
+        ${
+          isClientSignalClosed(client.client_id)
+            ? renderClosedSignalText(client.client_id)
+            : renderSignalTags(client.signal_tags, client)
+        }
 
-        ${includeNotesCheckbox && includeNotesCheckbox.checked && client.latest_note ? `
-  <div class="client-report-note">
-    <strong>Laatste notitie:</strong><br>
-    ${escapeHtml(client.latest_note)}
-  </div>
-` : ""}
+        ${
+          includeNotesCheckbox && includeNotesCheckbox.checked && client.latest_note
+            ? `
+              <div class="client-report-note">
+                <strong>Laatste notitie:</strong><br>
+                ${escapeHtml(client.latest_note)}
+              </div>
+            `
+            : ""
+        }
 
         <div class="client-report-actions no-print">
           <a class="btn btn-secondary" href="./client-geschiedenis.html?id=${client.client_id}">
@@ -307,20 +313,10 @@ function renderClients(grouped) {
   }).join("");
 }
 
-function getClosedSignalBadge(clientId) {
-  const clientRecord = (window.clientsDataForReport || []).find(
-    client => client.id === clientId
+function isClientSignalClosed(clientId) {
+  return (window.clientsDataForReport || []).some(
+    client => client.id === clientId && client.signal_closed_at
   );
-
-  if (!clientRecord?.signal_closed_at) return "";
-
-  const date = new Date(clientRecord.signal_closed_at).toLocaleDateString("nl-NL");
-
-  return `
-    <span class="status-badge">
-      Signaal afgesloten ${date}
-    </span>
-  `;
 }
 
 function renderClosedSignalText(clientId) {
@@ -370,9 +366,11 @@ function renderSignalTags(tags, client = {}) {
   `;
 }
 
-
-
 function getClientStatus(client) {
+  if (isClientSignalClosed(client.client_id)) {
+    return "Signaal afgesloten";
+  }
+
   const latestPerson = client.latest_person_status;
   const latestHouse = client.latest_house_status;
 
@@ -398,6 +396,7 @@ function getClientStatus(client) {
 function getStatusClass(status) {
   if (status === "Actie nodig") return "status-alert";
   if (status === "Let op") return "status-watch";
+  if (status === "Signaal afgesloten") return "status-good";
   return "status-good";
 }
 
