@@ -146,6 +146,82 @@ function getLatestSignalText(appointments) {
   return "-";
 }
 
+function buildSignalText(item) {
+  const parts = [];
+
+  if (item.person_status) parts.push(item.person_status);
+  if (item.house_status) parts.push(item.house_status);
+
+  if (Array.isArray(item.internal_signals)) {
+    parts.push(...item.internal_signals);
+  } else if (typeof item.internal_signals === "string" && item.internal_signals.trim()) {
+    parts.push(item.internal_signals);
+  }
+
+  if (item.signal_notes) parts.push(item.signal_notes);
+
+  return parts.filter(Boolean).join(", ");
+}
+
+async function loadClientSignals() {
+  if (!currentUser || !currentClient?.id) return;
+
+  const signalTotalEl = document.getElementById("signalTotal");
+  const lastSignalEl = document.getElementById("lastSignal");
+  const alertBoxEl = document.getElementById("alertBox");
+  const alertStatusEl = document.getElementById("alertStatus");
+
+  const { data, error } = await supabaseClient
+    .from("Appointments")
+    .select("id, client_id, appointment_date, created_at, person_status, house_status, internal_signals, signal_notes, signal_status")
+    .eq("owner_id", currentUser.id)
+    .eq("client_id", currentClient.id)
+    .order("appointment_date", { ascending: false });
+
+  if (error) {
+    console.error("Signalen laden mislukt:", error);
+    return;
+  }
+
+  const signalAppointments = (data || []).filter((item) =>
+    item.person_status ||
+    item.house_status ||
+    item.signal_notes ||
+    item.signal_status === "actief" ||
+    (Array.isArray(item.internal_signals) && item.internal_signals.length > 0) ||
+    (typeof item.internal_signals === "string" && item.internal_signals.trim() !== "")
+  );
+
+  const activeSignals = signalAppointments.filter(
+    (item) => item.signal_status === "actief"
+  );
+
+  if (signalTotalEl) {
+    signalTotalEl.textContent = String(signalAppointments.length);
+  }
+
+  if (lastSignalEl) {
+    const latest = signalAppointments[0];
+    lastSignalEl.textContent = latest ? buildSignalText(latest) || "Signaal aanwezig" : "-";
+  }
+
+  if (alertBoxEl && alertStatusEl) {
+    if (activeSignals.length > 0) {
+      alertStatusEl.textContent = "Actiesignaal actief";
+      alertBoxEl.style.background = "#fef2f2";
+      alertBoxEl.style.borderColor = "#fecaca";
+
+      const closeBtn = document.getElementById("closeSignalBtn");
+      if (closeBtn && !currentClient?.signal_closed_at) {
+        closeBtn.style.display = "block";
+      }
+      return;
+    }
+
+    setAlertStatus(signalAppointments.length, alertBoxEl, alertStatusEl);
+  }
+}
+
 function setAlertStatus(signalTotal, alertBoxEl, alertStatusEl) {
   const closeBtn = document.getElementById("closeSignalBtn");
 
@@ -384,20 +460,22 @@ const saveContactNoteBtn = document.getElementById("saveContactNoteBtn");
     callClientBtn.href = "#";
   }
 
-  if (newAppointmentBtn) {
-    newAppointmentBtn.href = `./new-client.html?client_id=${currentClient.id}`;
-  }
+ if (newAppointmentBtn) {
+  newAppointmentBtn.href = `./new-client.html?client_id=${currentClient.id}`;
+}
 
-  if (clientHistoryBtn) {
+if (clientHistoryBtn) {
   clientHistoryBtn.href = `./client-geschiedenis.html?id=${currentClient.id}`;
 }
 
-  totalAppointmentsEl.textContent = String(appointmentList.length);
+totalAppointmentsEl.textContent = String(appointmentList.length);
 
-  const lastAppointment = appointmentList[0];
-  lastVisitEl.textContent = lastAppointment?.appointment_date
-    ? formatDate(lastAppointment.appointment_date)
-    : "-";
+const lastAppointment = appointmentList[0];
+lastVisitEl.textContent = lastAppointment?.appointment_date
+  ? formatDate(lastAppointment.appointment_date)
+  : "-";
+
+await loadClientSignals();
 
   const monthPrefix = getCurrentMonthPrefix();
   const minutesThisMonth = appointmentList
