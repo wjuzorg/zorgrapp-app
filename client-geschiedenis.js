@@ -67,45 +67,39 @@ function escapeHtml(value) {
 }
 
 function countSignalPoints(appointments) {
-  let total = 0;
-
-  appointments.forEach(item => {
-    if (item.person_status === "zorgelijk") total += 1;
-    if (item.house_status === "zorgelijk") total += 1;
-
-    if (item.internal_signals && String(item.internal_signals).trim() !== "") {
-      const arr = String(item.internal_signals)
-        .split(",")
-        .map(s => s.trim())
-        .filter(Boolean);
-      total += arr.length;
-    }
-
-    if (item.signal_notes && String(item.signal_notes).trim() !== "") {
-      total += 1;
-    }
-  });
-
-  return total;
+  return appointments.filter((item) =>
+    item.person_status ||
+    item.house_status ||
+    item.signal_notes ||
+    item.signal_status === "actief" ||
+    (Array.isArray(item.internal_signals) && item.internal_signals.length > 0) ||
+    (typeof item.internal_signals === "string" &&
+      item.internal_signals.trim() !== "")
+  ).length;
 }
 
 function getSignalText(item) {
   const signals = [];
 
-  if (item.person_status === "zorgelijk") {
-    signals.push("Persoon is zorgelijk");
+  if (item.person_status) {
+    signals.push(item.person_status);
   }
 
-  if (item.house_status === "zorgelijk") {
-    signals.push("Huis is zorgelijk");
+  if (item.house_status) {
+    signals.push(item.house_status);
   }
 
-  if (item.internal_signals && String(item.internal_signals).trim() !== "") {
-    signals.push(String(item.internal_signals));
+  if (Array.isArray(item.internal_signals)) {
+    signals.push(...item.internal_signals);
+  } else if (
+    typeof item.internal_signals === "string" &&
+    item.internal_signals.trim() !== ""
+  ) {
+    signals.push(item.internal_signals);
   }
 
-  if (item.signal_notes && String(item.signal_notes).trim() !== "") {
-    signals.push(String(item.signal_notes));
+  if (item.signal_notes && item.signal_notes.trim() !== "") {
+    signals.push(item.signal_notes);
   }
 
   return signals.length ? signals.join(" • ") : "Geen signalen";
