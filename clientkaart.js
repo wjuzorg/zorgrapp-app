@@ -475,25 +475,27 @@ lastVisitEl.textContent = lastAppointment?.appointment_date
   ? formatDate(lastAppointment.appointment_date)
   : "-";
 
+const monthPrefix = getCurrentMonthPrefix();
+
+const minutesThisMonth = appointmentList
+  .filter(item =>
+    item.appointment_date &&
+    item.appointment_date.startsWith(monthPrefix)
+  )
+  .reduce(
+    (sum, item) =>
+      sum + Number(item.worked_minutes || item.duration_minutes || 0),
+    0
+  );
+
+minutesThisMonthEl.textContent = String(minutesThisMonth);
+
+// Signalen laden
 await loadClientSignals();
 
-  const monthPrefix = getCurrentMonthPrefix();
-  const minutesThisMonth = appointmentList
-    .filter(item => item.appointment_date && item.appointment_date.startsWith(monthPrefix))
-    .reduce((sum, item) => sum + Number(item.worked_minutes || item.duration_minutes || 0), 0);
-
-  minutesThisMonthEl.textContent = String(minutesThisMonth);
-
-  const signalTotal = countSignalPoints(appointmentList);
-  signalTotalEl.textContent = String(signalTotal);
-
-  lastSignalEl.textContent = getLatestSignalText(appointmentList);
-  setAlertStatus(signalTotal, alertBoxEl, alertStatusEl);
-
-  saveContactNoteBtn?.addEventListener("click", saveContactNote);
+// Contactnotities
+saveContactNoteBtn?.addEventListener("click", saveContactNote);
 }
-
 document.getElementById("closeSignalBtn")?.addEventListener("click", closeClientSignal);
 window.closeClientSignal = closeClientSignal;
-
 loadClientCard();
