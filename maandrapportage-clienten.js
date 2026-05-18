@@ -313,29 +313,7 @@ function renderClients(grouped) {
   }).join("");
 }
 
-function isClientSignalClosed(clientId) {
-  return (window.clientsDataForReport || []).some(
-    client => client.id === clientId && client.signal_closed_at
-  );
-}
 
-function renderClosedSignalText(clientId) {
-  const clientRecord = (window.clientsDataForReport || []).find(
-    client => client.id === clientId
-  );
-
-  if (!clientRecord?.signal_closed_at) return "";
-
-  const date = new Date(clientRecord.signal_closed_at).toLocaleDateString("nl-NL");
-
-  return `
-    <div class="client-report-note">
-      <strong>Signaal afgesloten:</strong><br>
-      ${date}<br>
-      ${escapeHtml(clientRecord.signal_closed_note || "Geen toelichting")}
-    </div>
-  `;
-}
 
 function renderSignalTags(tags, client = {}) {
   if (!tags || tags.length === 0) {
@@ -367,10 +345,6 @@ function renderSignalTags(tags, client = {}) {
 }
 
 function getClientStatus(client) {
-  if (isClientSignalClosed(client.client_id)) {
-    return "Signaal afgesloten";
-  }
-
   const latestPerson = client.latest_person_status;
   const latestHouse = client.latest_house_status;
 
@@ -393,12 +367,6 @@ function getClientStatus(client) {
   return "Gaat goed";
 }
 
-function getStatusClass(status) {
-  if (status === "Actie nodig") return "status-alert";
-  if (status === "Let op") return "status-watch";
-  if (status === "Signaal afgesloten") return "status-good";
-  return "status-good";
-}
 
 function getStatusClass(status) {
   if (status === "Actie nodig") return "status-alert";
