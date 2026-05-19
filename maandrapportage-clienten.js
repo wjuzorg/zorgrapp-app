@@ -168,10 +168,11 @@ function groupByClient(appointments) {
       ...normalizeSignalTags(item.internal_signals)
     ].filter(Boolean);
 
-    const hasSignal =
-      tags.length > 0 ||
-      !!item.signal_notes ||
-      item.signal_status === "actief";
+    const note = String(item.signal_notes || "").trim();
+
+const hasSignal =
+  tags.length > 0 ||
+  (note !== "" && note !== "-");
 
     if (hasSignal) {
       result[clientId].total_signals += 1;
