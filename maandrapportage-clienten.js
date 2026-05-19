@@ -286,11 +286,7 @@ function renderClients(grouped) {
           </div>
         </div>
 
-        ${
-          isClientSignalClosed(client.client_id)
-            ? renderClosedSignalText(client.client_id)
-            : renderSignalTags(client.signal_tags, client)
-        }
+        ${renderSignalTags(client.signal_tags, client)}
 
         ${
           includeNotesCheckbox && includeNotesCheckbox.checked && client.latest_note
