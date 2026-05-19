@@ -271,8 +271,8 @@ async function loadClientHistory() {
     .select("*")
     .eq("owner_id", currentUser.id)
     .neq("status", "verwijderd")
-    .order("appointment_date", { ascending: false })
-    .order("appointment_time", { ascending: false });
+    .order("appointment_date", { ascending: true })
+.order("appointment_time", { ascending: true });
 
   if (appointmentError) {
     console.error("Fout bij laden van afspraken:", appointmentError);

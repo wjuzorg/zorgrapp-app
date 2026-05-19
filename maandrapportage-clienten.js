@@ -606,12 +606,12 @@ async function loadProfileName() {
 
 function printWithFileName() {
   const selectedMonth = reportMonthInput.value || "";
-  const monthLabel = formatMonthLabel(selectedMonth);
+  const monthLabel = formatMonthLabel(selectedMonth); // bijvoorbeeld "mei 2026"
 
-  const fileName =
-    "maandrapportage-clienten-" +
-    slugify(monthLabel).replace("-", "") +
-    ".pdf";
+  // verwijder spatie zodat het wordt: mei2026
+  const compactMonth = monthLabel.toLowerCase().replace(/\s+/g, "");
+
+  const fileName = `maandrapportage-clienten-${compactMonth}.pdf`;
 
   const oldTitle = document.title;
   document.title = fileName.replace(".pdf", "");
