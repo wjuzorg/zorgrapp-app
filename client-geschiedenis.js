@@ -66,39 +66,57 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
-function countSignalPoints(appointments) {
-  return appointments.filter((item) =>
-    item.person_status ||
-    item.house_status ||
-    item.signal_notes ||
-    item.signal_status === "actief" ||
+function hasRealSignal(item) {
+  const personStatus = String(item.person_status || "").trim();
+  const houseStatus = String(item.house_status || "").trim();
+  const signalNotes = String(item.signal_notes || "").trim();
+
+  const hasPersonSignal =
+    personStatus === "redelijk" || personStatus === "zorgelijk";
+
+  const hasHouseSignal =
+    houseStatus === "rommelig" || houseStatus === "zorgelijk";
+
+  const hasNotes =
+    signalNotes !== "" && signalNotes !== "-";
+
+  const hasInternalSignals =
     (Array.isArray(item.internal_signals) && item.internal_signals.length > 0) ||
-    (typeof item.internal_signals === "string" &&
-      item.internal_signals.trim() !== "")
-  ).length;
+    (
+      typeof item.internal_signals === "string" &&
+      item.internal_signals.trim() !== "" &&
+      item.internal_signals.trim() !== "[]"
+    );
+
+  return hasPersonSignal || hasHouseSignal || hasInternalSignals || hasNotes;
+}
+
+function countSignalPoints(appointments) {
+  return appointments.filter(hasRealSignal).length;
 }
 
 function getSignalText(item) {
   const signals = [];
 
-  if (item.person_status) {
+  if (item.person_status === "redelijk" || item.person_status === "zorgelijk") {
     signals.push(item.person_status);
   }
 
-  if (item.house_status) {
+  if (item.house_status === "rommelig" || item.house_status === "zorgelijk") {
     signals.push(item.house_status);
   }
 
   if (Array.isArray(item.internal_signals)) {
-    signals.push(...item.internal_signals);
+    signals.push(...item.internal_signals.filter(Boolean));
   } else if (
     typeof item.internal_signals === "string" &&
-    item.internal_signals.trim() !== ""
+    item.internal_signals.trim() !== "" &&
+    item.internal_signals.trim() !== "[]"
   ) {
     signals.push(item.internal_signals);
   }
 
-  if (item.signal_notes && item.signal_notes.trim() !== "") {
+  if (item.signal_notes && item.signal_notes.trim() !== "" && item.signal_notes.trim() !== "-") {
     signals.push(item.signal_notes);
   }
 

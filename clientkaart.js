@@ -94,73 +94,78 @@ function buildNewContactNote(existingNotes, newNoteText) {
   return `${datedNote}\n---\n${existingNotes}`;
 }
 
-function countSignalPoints(appointments) {
-  let total = 0;
+function normalizeInternalSignals(value) {
+  if (!value) return [];
 
-  appointments.forEach(item => {
-    if (item.person_status === "zorgelijk") total += 1;
-    if (item.house_status === "zorgelijk") total += 1;
+  if (Array.isArray(value)) {
+    return value.filter(Boolean);
+  }
 
-    if (item.internal_signals && String(item.internal_signals).trim() !== "") {
-      const arr = String(item.internal_signals)
-        .split(",")
-        .map(s => s.trim())
-        .filter(Boolean);
-      total += arr.length;
-    }
+  if (typeof value === "string") {
+    const cleaned = value.trim();
+    if (!cleaned || cleaned === "[]" || cleaned === "-") return [];
 
-    if (item.signal_notes && String(item.signal_notes).trim() !== "") {
-      total += 1;
-    }
-  });
+    try {
+      const parsed = JSON.parse(cleaned);
+      if (Array.isArray(parsed)) return parsed.filter(Boolean);
+    } catch (e) {}
 
-  return total;
+    return cleaned
+      .split(",")
+      .map(item => item.trim())
+      .filter(Boolean);
+  }
+
+  return [];
 }
 
-function getLatestSignalText(appointments) {
-  const latestSignalAppointment = appointments.find(item =>
-    (item.signal_notes && String(item.signal_notes).trim() !== "") ||
-    (item.internal_signals && String(item.internal_signals).trim() !== "") ||
-    item.person_status === "zorgelijk" ||
-    item.house_status === "zorgelijk"
+function hasRealSignal(item) {
+  const personStatus = String(item.person_status || "").trim();
+  const houseStatus = String(item.house_status || "").trim();
+  const signalNotes = String(item.signal_notes || "").trim();
+  const internalSignals = normalizeInternalSignals(item.internal_signals);
+
+  return (
+    personStatus === "redelijk" ||
+    personStatus === "zorgelijk" ||
+    houseStatus === "rommelig" ||
+    houseStatus === "zorgelijk" ||
+    internalSignals.length > 0 ||
+    (signalNotes !== "" && signalNotes !== "-")
   );
-
-  if (!latestSignalAppointment) return "-";
-
-  if (latestSignalAppointment.signal_notes && String(latestSignalAppointment.signal_notes).trim() !== "") {
-    return latestSignalAppointment.signal_notes;
-  }
-
-  if (latestSignalAppointment.internal_signals && String(latestSignalAppointment.internal_signals).trim() !== "") {
-    return latestSignalAppointment.internal_signals;
-  }
-
-  if (latestSignalAppointment.person_status === "zorgelijk") {
-    return "Persoon is zorgelijk";
-  }
-
-  if (latestSignalAppointment.house_status === "zorgelijk") {
-    return "Huis is zorgelijk";
-  }
-
-  return "-";
 }
 
 function buildSignalText(item) {
   const parts = [];
 
-  if (item.person_status) parts.push(item.person_status);
-  if (item.house_status) parts.push(item.house_status);
-
-  if (Array.isArray(item.internal_signals)) {
-    parts.push(...item.internal_signals);
-  } else if (typeof item.internal_signals === "string" && item.internal_signals.trim()) {
-    parts.push(item.internal_signals);
+  if (item.person_status === "redelijk" || item.person_status === "zorgelijk") {
+    parts.push(item.person_status);
   }
 
-  if (item.signal_notes) parts.push(item.signal_notes);
+  if (item.house_status === "rommelig" || item.house_status === "zorgelijk") {
+    parts.push(item.house_status);
+  }
 
-  return parts.filter(Boolean).join(", ");
+  parts.push(...normalizeInternalSignals(item.internal_signals));
+
+  if (
+    item.signal_notes &&
+    item.signal_notes.trim() !== "" &&
+    item.signal_notes.trim() !== "-"
+  ) {
+    parts.push(item.signal_notes);
+  }
+
+  return parts.length ? parts.join(" • ") : "-";
+}
+
+function countSignalPoints(appointments) {
+  return appointments.filter(hasRealSignal).length;
+}
+
+function getLatestSignalText(appointments) {
+  const latestSignalAppointment = appointments.find(hasRealSignal);
+  return latestSignalAppointment ? buildSignalText(latestSignalAppointment) : "-";
 }
 
 async function loadClientSignals() {
@@ -170,82 +175,44 @@ async function loadClientSignals() {
   const lastSignalEl = document.getElementById("lastSignal");
   const alertBoxEl = document.getElementById("alertBox");
   const alertStatusEl = document.getElementById("alertStatus");
+  const closeBtn = document.getElementById("closeSignalBtn");
 
   const { data, error } = await supabaseClient
     .from("Appointments")
-    .select("id, client_id, appointment_date, created_at, person_status, house_status, internal_signals, signal_notes, signal_status")
+    .select("*")
     .eq("owner_id", currentUser.id)
     .eq("client_id", currentClient.id)
-    .order("appointment_date", { ascending: false });
+    .neq("status", "verwijderd")
+    .order("appointment_date", { ascending: false })
+    .order("appointment_time", { ascending: false });
 
   if (error) {
     console.error("Signalen laden mislukt:", error);
     return;
   }
 
-  const signalAppointments = (data || []).filter((item) =>
-    item.person_status ||
-    item.house_status ||
-    item.signal_notes ||
-    item.signal_status === "actief" ||
-    (Array.isArray(item.internal_signals) && item.internal_signals.length > 0) ||
-    (typeof item.internal_signals === "string" && item.internal_signals.trim() !== "")
-  );
+  const signalAppointments = (data || []).filter(hasRealSignal);
+  const signalTotal = signalAppointments.length;
+  const isClosed = !!currentClient.signal_closed_at;
 
-  const activeSignals = signalAppointments.filter(
-    (item) => item.signal_status === "actief"
-  );
+  if (signalTotalEl) signalTotalEl.textContent = String(signalTotal);
+  if (lastSignalEl) lastSignalEl.textContent = getLatestSignalText(signalAppointments);
 
-  if (signalTotalEl) {
-    signalTotalEl.textContent = String(signalAppointments.length);
-  }
-
-  if (lastSignalEl) {
-    const latest = signalAppointments[0];
-    lastSignalEl.textContent = latest ? buildSignalText(latest) || "Signaal aanwezig" : "-";
-  }
-
-  if (alertBoxEl && alertStatusEl) {
-    if (activeSignals.length > 0) {
-      alertStatusEl.textContent = "Actiesignaal actief";
-      alertBoxEl.style.background = "#fef2f2";
-      alertBoxEl.style.borderColor = "#fecaca";
-
-      const closeBtn = document.getElementById("closeSignalBtn");
-      if (closeBtn && !currentClient?.signal_closed_at) {
-        closeBtn.style.display = "block";
-      }
-      return;
-    }
-
-    setAlertStatus(signalAppointments.length, alertBoxEl, alertStatusEl);
-  }
-}
-
-function setAlertStatus(signalTotal, alertBoxEl, alertStatusEl) {
-  const closeBtn = document.getElementById("closeSignalBtn");
+  if (!alertBoxEl || !alertStatusEl) return;
 
   alertBoxEl.style.background = "#f9fafb";
   alertBoxEl.style.borderColor = "#e5e7eb";
 
-  if (currentClient?.signal_closed_at) {
+  if (isClosed) {
     alertStatusEl.textContent = "Signaal afgesloten";
     if (closeBtn) closeBtn.style.display = "none";
     return;
   }
 
-  if (signalTotal >= 3) {
+  if (signalTotal > 0) {
     alertStatusEl.textContent = "Actiesignaal actief";
     alertBoxEl.style.background = "#fef2f2";
     alertBoxEl.style.borderColor = "#fecaca";
-    if (closeBtn) closeBtn.style.display = "block";
-    return;
-  }
-
-  if (signalTotal >= 2) {
-    alertStatusEl.textContent = "Let op";
-    alertBoxEl.style.background = "#fff7ed";
-    alertBoxEl.style.borderColor = "#fed7aa";
     if (closeBtn) closeBtn.style.display = "block";
     return;
   }
@@ -382,7 +349,7 @@ async function loadClientCard() {
     normalizeName(client.full_name) === normalizedClientName
   );
 
-  currentClient = matchingClients[0] || selectedClient;
+  currentClient = selectedClient;
   const matchingClientIds = matchingClients.map(client => client.id);
 
   const { data: allAppointments, error: appointmentError } = await supabaseClient
