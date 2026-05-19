@@ -1,6 +1,5 @@
 const SUPABASE_URL = "https://bqqoxawgjxxvolljkqnp.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxcW94YXdnanh4dm9sbGprcW5wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODc0OTMsImV4cCI6MjA5MjA2MzQ5M30.WLTELxD32HFtyV1pbsB-60nF_k4Zq7DSvaR87-kj2es";
-
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 console.log("MAANDRAPPORTAGE CLIENTEN JS IS GELADEN");
@@ -17,6 +16,32 @@ const clientsReportList = document.getElementById("clientsReportList");
 const loadReportBtn = document.getElementById("loadReportBtn");
 const includeNotesCheckbox = document.getElementById("includeNotesCheckbox");
 const profileNameBox = document.getElementById("profileNameBox");
+
+let currentUser = null;
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const ok = await enforceProcessorAgreement();
+  if (!ok) return;
+
+  const { data: sessionData } = await supabaseClient.auth.getSession();
+  const user = sessionData.session?.user;
+
+  if (!user) {
+    window.location.href = "./login.html";
+    return;
+  }
+
+  currentUser = user;
+
+  setDefaultMonth();
+  await loadProfileName();
+
+  loadReportBtn?.addEventListener("click", loadClientMonthReport);
+  includeNotesCheckbox?.addEventListener("change", loadClientMonthReport);
+  printReportBtn?.addEventListener("click", printWithFileName);
+
+  await loadClientMonthReport();
+});
 
 async function enforceProcessorAgreement() {
   const { data: sessionData } = await supabaseClient.auth.getSession();
@@ -49,39 +74,9 @@ async function enforceProcessorAgreement() {
   return true;
 }
 
-let currentUser = null;
-
-document.addEventListener("DOMContentLoaded", async () => {
-  const ok = await enforceProcessorAgreement();
-  if (!ok) return;
-
-  const { data: sessionData } = await supabaseClient.auth.getSession();
-  const user = sessionData.session?.user;
-
-  if (!user) {
-    window.location.href = "./login.html";
-    return;
-  }
-
-  currentUser = user;
-
-  setDefaultMonth();
-  await loadProfileName();
-
-  loadReportBtn?.addEventListener("click", loadClientMonthReport);
-  includeNotesCheckbox?.addEventListener("change", loadClientMonthReport);
-  printReportBtn?.addEventListener("click", printWithFileName);
-
-  await loadClientMonthReport();
-});
-
-
-
 function setDefaultMonth() {
   const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  reportMonthInput.value = `${year}-${month}`;
+  reportMonthInput.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 }
 
 async function loadClientMonthReport() {
@@ -99,14 +94,6 @@ async function loadClientMonthReport() {
 
   summaryMonth.textContent = formatMonthLabel(selectedMonth);
 
-  const { data, error } = await supabaseClient
-    .from("Appointments")
-    .select("*")
-    .eq("owner_id", currentUser.id)
-    .gte("appointment_date", startDate)
-    .lt("appointment_date", endDate)
-    .order("appointment_date", { ascending: false });
-
   const { data: clientsData, error: clientsError } = await supabaseClient
     .from("Clients")
     .select("id, full_name, signal_closed_at, signal_closed_note")
@@ -117,19 +104,25 @@ async function loadClientMonthReport() {
   }
 
   window.clientsDataForReport = clientsData || [];
-window.reportStartDate = startDate + "T00:00:00";
-window.reportEndDate = endDate + "T00:00:00";
+  window.reportStartDate = `${startDate}T00:00:00`;
+  window.reportEndDate = `${endDate}T00:00:00`;
+
+  const { data, error } = await supabaseClient
+    .from("Appointments")
+    .select("*")
+    .eq("owner_id", currentUser.id)
+    .gte("appointment_date", startDate)
+    .lt("appointment_date", endDate)
+    .order("appointment_date", { ascending: false });
 
   if (error) {
-    console.error(error);
+    console.error("Rapport laden mislukt:", error);
     clientsReportList.innerHTML = "Rapport kon niet geladen worden.";
     return;
   }
 
   if (!data || data.length === 0) {
     resetSummary();
-
-
     clientsReportList.innerHTML = "Geen afgeronde afspraken gevonden voor deze maand.";
     return;
   }
@@ -145,7 +138,8 @@ function groupByClient(appointments) {
 
   appointments.forEach((item) => {
     const clientId = item.client_id || "onbekend";
-    const clientName = item.client_name || "Onbekende cliënt";
+    const clientName = item.client_name || getClientNameFromClients(clientId) || "Onbekende cliënt";
+    const closed = isClientSignalClosed(clientId);
 
     if (!result[clientId]) {
       result[clientId] = {
@@ -168,28 +162,26 @@ function groupByClient(appointments) {
     const minutes = Number(item.worked_minutes || item.duration_minutes || 0);
     result[clientId].total_minutes += minutes;
 
-    if (item.person_status || item.house_status || item.signal_notes) {
+    const tags = [
+      item.person_status,
+      item.house_status,
+      ...normalizeSignalTags(item.internal_signals)
+    ].filter(Boolean);
+
+    const hasSignal =
+      tags.length > 0 ||
+      !!item.signal_notes ||
+      item.signal_status === "actief";
+
+    if (hasSignal) {
       result[clientId].total_signals += 1;
+      result[clientId].signal_tags.push(...tags);
     }
 
-    const clientRecord = (window.clientsDataForReport || []).find(
-  client => client.id === clientId
-);
+    if (hasSignal && !closed) {
+      result[clientId].active_signals = 1;
+    }
 
-const signalIsClosed = !!clientRecord?.signal_closed_at;
-
-const clientRecord = (window.clientsDataForReport || []).find(
-  client => client.id === clientId
-);
-
-const signalIsClosed = !!clientRecord?.signal_closed_at;
-
-if (item.signal_status === "actief" && !signalIsClosed) {
-  result[clientId].active_signals += 1;
-}
-
-    const tags = normalizeSignalTags(item.internal_signals);
-result[clientId].signal_tags.push(...tags);
     if (!result[clientId].latest_visit || item.appointment_date > result[clientId].latest_visit) {
       result[clientId].latest_visit = item.appointment_date;
       result[clientId].latest_person_status = item.person_status || "";
@@ -199,7 +191,11 @@ result[clientId].signal_tags.push(...tags);
   });
 
   Object.values(result).forEach((client) => {
-    client.signal_tags = [...new Set(client.signal_tags)];
+    client.signal_tags = [...new Set(client.signal_tags.filter(Boolean))];
+
+    if (isClientSignalClosed(client.client_id)) {
+      client.active_signals = 0;
+    }
   });
 
   return result;
@@ -207,6 +203,7 @@ result[clientId].signal_tags.push(...tags);
 
 function renderSummary(grouped, allAppointments) {
   const clients = Object.values(grouped);
+
   const totalMinutes = clients.reduce((sum, client) => sum + client.total_minutes, 0);
   const totalSignals = clients.reduce((sum, client) => sum + client.total_signals, 0);
   const activeSignals = clients.reduce((sum, client) => sum + client.active_signals, 0);
@@ -221,20 +218,6 @@ function renderSummary(grouped, allAppointments) {
   if (summaryClosedSignals) {
     summaryClosedSignals.textContent = countClosedSignalsForReport();
   }
-}
-
-function countClosedSignalsForReport() {
-  const clients = window.clientsDataForReport || [];
-  const start = new Date(window.reportStartDate);
-  const end = new Date(window.reportEndDate);
-
-  return clients.filter((client) => {
-    if (!client.signal_closed_at) return false;
-
-    const closedDate = new Date(client.signal_closed_at);
-
-    return !isNaN(closedDate) && closedDate >= start && closedDate < end;
-  }).length;
 }
 
 function renderClients(grouped) {
@@ -276,7 +259,7 @@ function renderClients(grouped) {
           </div>
 
           <div class="small-stat">
-            <span>Signalen</span>
+            <span>Signalen totaal</span>
             <strong>${client.total_signals}</strong>
           </div>
 
@@ -309,66 +292,103 @@ function renderClients(grouped) {
   }).join("");
 }
 
-
-
-function renderSignalTags(tags, client = {}) {
-  if (!tags || tags.length === 0) {
-    const fallbackSignals = [
-      client.latest_person_status,
-      client.latest_house_status
-    ].filter(Boolean);
-
-    return `
-      <div class="signal-tags">
-        <span class="signal-tag">
-          ${
-            fallbackSignals.length
-              ? escapeHtml(fallbackSignals.join(", "))
-              : "Geen specifieke signalen"
-          }
-        </span>
-      </div>
-    `;
+function getClientStatus(client) {
+  if (isClientSignalClosed(client.client_id)) {
+    return "Signaal afgesloten";
   }
 
-  return `
-    <div class="signal-tags">
-      ${tags
-        .map(tag => `<span class="signal-tag">${escapeHtml(tag)}</span>`)
-        .join("")}
-    </div>
-  `;
-}
-
-function getClientStatus(client) {
-  const latestPerson = client.latest_person_status;
-  const latestHouse = client.latest_house_status;
-
-  if (
-    client.active_signals > 0 ||
-    latestPerson === "zorgelijk" ||
-    latestHouse === "zorgelijk"
-  ) {
+  if (client.active_signals > 0) {
     return "Actie nodig";
   }
 
-  if (
-    client.total_signals > 0 ||
-    latestPerson === "redelijk" ||
-    latestHouse === "rommelig"
-  ) {
+  if (client.total_signals > 0) {
     return "Let op";
   }
 
   return "Gaat goed";
 }
 
-
 function getStatusClass(status) {
   if (status === "Actie nodig") return "status-alert";
   if (status === "Let op") return "status-watch";
   if (status === "Signaal afgesloten") return "status-good";
   return "status-good";
+}
+
+function renderSignalTags(tags, client = {}) {
+  if (isClientSignalClosed(client.client_id)) {
+    return renderClosedSignalText(client.client_id);
+  }
+
+  const fallbackSignals = [
+    client.latest_person_status,
+    client.latest_house_status
+  ].filter(Boolean);
+
+  const allTags = [...new Set([...(tags || []), ...fallbackSignals].filter(Boolean))];
+
+  if (allTags.length === 0) {
+    return `
+      <div class="signal-tags">
+        <span class="signal-tag">Geen specifieke signalen</span>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="signal-tags">
+      ${allTags
+        .map(tag => `<span class="signal-tag">${escapeHtml(formatSignalTag(tag))}</span>`)
+        .join("")}
+    </div>
+  `;
+}
+
+function isClientSignalClosed(clientId) {
+  const client = getClientRecord(clientId);
+  return !!client?.signal_closed_at;
+}
+
+function renderClosedSignalText(clientId) {
+  const client = getClientRecord(clientId);
+
+  if (!client?.signal_closed_at) return "";
+
+  return `
+    <div class="client-report-note signal-closed-box">
+      <strong>Signaal afgesloten:</strong><br>
+      ${formatDate(client.signal_closed_at)}<br>
+      ${
+        client.signal_closed_note
+          ? `Reden: ${escapeHtml(client.signal_closed_note)}`
+          : "Geen reden ingevuld."
+      }
+    </div>
+  `;
+}
+
+function getClientRecord(clientId) {
+  return (window.clientsDataForReport || []).find((client) => {
+    return String(client.id) === String(clientId);
+  });
+}
+
+function getClientNameFromClients(clientId) {
+  const client = getClientRecord(clientId);
+  return client?.full_name || "";
+}
+
+function countClosedSignalsForReport() {
+  const clients = window.clientsDataForReport || [];
+  const start = new Date(window.reportStartDate);
+  const end = new Date(window.reportEndDate);
+
+  return clients.filter((client) => {
+    if (!client.signal_closed_at) return false;
+
+    const closedDate = new Date(client.signal_closed_at);
+    return !isNaN(closedDate) && closedDate >= start && closedDate < end;
+  }).length;
 }
 
 function normalizeSignalTags(value) {
@@ -393,111 +413,11 @@ function normalizeSignalTags(value) {
   return [];
 }
 
-function getNextMonthDate(selectedMonth) {
-  const [year, month] = selectedMonth.split("-").map(Number);
-  const date = new Date(year, month, 1);
-  const nextYear = date.getFullYear();
-  const nextMonth = String(date.getMonth() + 1).padStart(2, "0");
-  return `${nextYear}-${nextMonth}-01`;
-}
-
-function formatMinutesToHours(minutes) {
-  const total = Number(minutes || 0);
-
-  if (total === 0) return "0 uur";
-
-  const hours = Math.floor(total / 60);
-  const mins = total % 60;
-
-  if (hours > 0 && mins > 0) {
-    return `${hours} u ${mins} min`;
-  }
-
-  if (hours > 0) {
-    return `${hours} uur`;
-  }
-
-  return `${mins} min`;
-}
-
-function formatDate(dateString) {
-  if (!dateString) return "-";
-
-  const date = new Date(dateString);
-  return date.toLocaleDateString("nl-NL", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric"
-  });
-}
-
-function formatMonthLabel(value) {
-  if (!value) return "-";
-
-  const [year, month] = value.split("-");
-  const date = new Date(Number(year), Number(month) - 1, 1);
-
-  return date.toLocaleDateString("nl-NL", {
-    month: "long",
-    year: "numeric"
-  });
-}
-
-function formatValue(value) {
-  if (!value) return "-";
-  return String(value)
-    .replaceAll("_", " ")
-    .replace(/^./, letter => letter.toUpperCase());
-}
-
-function slugify(value) {
-  return String(value || "maand")
-    .toLowerCase()
-    .replaceAll(" ", "-")
-    .replaceAll("á", "a")
-    .replaceAll("é", "e")
-    .replaceAll("ë", "e")
-    .replaceAll("í", "i")
-    .replaceAll("ó", "o")
-    .replaceAll("ú", "u")
-    .replaceAll("ü", "u")
-    .replace(/[^a-z0-9-]/g, "");
-}
-
-function formatSignalTag(tag) {
-  const labels = {
-    vergeetachtig: "Vergeetachtig",
-    somber: "Somber",
-    eenzaam: "Eenzaam",
-    slechter_ter_been: "Slechter ter been",
-    huis_vervuilt: "Huis vervuilt",
-    mantelzorger_belast: "Mantelzorger belast",
-    niet_open_gedaan: "Niet open gedaan"
-  };
-
-  return labels[tag] || formatValue(tag);
-}
-
-function resetSummary() {
-  summaryClients.textContent = "0";
-  summaryAppointments.textContent = "0";
-  summaryHours.textContent = "0 uur";
-  summarySignals.textContent = "0";
-  summaryActiveSignals.textContent = "0";
-}
-
-function escapeHtml(value) {
-  if (!value) return "";
-
-  return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
 function getLastImpression(client) {
+  if (isClientSignalClosed(client.client_id)) {
+    return "signaal afgesloten";
+  }
+
   if (
     client.latest_person_status === "zorgelijk" ||
     client.latest_house_status === "zorgelijk"
@@ -522,15 +442,127 @@ function getLastImpression(client) {
   return "niet ingevuld";
 }
 
+function getNextMonthDate(selectedMonth) {
+  const [year, month] = selectedMonth.split("-").map(Number);
+  const date = new Date(year, month, 1);
+  const nextYear = date.getFullYear();
+  const nextMonth = String(date.getMonth() + 1).padStart(2, "0");
+
+  return `${nextYear}-${nextMonth}-01`;
+}
+
+function formatMinutesToHours(minutes) {
+  const total = Number(minutes || 0);
+
+  if (total === 0) return "0 uur";
+
+  const hours = Math.floor(total / 60);
+  const mins = total % 60;
+
+  if (hours > 0 && mins > 0) return `${hours} u ${mins} min`;
+  if (hours > 0) return `${hours} uur`;
+
+  return `${mins} min`;
+}
+
+function formatDate(dateString) {
+  if (!dateString) return "-";
+
+  const date = new Date(dateString);
+
+  if (isNaN(date)) return "-";
+
+  return date.toLocaleDateString("nl-NL", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  });
+}
+
+function formatMonthLabel(value) {
+  if (!value) return "-";
+
+  const [year, month] = value.split("-");
+  const date = new Date(Number(year), Number(month) - 1, 1);
+
+  return date.toLocaleDateString("nl-NL", {
+    month: "long",
+    year: "numeric"
+  });
+}
+
+function formatValue(value) {
+  if (!value) return "-";
+
+  return String(value)
+    .replaceAll("_", " ")
+    .replace(/^./, letter => letter.toUpperCase());
+}
+
+function formatSignalTag(tag) {
+  const labels = {
+    goed: "Goed",
+    redelijk: "Redelijk",
+    zorgelijk: "Zorgelijk",
+    netjes: "Netjes",
+    rommelig: "Rommelig",
+    vergeetachtig: "Vergeetachtig",
+    somber: "Somber",
+    eenzaam: "Eenzaam",
+    slechter_ter_been: "Slechter ter been",
+    huis_vervuilt: "Huis vervuilt",
+    mantelzorger_belast: "Mantelzorger belast",
+    niet_open_gedaan: "Niet open gedaan"
+  };
+
+  return labels[tag] || formatValue(tag);
+}
+
+function resetSummary() {
+  summaryClients.textContent = "0";
+  summaryAppointments.textContent = "0";
+  summaryHours.textContent = "0 uur";
+  summarySignals.textContent = "0";
+  summaryActiveSignals.textContent = "0";
+
+  const summaryClosedSignals = document.getElementById("summaryClosedSignals");
+  if (summaryClosedSignals) {
+    summaryClosedSignals.textContent = "0";
+  }
+}
+
+function escapeHtml(value) {
+  if (!value) return "";
+
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function slugify(value) {
+  return String(value || "maand")
+    .toLowerCase()
+    .replaceAll(" ", "-")
+    .replaceAll("á", "a")
+    .replaceAll("é", "e")
+    .replaceAll("ë", "e")
+    .replaceAll("í", "i")
+    .replaceAll("ó", "o")
+    .replaceAll("ú", "u")
+    .replaceAll("ü", "u")
+    .replace(/[^a-z0-9-]/g, "");
+}
+
 async function loadProfileName() {
   try {
     const { data: userData } = await supabaseClient.auth.getUser();
     const user = userData?.user;
 
     if (!user) {
-      if (profileNameBox) {
-        profileNameBox.textContent = "Cliëntenrapportage";
-      }
+      if (profileNameBox) profileNameBox.textContent = "Cliëntenrapportage";
       return;
     }
 
@@ -547,9 +579,7 @@ async function loadProfileName() {
     const profile = data && data.length ? data[0] : null;
 
     if (!profile) {
-      if (profileNameBox) {
-        profileNameBox.textContent = "Mijn bedrijf";
-      }
+      if (profileNameBox) profileNameBox.textContent = "Mijn bedrijf";
       return;
     }
 
@@ -566,6 +596,7 @@ async function loadProfileName() {
     }
   } catch (err) {
     console.error("Fout bij laden profielnaam:", err);
+
     if (profileNameBox) {
       profileNameBox.textContent = "Mijn bedrijf";
     }
@@ -574,11 +605,12 @@ async function loadProfileName() {
 
 function printWithFileName() {
   const selectedMonth = reportMonthInput.value || "";
-  const monthLabel = formatMonthLabel(selectedMonth); // bijvoorbeeld "mei 2026"
+  const monthLabel = formatMonthLabel(selectedMonth);
 
   const fileName =
     "maandrapportage-clienten-" +
-    slugify(monthLabel).replace("-", "") + ".pdf";
+    slugify(monthLabel).replace("-", "") +
+    ".pdf";
 
   const oldTitle = document.title;
   document.title = fileName.replace(".pdf", "");
