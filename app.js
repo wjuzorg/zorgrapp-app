@@ -22,6 +22,7 @@ const appointmentsListEl = document.getElementById("appointmentsList");
 const welcomeTitleEl = document.getElementById("welcomeTitle");
 const welcomeTextEl = document.getElementById("welcomeText");
 const todayDateLabelEl = document.getElementById("todayDateLabel");
+const todayTitleEl = document.getElementById("todayTitle");
 
 const btnNewClient = document.getElementById("btnNewClient");
 const btnUserProfile = document.getElementById("btnUserProfile");
@@ -470,6 +471,10 @@ async function loadDashboard() {
 
     const todayAppointments = appointments.filter(item => item.appointment_date === today);
     todayCountEl.textContent = todayAppointments.length;
+
+    if (todayTitleEl) {
+  todayTitleEl.textContent = `Vandaag (${appointmentsToday.length})`;
+}
 
    const signalCountByClient = {};
 
