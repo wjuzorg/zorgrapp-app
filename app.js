@@ -118,13 +118,6 @@ nextWeekBtn?.addEventListener("click", () => {
   renderWeekPlanning(allAppointmentsCache);
 });
 
-const btnClients = document.getElementById("btnClients");
-
-btnClients?.addEventListener("click", (e) => {
-  e.preventDefault();
-  if (!requireProcessorAgreement()) return;
-  window.location.href = "./new-client.html";
-});
 
 document.addEventListener("click", (e) => {
   if (processorAgreementAccepted === true) return;
