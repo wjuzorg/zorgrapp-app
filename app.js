@@ -50,6 +50,14 @@ if (btnUserProfile) {
   });
 }
 
+const btnClients = document.getElementById("btnClients");
+
+btnClients?.addEventListener("click", (e) => {
+  e.preventDefault();
+  if (!requireProcessorAgreement()) return;
+  window.location.href = "./clientkaart.html";
+});
+
 // Klik buiten menu = sluiten
 document.addEventListener("click", function () {
   profileDropdown?.classList.add("hidden");
@@ -110,11 +118,19 @@ nextWeekBtn?.addEventListener("click", () => {
   renderWeekPlanning(allAppointmentsCache);
 });
 
+const btnClients = document.getElementById("btnClients");
+
+btnClients?.addEventListener("click", (e) => {
+  e.preventDefault();
+  if (!requireProcessorAgreement()) return;
+  window.location.href = "./new-client.html";
+});
+
 document.addEventListener("click", (e) => {
   if (processorAgreementAccepted === true) return;
 
   const blockedButton = e.target.closest(
-    "#btnNewClient, #btnInvoices, #btnMonthReports"
+    "#btnNewClient, #btnClients, #btnInvoices, #btnMonthReports"
   );
 
   if (blockedButton) {

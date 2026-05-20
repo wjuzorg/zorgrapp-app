@@ -21,6 +21,73 @@ function getClientIdFromUrl() {
   return params.get("id");
 }
 
+function showClientSearchOnly() {
+  const searchSection = document.getElementById("clientSearchSection");
+  const cardSection = document.getElementById("clientCardSection");
+
+  if (searchSection) searchSection.style.display = "block";
+  if (cardSection) cardSection.style.display = "none";
+}
+
+function showClientCardOnly() {
+  const searchSection = document.getElementById("clientSearchSection");
+  const cardSection = document.getElementById("clientCardSection");
+
+  if (searchSection) searchSection.style.display = "none";
+  if (cardSection) cardSection.style.display = "block";
+}
+
+async function setupClientSearch() {
+  const input = document.getElementById("clientSearchInput");
+  const results = document.getElementById("clientSearchResults");
+
+  if (!input || !results || !currentUser) return;
+
+  const { data, error } = await supabaseClient
+    .from("Clients")
+    .select("id, full_name, phone, city")
+    .eq("owner_id", currentUser.id)
+    .is("deleted_at", null)
+    .order("full_name", { ascending: true });
+
+  if (error) {
+    console.error("Cliënten zoeken mislukt:", error);
+    results.innerHTML = "Cliënten konden niet geladen worden.";
+    return;
+  }
+
+  const clients = data || [];
+
+  function renderSearchList(searchTerm = "") {
+    const term = searchTerm.trim().toLowerCase();
+
+    const filtered = clients.filter(client =>
+      String(client.full_name || "").toLowerCase().includes(term)
+    );
+
+    if (!filtered.length) {
+      results.innerHTML = `<div class="helper-text">Geen cliënt gevonden.</div>`;
+      return;
+    }
+
+    results.innerHTML = filtered.map(client => `
+      <div class="saved-note-card" style="margin-bottom: 10px;">
+        <strong>${escapeHtml(client.full_name || "Onbekende cliënt")}</strong><br>
+        <span>${escapeHtml(client.phone || "-")} ${client.city ? "• " + escapeHtml(client.city) : ""}</span><br>
+        <a class="btn btn-secondary" style="margin-top: 8px;" href="./clientkaart.html?id=${client.id}">
+          Open cliëntenkaart
+        </a>
+      </div>
+    `).join("");
+  }
+
+  renderSearchList();
+
+  input.addEventListener("input", () => {
+    renderSearchList(input.value);
+  });
+}
+
 function formatDate(dateString) {
   if (!dateString) return "-";
   return new Intl.DateTimeFormat("nl-NL", {
@@ -315,11 +382,15 @@ async function loadClientCard() {
   currentUser = await requireLogin();
   if (!currentUser) return;
 
-  const clientId = getClientIdFromUrl();
-  if (!clientId) {
-    alert("Geen cliënt-ID gevonden.");
-    return;
-  }
+ const clientId = getClientIdFromUrl();
+
+if (!clientId) {
+  showClientSearchOnly();
+  await setupClientSearch();
+  return;
+}
+
+showClientCardOnly();
 
   const { data: selectedClient, error: clientError } = await supabaseClient
     .from("Clients")
