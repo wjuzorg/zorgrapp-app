@@ -153,7 +153,8 @@ function groupByClient(appointments) {
         latest_visit: null,
         latest_person_status: "",
         latest_house_status: "",
-        latest_note: ""
+        latest_note: "",
+        signal_details: []
       };
     }
 
@@ -175,9 +176,15 @@ const hasSignal =
   (note !== "" && note !== "-");
 
     if (hasSignal) {
-      result[clientId].total_signals += 1;
-      result[clientId].signal_tags.push(...tags);
-    }
+  result[clientId].total_signals += 1;
+  result[clientId].signal_tags.push(...tags);
+
+  result[clientId].signal_details.push({
+    date: item.appointment_date || item.created_at,
+    text: tags.length ? tags.map(formatSignalTag).join(" • ") : "Signaal genoteerd",
+    note: note && note !== "-" ? note : ""
+  });
+}
 
     if (hasSignal && !closed) {
       result[clientId].active_signals = 1;
@@ -271,6 +278,7 @@ function renderClients(grouped) {
         </div>
 
         ${renderSignalTags(client.signal_tags, client)}
+        ${renderSignalDetails(client)}
 
         ${
           includeNotesCheckbox && includeNotesCheckbox.checked && client.latest_note
@@ -341,6 +349,28 @@ function renderSignalTags(tags, client = {}) {
       ${allTags
         .map(tag => `<span class="signal-tag">${escapeHtml(formatSignalTag(tag))}</span>`)
         .join("")}
+    </div>
+  `;
+}
+
+function renderSignalDetails(client) {
+  if (!client.signal_details || client.signal_details.length === 0) {
+    return "";
+  }
+
+  return `
+    <div class="client-report-note">
+      <strong>Signalen deze maand:</strong><br>
+      ${client.signal_details.map(signal => `
+        <div style="margin-top: 8px;">
+          <strong>${formatDate(signal.date)}</strong> — ${escapeHtml(signal.text)}
+          ${
+            signal.note
+              ? `<br><span>${escapeHtml(signal.note)}</span>`
+              : ""
+          }
+        </div>
+      `).join("")}
     </div>
   `;
 }
