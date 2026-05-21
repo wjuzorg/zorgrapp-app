@@ -43,9 +43,12 @@ async function setupClientSearch() {
   const button = document.getElementById("clientSearchBtn");
   const results = document.getElementById("clientSearchResults");
 
-  if (!input || !button || !results) return;
+  if (!input || !button || !results) {
+    console.error("Zoekelementen niet gevonden");
+    return;
+  }
 
-  results.innerHTML = "";
+  results.innerHTML = `<div class="helper-text">Typ een naam en klik op zoeken.</div>`;
 
   const { data, error } = await supabaseClient
     .from("Clients")
@@ -89,14 +92,10 @@ async function setupClientSearch() {
     `).join("");
   }
 
-  results.innerHTML = `<div class="helper-text">Typ een naam en klik op zoeken.</div>`;
-
-  button.addEventListener("click", renderSearchList);
+  button.onclick = renderSearchList;
 
   input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      renderSearchList();
-    }
+    if (e.key === "Enter") renderSearchList();
   });
 }
 
