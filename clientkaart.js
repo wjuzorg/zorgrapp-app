@@ -683,8 +683,14 @@ async function saveClientEdit() {
   }
 
   if (editClientMessage) {
-    editClientMessage.textContent = "Gegevens opgeslagen.";
+  editClientMessage.textContent = "Gegevens opgeslagen.";
+}
+
+setTimeout(() => {
+  if (editClientForm) {
+    editClientForm.style.display = "none";
   }
+}, 800);
 }
 
 

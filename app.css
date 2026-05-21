@@ -3047,3 +3047,15 @@ button.finish-btn:disabled,
     padding: 13px 10px !important;
   }
 }
+
+#saveClientEditBtn {
+  background: #0f172a;
+  color: white;
+  border: none;
+  opacity: 1;
+  font-weight: 700;
+}
+
+#saveClientEditBtn:hover {
+  background: #1e293b;
+}
