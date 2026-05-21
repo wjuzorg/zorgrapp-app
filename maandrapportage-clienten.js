@@ -327,9 +327,9 @@ function getStatusClass(status) {
 }
 
 function renderSignalTags(tags, client = {}) {
-  if (isClientSignalClosed(client.client_id)) {
-    return renderClosedSignalText(client.client_id);
-  }
+  if (isClientSignalClosed(client.client_id) && Number(client.active_signals || 0) === 0) {
+  return renderClosedSignalText(client.client_id);
+}
 
   const fallbackSignals = [
     client.latest_person_status,
