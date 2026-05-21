@@ -678,9 +678,16 @@ async function saveClientEdit() {
 
   const callClientBtn = document.getElementById("callClientBtn");
   if (callClientBtn) {
-    const cleanPhone = String(currentClient.phone || "").replace(/\s+/g, "");
-    callClientBtn.href = cleanPhone ? `tel:${cleanPhone}` : "#";
+  const cleanPhone = String(currentClient.phone || "").replace(/\s+/g, "");
+
+  if (cleanPhone) {
+    callClientBtn.href = `tel:${cleanPhone}`;
+    callClientBtn.textContent = "Bel cliënt";
+  } else {
+    callClientBtn.href = "#";
+    callClientBtn.textContent = "Geen telefoonnummer bekend";
   }
+}
 
   if (editClientMessage) {
   editClientMessage.textContent = "Gegevens opgeslagen.";
