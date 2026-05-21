@@ -52,7 +52,7 @@ async function setupClientSearch() {
     return;
   }
 
-  results.innerHTML = `<div class="helper-text">Typ minimaal 3 letters van de naam en klik op zoeken.</div>`;
+  results.innerHTML = `<div class="helper-text">"Bijvoorbeeld: gro voor Groothuizen."</div>`;
 
   const { data, error } = await supabaseClient
     .from("Clients")
@@ -72,7 +72,7 @@ async function setupClientSearch() {
     const term = input.value.trim().toLowerCase();
 
     if (!term) {
-      results.innerHTML = `<div class="helper-text">Typ minimaal 3 letters van de naam en klik op zoeken.</div>`;
+      results.innerHTML = `<div class="helper-text">"Bijvoorbeeld: gro voor Groothuizen."</div>`;
       return;
     }
 
