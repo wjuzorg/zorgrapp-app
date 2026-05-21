@@ -7,6 +7,22 @@ let currentUser = null;
 let currentClient = null;
 let matchingClients = [];
 
+const toggleEditClientBtn = document.getElementById("toggleEditClientBtn");
+const editClientForm = document.getElementById("editClientForm");
+const saveClientEditBtn = document.getElementById("saveClientEditBtn");
+
+const editPhone = document.getElementById("editPhone");
+const editEmail = document.getElementById("editEmail");
+const editAddress = document.getElementById("editAddress");
+const editPostalCode = document.getElementById("editPostalCode");
+const editCity = document.getElementById("editCity");
+const editIban = document.getElementById("editIban");
+
+const editEmergencyContact = document.getElementById("editEmergencyContact");
+const editEmergencyContactEmail = document.getElementById("editEmergencyContactEmail");
+const editEmergencyContactPhone = document.getElementById("editEmergencyContactPhone");
+const editClientMessage = document.getElementById("editClientMessage");
+
 async function requireLogin() {
   const { data } = await supabaseClient.auth.getSession();
   if (!data.session) {
@@ -513,22 +529,7 @@ if (editEmergencyContactPhone) {
 const newAppointmentBtn = document.getElementById("newAppointmentBtn");
 const clientHistoryBtn = document.getElementById("clientHistoryBtn");
 const saveContactNoteBtn = document.getElementById("saveContactNoteBtn");
-const toggleEditClientBtn = document.getElementById("toggleEditClientBtn");
-const editClientForm = document.getElementById("editClientForm");
-const saveClientEditBtn = document.getElementById("saveClientEditBtn");
 
-const editPhone = document.getElementById("editPhone");
-const editEmail = document.getElementById("editEmail");
-const editAddress = document.getElementById("editAddress");
-const editPostalCode = document.getElementById("editPostalCode");
-const editCity = document.getElementById("editCity");
-const editIban = document.getElementById("editIban");
-
-const editEmergencyContact = document.getElementById("editEmergencyContact");
-const editEmergencyContactEmail = document.getElementById("editEmergencyContactEmail");
-const editEmergencyContactPhone = document.getElementById("editEmergencyContactPhone");
-
-const editClientMessage = document.getElementById("editClientMessage");
   clientNameEl.textContent = currentClient.full_name || "Onbekende cliënt";
 
   clientPhoneEl.textContent = currentClient.phone || "-";
