@@ -25,17 +25,21 @@ function getClientIdFromUrl() {
 function showClientSearchOnly() {
   const searchSection = document.getElementById("clientSearchSection");
   const cardSection = document.getElementById("clientCardSection");
+  const backToClientSearch = document.getElementById("backToClientSearch");
 
   if (searchSection) searchSection.style.display = "block";
   if (cardSection) cardSection.style.display = "none";
+  if (backToClientSearch) backToClientSearch.style.display = "none";
 }
 
 function showClientCardOnly() {
   const searchSection = document.getElementById("clientSearchSection");
   const cardSection = document.getElementById("clientCardSection");
+  const backToClientSearch = document.getElementById("backToClientSearch");
 
   if (searchSection) searchSection.style.display = "none";
   if (cardSection) cardSection.style.display = "block";
+  if (backToClientSearch) backToClientSearch.style.display = "block";
 }
 
 async function setupClientSearch() {
@@ -48,7 +52,7 @@ async function setupClientSearch() {
     return;
   }
 
-  results.innerHTML = `<div class="helper-text">Typ een naam en klik op zoeken.</div>`;
+  results.innerHTML = `<div class="helper-text">Typ minimaal 3 letters van de naam en klik op zoeken.</div>`;
 
   const { data, error } = await supabaseClient
     .from("Clients")
@@ -68,7 +72,7 @@ async function setupClientSearch() {
     const term = input.value.trim().toLowerCase();
 
     if (!term) {
-      results.innerHTML = `<div class="helper-text">Typ een naam en klik op zoeken.</div>`;
+      results.innerHTML = `<div class="helper-text">Typ minimaal 3 letters van de naam en klik op zoeken.</div>`;
       return;
     }
 
