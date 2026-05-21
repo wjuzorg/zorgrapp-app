@@ -539,12 +539,25 @@ const minutesThisMonth = appointmentList
 
 minutesThisMonthEl.textContent = String(minutesThisMonth);
 
+
 // Signalen laden
 await loadClientSignals();
 
 // Contactnotities
 saveContactNoteBtn?.addEventListener("click", saveContactNote);
 }
+
 document.getElementById("closeSignalBtn")?.addEventListener("click", closeClientSignal);
 window.closeClientSignal = closeClientSignal;
 loadClientCard();
+
+function escapeHtml(value) {
+  if (!value) return "";
+
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
