@@ -69,23 +69,95 @@
       </div>
 
       <div class="section">
-        <h3>Contactpersoon</h3>
-        <div class="info-grid">
-          <div class="info-box">
-            <span class="info-label">Mantelzorger / contact</span>
-            <strong id="clientEmergencyContact">-</strong>
-          </div>
+  <h3>Contactpersoon</h3>
 
-          <div class="info-box">
-            <span class="info-label">E-mail mantelzorger / contact</span>
-            <strong id="clientEmergencyContactEmail">-</strong>
-          </div>
+  <div class="info-grid">
+    <div class="info-box">
+      <span class="info-label">Mantelzorger / contact</span>
+      <strong id="clientEmergencyContact">-</strong>
+    </div>
 
-          <div class="info-box">
-            <span class="info-label">Telefoon mantelzorger / contact</span>
-            <strong id="clientEmergencyContactPhone">-</strong>
-          </div>
+    <div class="info-box">
+      <span class="info-label">E-mail mantelzorger / contact</span>
+      <strong id="clientEmergencyContactEmail">-</strong>
+    </div>
+
+    <div class="info-box">
+      <span class="info-label">Telefoon mantelzorger / contact</span>
+      <strong id="clientEmergencyContactPhone">-</strong>
+    </div>
+  </div>
+
+  <div class="edit-client-box">
+    <button
+      type="button"
+      class="btn btn-secondary"
+      id="toggleEditClientBtn"
+    >
+      Basis- en contactgegevens aanpassen
+    </button>
+
+    <div id="editClientForm" style="display:none; margin-top:18px;">
+      <div class="form-grid-two">
+
+        <div>
+          <label class="form-label">Telefoon cliënt</label>
+          <input class="form-input" id="editPhone" type="text">
         </div>
+
+        <div>
+          <label class="form-label">E-mail cliënt</label>
+          <input class="form-input" id="editEmail" type="email">
+        </div>
+
+        <div>
+          <label class="form-label">Adres</label>
+          <input class="form-input" id="editAddress" type="text">
+        </div>
+
+        <div>
+          <label class="form-label">Postcode</label>
+          <input class="form-input" id="editPostalCode" type="text">
+        </div>
+
+        <div>
+          <label class="form-label">Plaats</label>
+          <input class="form-input" id="editCity" type="text">
+        </div>
+
+        <div>
+          <label class="form-label">IBAN cliënt</label>
+          <input class="form-input" id="editIban" type="text">
+        </div>
+
+        <div>
+          <label class="form-label">Contactpersoon</label>
+          <input class="form-input" id="editEmergencyContact" type="text">
+        </div>
+
+        <div>
+          <label class="form-label">E-mail contactpersoon</label>
+          <input class="form-input" id="editEmergencyContactEmail" type="email">
+        </div>
+
+        <div>
+          <label class="form-label">Telefoon contactpersoon</label>
+          <input class="form-input" id="editEmergencyContactPhone" type="text">
+        </div>
+
+      </div>
+
+      <div id="editClientMessage" class="helper-text"></div>
+
+      <button
+        type="button"
+        class="btn btn-primary"
+        id="saveClientEditBtn"
+      >
+        Gegevens opslaan
+      </button>
+    </div>
+  </div>
 
         <div class="contact-notes-layout">
           <div class="contact-note-entry">

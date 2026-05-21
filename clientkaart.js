@@ -449,6 +449,27 @@ showClientCardOnly();
   currentClient = selectedClient;
   const matchingClientIds = matchingClients.map(client => client.id);
 
+  if (editPhone) editPhone.value = currentClient.phone || "";
+if (editEmail) editEmail.value = currentClient.email || "";
+if (editAddress) editAddress.value = currentClient.address || "";
+if (editPostalCode) editPostalCode.value = currentClient.postal_code || "";
+if (editCity) editCity.value = currentClient.city || "";
+if (editIban) editIban.value = currentClient.iban || "";
+
+if (editEmergencyContact) {
+  editEmergencyContact.value = currentClient.emergency_contact || "";
+}
+
+if (editEmergencyContactEmail) {
+  editEmergencyContactEmail.value =
+    currentClient.emergency_contact_email || "";
+}
+
+if (editEmergencyContactPhone) {
+  editEmergencyContactPhone.value =
+    currentClient.emergency_contact_phone || "";
+}
+
   const { data: allAppointments, error: appointmentError } = await supabaseClient
     .from("Appointments")
     .select("*")
@@ -492,7 +513,22 @@ showClientCardOnly();
 const newAppointmentBtn = document.getElementById("newAppointmentBtn");
 const clientHistoryBtn = document.getElementById("clientHistoryBtn");
 const saveContactNoteBtn = document.getElementById("saveContactNoteBtn");
+const toggleEditClientBtn = document.getElementById("toggleEditClientBtn");
+const editClientForm = document.getElementById("editClientForm");
+const saveClientEditBtn = document.getElementById("saveClientEditBtn");
 
+const editPhone = document.getElementById("editPhone");
+const editEmail = document.getElementById("editEmail");
+const editAddress = document.getElementById("editAddress");
+const editPostalCode = document.getElementById("editPostalCode");
+const editCity = document.getElementById("editCity");
+const editIban = document.getElementById("editIban");
+
+const editEmergencyContact = document.getElementById("editEmergencyContact");
+const editEmergencyContactEmail = document.getElementById("editEmergencyContactEmail");
+const editEmergencyContactPhone = document.getElementById("editEmergencyContactPhone");
+
+const editClientMessage = document.getElementById("editClientMessage");
   clientNameEl.textContent = currentClient.full_name || "Onbekende cliënt";
 
   clientPhoneEl.textContent = currentClient.phone || "-";
@@ -568,9 +604,88 @@ await loadClientSignals();
 saveContactNoteBtn?.addEventListener("click", saveContactNote);
 }
 
+toggleEditClientBtn?.addEventListener("click", () => {
+  const isOpen = editClientForm.style.display === "block";
+
+  editClientForm.style.display = isOpen ? "none" : "block";
+});
+
 document.getElementById("closeSignalBtn")?.addEventListener("click", closeClientSignal);
+
+saveClientEditBtn?.addEventListener("click", saveClientEdit);
+
 window.closeClientSignal = closeClientSignal;
+
 loadClientCard();
+
+async function saveClientEdit() {
+  if (!currentUser || !currentClient?.id) return;
+
+  if (editClientMessage) {
+    editClientMessage.textContent = "Opslaan...";
+  }
+
+  const updates = {
+    phone: editPhone?.value.trim() || null,
+    email: editEmail?.value.trim() || null,
+    address: editAddress?.value.trim() || null,
+    postal_code: editPostalCode?.value.trim() || null,
+    city: editCity?.value.trim() || null,
+    iban: editIban?.value.trim() || null,
+    emergency_contact: editEmergencyContact?.value.trim() || null,
+    emergency_contact_email: editEmergencyContactEmail?.value.trim() || null,
+    emergency_contact_phone: editEmergencyContactPhone?.value.trim() || null,
+    updated_at: new Date().toISOString()
+  };
+
+  const { data, error } = await supabaseClient
+    .from("Clients")
+    .update(updates)
+    .eq("id", currentClient.id)
+    .eq("owner_id", currentUser.id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Cliëntgegevens opslaan mislukt:", error);
+    if (editClientMessage) {
+      editClientMessage.textContent = "Opslaan mislukt: " + error.message;
+    }
+    return;
+  }
+
+  currentClient = data;
+
+  document.getElementById("clientPhone").textContent = currentClient.phone || "-";
+
+  document.getElementById("clientAddress").textContent =
+    [currentClient.address, currentClient.postal_code, currentClient.city]
+      .filter(Boolean)
+      .join(", ") || "-";
+
+  document.getElementById("clientPayment").textContent =
+    currentClient.iban ? `IBAN: ${currentClient.iban}` : "-";
+
+  document.getElementById("clientEmergencyContact").textContent =
+    currentClient.emergency_contact || "-";
+
+  document.getElementById("clientEmergencyContactEmail").textContent =
+    currentClient.emergency_contact_email || "-";
+
+  document.getElementById("clientEmergencyContactPhone").textContent =
+    currentClient.emergency_contact_phone || "-";
+
+  const callClientBtn = document.getElementById("callClientBtn");
+  if (callClientBtn) {
+    const cleanPhone = String(currentClient.phone || "").replace(/\s+/g, "");
+    callClientBtn.href = cleanPhone ? `tel:${cleanPhone}` : "#";
+  }
+
+  if (editClientMessage) {
+    editClientMessage.textContent = "Gegevens opgeslagen.";
+  }
+}
+
 
 function escapeHtml(value) {
   if (!value) return "";
