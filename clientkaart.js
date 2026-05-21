@@ -72,9 +72,11 @@ async function setupClientSearch() {
       return;
     }
 
-    const filtered = clients.filter(client =>
-      String(client.full_name || "").toLowerCase().includes(term)
-    );
+    const filtered = clients
+  .filter(client =>
+    String(client.full_name || "").toLowerCase().includes(term)
+  )
+  .slice(0, 10);
 
     if (!filtered.length) {
       results.innerHTML = `<div class="helper-text">Geen cliënt gevonden.</div>`;
@@ -82,14 +84,23 @@ async function setupClientSearch() {
     }
 
     results.innerHTML = filtered.map(client => `
-      <div class="saved-note-card" style="margin-bottom: 10px;">
-        <strong>${escapeHtml(client.full_name || "Onbekende cliënt")}</strong><br>
-        <span>${escapeHtml(client.phone || "-")} ${client.city ? "• " + escapeHtml(client.city) : ""}</span><br>
-        <a class="btn btn-secondary" style="margin-top: 8px;" href="./clientkaart.html?id=${client.id}">
-          Open cliëntenkaart
-        </a>
-      </div>
-    `).join("");
+  <div class="client-search-result">
+    <div class="client-search-result-name">
+      ${escapeHtml(client.full_name || "Onbekende cliënt")}
+    </div>
+
+    <div class="client-search-result-meta">
+      ${client.phone ? `Telefoon: ${escapeHtml(client.phone)}<br>` : ""}
+      ${client.city ? `Plaats: ${escapeHtml(client.city)}<br>` : ""}
+    </div>
+
+    <div class="client-search-result-actions">
+      <a class="btn btn-secondary" href="./clientkaart.html?id=${client.id}">
+        Open cliëntenkaart
+      </a>
+    </div>
+  </div>
+`).join("");
   }
 
   button.onclick = renderSearchList;
