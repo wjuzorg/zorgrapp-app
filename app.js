@@ -218,28 +218,37 @@ function getMotivation(name) {
   const dayOfMonth = new Date().getDate();
 
   const mondayMessages = [
-    `${name}, nieuwe week. Jij brengt vandaag weer rust en overzicht.`,
-    `Goed begin van de week, ${name}. Vandaag zet jij de toon.`
-  ];
+  `${name}, een nieuwe week. Fijn dat jij er weer bent voor anderen.`,
+  `Nieuwe week, ${name}. Iemand gaat vandaag blij zijn dat jij komt.`,
+  `${name}, begin rustig. Goede zorg hoeft niet gehaast te voelen.`
+];
 
-  const wednesdayMessages = [
-    `${name}, midden in de week en alles netjes onder controle.`,
-    `Woensdagkracht, ${name}. Jij houdt het overzicht scherp.`
-  ];
+const wednesdayMessages = [
+  `${name}, midden in de week. Vergeet niet hoeveel verschil jij maakt.`,
+  `Ook op drukke dagen brengt jouw aandacht rust.`,
+  `${name}, zorg draait niet alleen om doen, maar ook om er zijn.`
+];
 
-  const fridayMessages = [
-    `Bijna weekend, ${name}. Nog even knallen en dan mooi afronden.`,
-    `${name}, laatste rechte lijn van de week. Jij hebt dit.`
-  ];
+const fridayMessages = [
+  `${name}, bijna weekend. Dankjewel voor alles wat je deze week hebt gedaan.`,
+  `De week is bijna rond, ${name}. Veel mensen hebben op jou kunnen rekenen.`,
+  `${name}, sluit de week rustig af. Je hebt veel betekend voor anderen.`
+];
 
   const complimentMessages = [
-    `${name}, jij maakt vandaag echt verschil.`,
-    `Kleine hulp bestaat niet. Jij bewijst dat elke dag.`,
-    `${name}, mensen rekenen vandaag op jouw rust.`,
-    `Jij helpt niet alleen praktisch, maar ook menselijk.`,
-    `${name}, vandaag weer een kans om iemand blij te maken.`,
-    `${name}, jouw aanwezigheid geeft vertrouwen.`
-  ];
+  `${name}, wat jij vandaag doet, maakt voor iemand echt verschil.`,
+  `Vergeet niet: jouw aandacht betekent vaak meer dan je denkt.`,
+  `${name}, achter iedere afspraak zit iemand die blij is dat jij komt.`,
+  `Goede zorg zit soms in de kleinste momenten.`,
+  `${name}, fijn dat jij er vandaag weer bent voor anderen.`,
+  `Jij brengt niet alleen hulp, maar ook rust en vertrouwen.`,
+  `${name}, iemand voelt zich vandaag minder alleen dankzij jou.`,
+  `Zorg met aandacht blijft mensen bij.`,
+  `${name}, ook op drukke dagen maak jij verschil.`,
+  `Dankzij mensen zoals jij voelt zorg persoonlijk.`,
+  `${name}, jouw aanwezigheid doet ertoe.`,
+  `Soms is er gewoon iemand nodig die écht even komt helpen.`
+];
 
   if (dayOfWeek === 1) {
     return mondayMessages[dayOfMonth % mondayMessages.length];
