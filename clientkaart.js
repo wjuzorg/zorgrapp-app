@@ -40,9 +40,12 @@ function showClientCardOnly() {
 
 async function setupClientSearch() {
   const input = document.getElementById("clientSearchInput");
+  const button = document.getElementById("clientSearchBtn");
   const results = document.getElementById("clientSearchResults");
 
-  if (!input || !results || !currentUser) return;
+  if (!input || !button || !results) return;
+
+  results.innerHTML = "";
 
   const { data, error } = await supabaseClient
     .from("Clients")
@@ -58,8 +61,13 @@ async function setupClientSearch() {
 
   const clients = data || [];
 
-  function renderSearchList(searchTerm = "") {
-    const term = searchTerm.trim().toLowerCase();
+  function renderSearchList() {
+    const term = input.value.trim().toLowerCase();
+
+    if (!term) {
+      results.innerHTML = `<div class="helper-text">Typ een naam en klik op zoeken.</div>`;
+      return;
+    }
 
     const filtered = clients.filter(client =>
       String(client.full_name || "").toLowerCase().includes(term)
@@ -81,10 +89,14 @@ async function setupClientSearch() {
     `).join("");
   }
 
-  renderSearchList();
+  results.innerHTML = `<div class="helper-text">Typ een naam en klik op zoeken.</div>`;
 
-  input.addEventListener("input", () => {
-    renderSearchList(input.value);
+  button.addEventListener("click", renderSearchList);
+
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      renderSearchList();
+    }
   });
 }
 
