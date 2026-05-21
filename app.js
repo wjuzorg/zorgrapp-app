@@ -473,7 +473,7 @@ async function loadDashboard() {
     todayCountEl.textContent = todayAppointments.length;
 
     if (todayTitleEl) {
-  todayTitleEl.textContent = `Vandaag (${appointmentsToday.length})`;
+  todayTitleEl.textContent = `Vandaag (${appointmentsListEl.querySelectorAll(".appointment-card").length})`;
 }
 
    const signalCountByClient = {};

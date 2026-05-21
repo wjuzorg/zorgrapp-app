@@ -341,7 +341,7 @@ function renderSignalTags(tags, client = {}) {
   if (allTags.length === 0) {
     return `
       <div class="signal-tags">
-        <span class="signal-tag">Geen specifieke signalen</span>
+        <span class="signal-tag">Signalen genoteerd</span>
       </div>
     `;
   }

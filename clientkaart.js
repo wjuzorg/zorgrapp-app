@@ -21,6 +21,7 @@ function getClientIdFromUrl() {
   return params.get("id");
 }
 
+
 function showClientSearchOnly() {
   const searchSection = document.getElementById("clientSearchSection");
   const cardSection = document.getElementById("clientCardSection");
@@ -47,7 +48,6 @@ async function setupClientSearch() {
     .from("Clients")
     .select("id, full_name, phone, city")
     .eq("owner_id", currentUser.id)
-    .is("deleted_at", null)
     .order("full_name", { ascending: true });
 
   if (error) {
