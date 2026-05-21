@@ -139,7 +139,10 @@ function groupByClient(appointments) {
   appointments.forEach((item) => {
     const clientId = item.client_id || "onbekend";
     const clientName = item.client_name || getClientNameFromClients(clientId) || "Onbekende cliënt";
-    const closed = isClientSignalClosed(clientId);
+    const clientRecord = getClientRecord(clientId);
+const closedAt = clientRecord?.signal_closed_at
+  ? new Date(clientRecord.signal_closed_at)
+  : null;
 
     if (!result[clientId]) {
       result[clientId] = {
@@ -186,9 +189,12 @@ const hasSignal =
   });
 }
 
-    if (hasSignal && !closed) {
-      result[clientId].active_signals = 1;
-    }
+   const signalDate = new Date(item.appointment_date || item.created_at);
+const isAfterClosure = closedAt ? signalDate > closedAt : true;
+
+if (hasSignal && isAfterClosure) {
+  result[clientId].active_signals = 1;
+}
 
     if (!result[clientId].latest_visit || item.appointment_date > result[clientId].latest_visit) {
       result[clientId].latest_visit = item.appointment_date;
@@ -200,10 +206,6 @@ const hasSignal =
 
   Object.values(result).forEach((client) => {
     client.signal_tags = [...new Set(client.signal_tags.filter(Boolean))];
-
-    if (isClientSignalClosed(client.client_id)) {
-      client.active_signals = 0;
-    }
   });
 
   return result;
@@ -302,12 +304,12 @@ function renderClients(grouped) {
 }
 
 function getClientStatus(client) {
-  if (isClientSignalClosed(client.client_id)) {
-    return "Signaal afgesloten";
-  }
-
   if (client.active_signals > 0) {
     return "Actie nodig";
+  }
+
+  if (isClientSignalClosed(client.client_id)) {
+    return "Signaal afgesloten";
   }
 
   if (client.total_signals > 0) {
@@ -445,22 +447,26 @@ function normalizeSignalTags(value) {
 }
 
 function getLastImpression(client) {
+  if (client.active_signals > 0) {
+    if (
+      client.latest_person_status === "zorgelijk" ||
+      client.latest_house_status === "zorgelijk"
+    ) {
+      return "zorgelijk";
+    }
+
+    if (
+      client.latest_person_status === "redelijk" ||
+      client.latest_house_status === "rommelig"
+    ) {
+      return "let op";
+    }
+
+    return "actief signaal";
+  }
+
   if (isClientSignalClosed(client.client_id)) {
     return "signaal afgesloten";
-  }
-
-  if (
-    client.latest_person_status === "zorgelijk" ||
-    client.latest_house_status === "zorgelijk"
-  ) {
-    return "zorgelijk";
-  }
-
-  if (
-    client.latest_person_status === "redelijk" ||
-    client.latest_house_status === "rommelig"
-  ) {
-    return "let op";
   }
 
   if (
