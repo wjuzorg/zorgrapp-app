@@ -360,10 +360,6 @@ function renderAppointments(items, clients = []) {
           <button class="btn btn-outline" onclick="window.location.href='./clientkaart.html?id=${item.client_id}'">
             Cliëntenkaart
           </button>
-
-          <button class="btn btn-finish ${filled ? "enabled" : ""}" data-id="${item.id}">
-  Afronden
-</button>
         </div>
       </article>
     `;
