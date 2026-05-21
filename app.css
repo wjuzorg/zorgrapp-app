@@ -2972,3 +2972,78 @@ button.finish-btn:disabled,
     width: 100%;
   }
 }
+
+/* === ZORGRAPP DASHBOARD MOBILE FIX === */
+
+.topbar p {
+  max-width: none;
+  white-space: nowrap;
+}
+
+@media (max-width: 560px) {
+  .container {
+    padding: 18px 14px 32px !important;
+  }
+
+  .topbar {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 14px !important;
+  }
+
+  .topbar h1 {
+    font-size: 40px !important;
+    word-break: normal !important;
+  }
+
+  .topbar p {
+    font-size: 15px !important;
+    white-space: normal !important;
+    max-width: 100% !important;
+  }
+
+  .stats {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+
+  .stats .card {
+    min-height: 115px !important;
+    padding: 16px !important;
+  }
+
+  .stats .card h3 {
+    font-size: 16px !important;
+  }
+
+  .stats .card span {
+    font-size: 30px !important;
+  }
+
+  .weekbar {
+    display: block !important;
+    position: static !important;
+    margin-bottom: 18px !important;
+  }
+
+  .compact-weekdays {
+    display: grid !important;
+    grid-template-columns: repeat(7, 1fr) !important;
+  }
+
+  .settings-nav {
+    position: static !important;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    margin-top: 18px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .settings-nav button {
+    width: 100% !important;
+    font-size: 14px !important;
+    padding: 13px 10px !important;
+  }
+}
