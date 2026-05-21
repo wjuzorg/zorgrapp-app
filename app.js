@@ -470,7 +470,7 @@ async function loadDashboard() {
     allAppointmentsCache = appointments;
 
     const todayAppointments = appointments.filter(item => item.appointment_date === today);
-    todayCountEl.textContent = todayAppointments.length;
+    todayCountEl.textContent = clients.length;
 
     if (todayTitleEl) {
   todayTitleEl.textContent = `Vandaag (${appointmentsListEl.querySelectorAll(".appointment-card").length})`;
