@@ -518,11 +518,17 @@ const saveContactNoteBtn = document.getElementById("saveContactNoteBtn");
 
   renderContactNotes(currentClient.contact_note || "");
 
-  if (currentClient.phone) {
-    callClientBtn.href = `tel:${currentClient.phone}`;
+  if (callClientBtn) {
+  const cleanPhone = String(currentClient.phone || "").replace(/\s+/g, "");
+
+  if (cleanPhone) {
+    callClientBtn.href = `tel:${cleanPhone}`;
+    callClientBtn.textContent = "Bel cliënt";
   } else {
     callClientBtn.href = "#";
+    callClientBtn.textContent = "Geen telefoonnummer bekend";
   }
+}
 
  if (newAppointmentBtn) {
   newAppointmentBtn.href = `./new-client.html?client_id=${currentClient.id}`;
