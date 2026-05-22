@@ -134,6 +134,10 @@ async function loadAppointment() {
   setValue("house_status", data.house_status || "");
   setValue("signal_notes", data.signal_notes || "");
   setValue("payment_type", data.payment_type || "");
+  setValue("funding_reference", data.funding_reference || currentClient?.funding_reference || "");
+setValue("funding_holder_name", data.funding_holder_name || currentClient?.funding_holder_name || "");
+setValue("funding_organization", data.funding_organization || currentClient?.funding_organization || "");
+setValue("funding_period", data.funding_period || currentClient?.funding_period || "");
 
   setSelectedSignals(data.internal_signals || "");
 
@@ -196,6 +200,10 @@ function buildAppointmentPayload(statusValue) {
     signal_notes: val("signal_notes"),
     signal_status: signalStatus || "geen",
     payment_type: val("payment_type") || null,
+    funding_reference: val("funding_reference") || null,
+funding_holder_name: val("funding_holder_name") || null,
+funding_organization: val("funding_organization") || null,
+funding_period: val("funding_period") || null,
     ready_for_invoice: statusValue === "voltooid",
     status: statusValue,
     km: Number(val("km") || 0),
@@ -213,7 +221,13 @@ function buildClientPayload() {
     invoice_address: val("invoice_address"),
     invoice_postal_code: val("invoice_postal_code"),
     invoice_city: val("invoice_city"),
+
     funding_type: val("payment_type") || currentClient?.funding_type || "",
+    funding_reference: val("funding_reference") || currentClient?.funding_reference || "",
+    funding_holder_name: val("funding_holder_name") || currentClient?.funding_holder_name || "",
+    funding_organization: val("funding_organization") || currentClient?.funding_organization || "",
+    funding_period: val("funding_period") || currentClient?.funding_period || "",
+
     updated_at: new Date().toISOString()
   };
 }
@@ -344,6 +358,10 @@ async function createInvoiceDraftFromAppointment() {
       material_cost: materialCost,
       parking_cost: parkingCost,
       payment_type: appointment.payment_type || "particulier",
+      funding_reference: appointment.funding_reference || null,
+funding_holder_name: appointment.funding_holder_name || null,
+funding_organization: appointment.funding_organization || null,
+funding_period: appointment.funding_period || null,
       status: "klaar"
     }]);
 

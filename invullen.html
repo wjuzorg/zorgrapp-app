@@ -151,16 +151,41 @@
         </div>
 
         <div class="section">
-          <h3>Betaling</h3>
+  <h3>Betaling</h3>
 
-          <label class="form-label" for="payment_type">Betalingsvorm</label>
-          <select id="payment_type" class="form-input">
-            <option value="">Kies een optie</option>
-            <option value="particulier">Particulier</option>
-            <option value="pgb">PGB</option>
-            <option value="wmo">Wmo</option>
-          </select>
-        </div>
+  <label class="form-label" for="payment_type">Betalingsvorm</label>
+  <select id="payment_type" class="form-input">
+    <option value="">Kies een optie</option>
+    <option value="particulier">Particulier</option>
+    <option value="pgb">PGB</option>
+    <option value="wmo">Wmo</option>
+  </select>
+
+  <label class="form-label" for="funding_reference">
+    Beschikkingsnummer / referentie
+  </label>
+  <input id="funding_reference" class="form-input" type="text">
+
+  <label class="form-label" for="funding_holder_name">
+    Budgethouder / contactpersoon betaling
+  </label>
+  <input id="funding_holder_name" class="form-input" type="text">
+
+  <label class="form-label" for="funding_organization">
+    Gemeente / SVB / organisatie
+  </label>
+  <input id="funding_organization" class="form-input" type="text">
+
+  <label class="form-label" for="funding_period">
+    Periode Wmo/PGB
+  </label>
+  <input
+    id="funding_period"
+    class="form-input"
+    type="text"
+    placeholder="Bijvoorbeeld: mei 2026"
+  >
+</div>
 
         <div class="section">
           <h3>Factuuradres</h3>
