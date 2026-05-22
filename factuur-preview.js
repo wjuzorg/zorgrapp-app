@@ -456,27 +456,28 @@ ${companyName}`;
     `&body=${body}`;
 
   if (sendCopy && bookkeepingEmail) {
-    gmailUrl += `&cc=${encodeURIComponent(bookkeepingEmail)}`;
+  gmailUrl += `&cc=${encodeURIComponent(bookkeepingEmail)}`;
+}
+
+const alreadySent =
+  currentInvoice.bookkeeper_copy_sent === true ||
+  !!currentInvoice.bookkeeper_copy_sent_at;
+
+if (sendCopy && alreadySent) {
+  const opnieuw = confirm(
+    "Deze factuur is al eerder naar de boekhouder gestuurd.\n\nWilt u opnieuw een kopie naar de boekhouder sturen?"
+  );
+
+  if (!opnieuw) {
+    return;
   }
+}
 
-  const gmailWindow = window.open(gmailUrl, "_blank");
+const gmailWindow = window.open(gmailUrl, "_blank");
 
-  if (!gmailWindow) {
-    window.location.href = gmailUrl;
-  }
-
-  const updateData = {
-    status: "open",
-    sent_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  };
-
-  if (sendCopy && bookkeepingEmail) {
-    updateData.bookkeeper_copy_sent = true;
-    updateData.bookkeeper_copy_sent_at = new Date().toISOString();
-    updateData.bookkeeper_email = bookkeepingEmail;
-    updateData.invoice_changed_after_bookkeeper_sent = false;
-  }
+if (!gmailWindow) {
+  window.location.href = gmailUrl;
+}
 
   const { error } = await supabaseClient
     .from("invoice_drafts")
@@ -506,6 +507,25 @@ async function printAndMarkSent() {
   );
 
   if (!ok) return;
+
+  const updateData = {
+  status: "open",
+  sent_at: new Date().toISOString(),
+  updated_at: new Date().toISOString()
+};
+
+if (sendCopy && bookkeepingEmail) {
+  updateData.bookkeeper_copy_sent = true;
+  updateData.bookkeeper_copy_sent_at = new Date().toISOString();
+  updateData.bookkeeper_email = bookkeepingEmail;
+  updateData.invoice_changed_after_bookkeeper_sent = false;
+}
+
+const { error } = await supabaseClient
+  .from("invoice_drafts")
+  .update(updateData)
+  .eq("owner_id", currentUser.id)
+  .eq("id", currentInvoice.id);
 
   const { error } = await supabaseClient
     .from("invoice_drafts")
