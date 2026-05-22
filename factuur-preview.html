@@ -238,7 +238,7 @@ ${companyName}`
     gmailUrl += `&cc=${encodeURIComponent(bookkeeperEmail)}`;
   }
 
-  window.open(gmailUrl, "_blank");
+  window.location.href = gmailUrl;
 
   const updateData = {
     status: "open",

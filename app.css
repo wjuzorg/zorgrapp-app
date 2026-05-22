@@ -1428,24 +1428,20 @@ body {
 
 @media (max-width: 768px) {
 
-  .invoice-table,
-  .invoice-table tbody,
-  .invoice-table tr,
-  .invoice-table td,
-  .invoice-table th {
-    display: block;
+  .invoice-table {
     width: 100%;
+    border-collapse: collapse;
   }
 
-  .invoice-table tr {
+  .invoice-table th,
+  .invoice-table td {
+    padding: 12px 6px;
+    font-size: 15px;
     border-bottom: 1px solid #e5e7eb;
-    margin-bottom: 14px;
-    padding-bottom: 10px;
   }
 
-  .invoice-table td,
-  .invoice-table th {
-    border-bottom: 1px solid #e5e7eb;
+  .invoice-total {
+    padding-top: 10px;
   }
 }
 
