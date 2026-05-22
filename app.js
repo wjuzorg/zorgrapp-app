@@ -667,7 +667,8 @@ const amount = laborAmount + kmAmount + materialCost + parkingCost;
   km_amount: kmAmount,
   material_cost: materialCost,
   parking_cost: parkingCost,
-  status: "klaar"
+payment_type: appointment.payment_type || "particulier",
+status: "klaar"
 }]);
 
     if (insertError) {
