@@ -431,6 +431,10 @@ ${companyIban ? `IBAN: ${companyIban}` : ""}`
     `&su=${subject}` +
     `&body=${body}`;
 
+    const alreadySent =
+  currentInvoice.bookkeeper_copy_sent === true ||
+  !!currentInvoice.bookkeeper_copy_sent_at;
+
   const alreadySent =
   currentInvoice.bookkeeper_copy_sent === true ||
   !!currentInvoice.bookkeeper_copy_sent_at;
