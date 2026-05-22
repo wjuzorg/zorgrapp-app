@@ -25,7 +25,7 @@ function formatEuro(value) {
 
 function getInvoiceNumberFromUrl() {
   const params = new URLSearchParams(window.location.search);
-  return params.get("invoice") || "#2026-TEST";
+  return params.get("invoice") || "";
 }
 
 function formatToday() {
@@ -37,6 +37,7 @@ async function initInvoicePreview() {
 
   if (error || !data.session?.user) {
     alert("U bent niet ingelogd.");
+    window.location.href = "./login.html";
     return;
   }
 
@@ -46,33 +47,9 @@ async function initInvoicePreview() {
   await loadInvoiceDraft();
   await loadClientFromInvoice();
 
+  if (!currentInvoice) return;
+
   fillInvoicePreview();
-}
-
-function getVatText(profile) {
-
-  if (!profile) return "";
-
-  if (profile.vat_status === "vrijgesteld") {
-    return profile.vat_text || "BTW vrijgesteld van omzetbelasting volgens geldende vrijstelling.";
-  }
-
-  if (profile.vat_status === "kor") {
-    return "Er wordt geen btw berekend vanwege toepassing van de kleineondernemersregeling (KOR).";
-  }
-
-  if (profile.vat_status === "verlegd") {
-    return `
-      BTW verlegd naar afnemer.<br>
-      BTW-nummer afnemer: ${profile.vat_customer_number || "-"}
-    `;
-  }
-
-  if (profile.vat_status === "btw_plichtig") {
-    return "BTW-plichtig. Btw-berekening wordt later toegevoegd.";
-  }
-
-  return "";
 }
 
 async function loadBusinessProfile() {
@@ -80,42 +57,40 @@ async function loadBusinessProfile() {
     .from("business_profiles")
     .select("*")
     .eq("owner_id", currentUser.id)
-    .single();
+    .maybeSingle();
 
   if (error) {
     alert("Bedrijfsprofiel laden mislukt: " + error.message);
     return;
   }
 
-  currentProfile = data;
+  currentProfile = data || {};
 }
 
 async function loadInvoiceDraft() {
   const invoiceNumber = getInvoiceNumberFromUrl();
 
-  const { data, error } = await supabaseClient
-  .from("invoice_drafts")
-  .select("*")
-  .eq("owner_id", currentUser.id)
-  .eq("invoice_number", invoiceNumber)
-  .order("created_at", { ascending: false })
-  .limit(1)
-  .maybesingle();
-
-  if (error) {
-    alert("Factuur laden mislukt: " + error.message);
+  if (!invoiceNumber) {
+    alert("Geen factuurnummer gevonden in de link.");
     return;
   }
 
-  currentInvoice = data || {
-    invoice_number: invoiceNumber,
-    client_name: "Dhr. Test",
-    client_email: "test@email.nl",
-    description: "Praktische ondersteuning aan huis",
-    minutes: 220,
-    amount: 110,
-    total: 110
-  };
+  const { data, error } = await supabaseClient
+    .from("invoice_drafts")
+    .select("*")
+    .eq("owner_id", currentUser.id)
+    .eq("invoice_number", invoiceNumber)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .single();
+
+  if (error || !data) {
+    alert("Factuur laden mislukt: " + (error?.message || "Factuur niet gevonden."));
+    console.error("Factuur niet gevonden:", invoiceNumber, error);
+    return;
+  }
+
+  currentInvoice = data;
 }
 
 async function loadClientFromInvoice() {
@@ -133,7 +108,29 @@ async function loadClientFromInvoice() {
     return;
   }
 
-  currentClient = data;
+  currentClient = data || {};
+}
+
+function getVatText() {
+  const profile = currentProfile || {};
+
+  if (profile.vat_status === "vrijgesteld") {
+    return profile.vat_text || "BTW vrijgesteld van omzetbelasting volgens geldende vrijstelling.";
+  }
+
+  if (profile.vat_status === "kor") {
+    return "Er wordt geen btw berekend vanwege toepassing van de kleineondernemersregeling (KOR).";
+  }
+
+  if (profile.vat_status === "verlegd") {
+    return `BTW verlegd naar afnemer. BTW-nummer afnemer: ${profile.vat_customer_number || "-"}`;
+  }
+
+  if (profile.vat_status === "btw_plichtig") {
+    return "BTW-plichtig. Btw-berekening wordt later toegevoegd.";
+  }
+
+  return profile.vat_text || "BTW vrijgesteld van omzetbelasting volgens geldende vrijstelling.";
 }
 
 function getClientName() {
@@ -141,7 +138,7 @@ function getClientName() {
     currentClient?.invoice_name ||
     currentClient?.full_name ||
     currentInvoice?.client_name ||
-    "Dhr. Test";
+    "Cliënt";
 
   const salutation = currentClient?.salutation;
 
@@ -157,22 +154,20 @@ function getClientName() {
 }
 
 function fillInvoicePreview() {
-  const invoiceNumber = currentInvoice?.invoice_number || getInvoiceNumberFromUrl();
-  const amount = currentInvoice?.amount || 0;
-  const total = currentInvoice?.total || amount;
+  const invoiceNumber = currentInvoice.invoice_number;
+  const total = getInvoiceTotal();
 
   setText("companyName", currentProfile?.company_name || "Bedrijfsnaam");
   setText("companyOwner", currentProfile?.owner_name || "");
-  setText("companyKvk", currentProfile?.kvk_number || "");
-  setText("companyIban", currentProfile?.iban || "");
   setText("companyAddressLine", currentProfile?.company_address || "");
   setText(
     "companyCityLine",
     `${currentProfile?.company_postcode || ""} ${currentProfile?.company_city || ""}`.trim()
   );
+  setText("companyKvk", currentProfile?.kvk_number || "-");
   setText("companyBtw", currentProfile?.btw_number || "-");
+  setText("companyIban", currentProfile?.iban || "-");
 
-  setText("invoiceVatText", currentProfile?.vat_text || "");
   setText("invoiceNumber", invoiceNumber);
   setText("invoiceDate", formatToday());
 
@@ -208,10 +203,8 @@ function fillInvoicePreview() {
       ""
   );
 
-  setText("invoiceDescription", currentInvoice?.description || "Praktische ondersteuning aan huis");
-  setText("invoiceMinutes", currentInvoice?.minutes || "");
-  setText("invoiceAmount", formatEuro(amount));
   setText("invoiceTotal", formatEuro(total));
+  setText("invoiceVatText", getVatText());
 
   const paymentDays = currentProfile?.payment_term_days || 14;
   setText(
@@ -220,6 +213,23 @@ function fillInvoicePreview() {
   );
 
   renderInvoiceLines();
+  renderFundingText();
+}
+
+function getInvoiceTotal() {
+  const minutes = Number(currentInvoice.minutes || 0);
+  const hourlyRate = Number(currentInvoice.hourly_rate || 0);
+  const laborAmount = Number(currentInvoice.amount || ((minutes / 60) * hourlyRate));
+
+  const kmAmount = Number(currentInvoice.km_amount || 0);
+  const materialCost = Number(currentInvoice.material_cost || 0);
+  const parkingCost = Number(currentInvoice.parking_cost || 0);
+
+  return Number(
+    currentInvoice.total ||
+    currentInvoice.total_amount ||
+    laborAmount + kmAmount + materialCost + parkingCost
+  );
 }
 
 function renderInvoiceLines() {
@@ -228,28 +238,27 @@ function renderInvoiceLines() {
 
   const minutes = Number(currentInvoice.minutes || 0);
   const hourlyRate = Number(currentInvoice.hourly_rate || 0);
-  const laborAmount = (minutes / 60) * hourlyRate;
+  const laborAmount = Number(currentInvoice.amount || ((minutes / 60) * hourlyRate));
 
   const km = Number(currentInvoice.km || 0);
   const kmAmount = Number(currentInvoice.km_amount || 0);
   const materialCost = Number(currentInvoice.material_cost || 0);
   const parkingCost = Number(currentInvoice.parking_cost || 0);
-  const invoiceVatText = document.getElementById("invoiceVatText");
 
   let rows = `
-  <tr>
-    <td><span id="invoiceDescription">${currentInvoice.description || "Praktische ondersteuning"}</span></td>
-    <td><span id="invoiceMinutes">${minutes}</span> minuten</td>
-    <td><span id="invoiceAmount">${formatEuro(laborAmount)}</span></td>
-  </tr>
-`;
+    <tr>
+      <td><span id="invoiceDescription">${currentInvoice.description || "Praktische ondersteuning"}</span></td>
+      <td><span id="invoiceMinutes">${minutes}</span> minuten</td>
+      <td><span id="invoiceAmount">${formatEuro(laborAmount)}</span></td>
+    </tr>
+  `;
 
   if (km > 0 || kmAmount > 0) {
     rows += `
       <tr>
         <td>Kilometervergoeding (${km} km × €0,23)</td>
         <td>${km} km</td>
-        <td>${formateuro(kmAmount)}</td>
+        <td>${formatEuro(kmAmount)}</td>
       </tr>
     `;
   }
@@ -274,15 +283,40 @@ function renderInvoiceLines() {
     `;
   }
 
-  if (invoiceVatText && currentProfile) {
-  invoiceVatText.innerHTML = getVatText(currentProfile);
-}
-
-if (invoiceVatText && currentProfile) {
-  invoiceVatText.innerHTML = getVatText(currentProfile);
-}
-
   tbody.innerHTML = rows;
+}
+
+function renderFundingText() {
+  const box = document.getElementById("invoiceFundingText");
+  if (!box) return;
+
+  const paymentType = currentInvoice.payment_type || "particulier";
+
+  if (paymentType === "wmo") {
+    box.innerHTML = `
+      <p><strong>Betaalvorm:</strong> Wmo</p>
+      <p>Ondersteuning geleverd op basis van maatschappelijke ondersteuning / Wmo.</p>
+      <p>BTW vrijgesteld van omzetbelasting voor maatschappelijke ondersteuning, indien de cliënt hiervoor volgens de Wmo is aangewezen.</p>
+      ${currentInvoice.funding_reference ? `<p><strong>Referentie/beschikking:</strong> ${currentInvoice.funding_reference}</p>` : ""}
+      ${currentInvoice.funding_organization ? `<p><strong>Gemeente / organisatie:</strong> ${currentInvoice.funding_organization}</p>` : ""}
+      ${currentInvoice.funding_period ? `<p><strong>Periode:</strong> ${currentInvoice.funding_period}</p>` : ""}
+    `;
+    return;
+  }
+
+  if (paymentType === "pgb") {
+    box.innerHTML = `
+      <p><strong>Betaalvorm:</strong> PGB</p>
+      <p>Declaratie/factuur voor geleverde ondersteuning vanuit persoonsgebonden budget (PGB).</p>
+      ${currentInvoice.funding_holder_name ? `<p><strong>Budgethouder:</strong> ${currentInvoice.funding_holder_name}</p>` : ""}
+      ${currentInvoice.funding_reference ? `<p><strong>PGB-referentie:</strong> ${currentInvoice.funding_reference}</p>` : ""}
+      ${currentInvoice.funding_organization ? `<p><strong>SVB / organisatie:</strong> ${currentInvoice.funding_organization}</p>` : ""}
+      ${currentInvoice.funding_period ? `<p><strong>Periode:</strong> ${currentInvoice.funding_period}</p>` : ""}
+    `;
+    return;
+  }
+
+  box.innerHTML = "";
 }
 
 function enableInvoiceEdit() {
@@ -320,8 +354,10 @@ async function saveInvoiceDraft() {
   }
 
   const invoiceNumber = getText("invoiceNumber") || currentInvoice.invoice_number;
+
   const amountNumber =
     Number(getText("invoiceAmount").replace("€", "").replace(",", ".").trim()) || 0;
+
   const totalNumber =
     Number(getText("invoiceTotal").replace("€", "").replace(",", ".").trim()) || amountNumber;
 
@@ -339,35 +375,21 @@ async function saveInvoiceDraft() {
     payload.invoice_changed_after_bookkeeper_sent = true;
   }
 
-  let query = supabaseClient
+  const { error } = await supabaseClient
     .from("invoice_drafts")
     .update(payload)
-    .eq("owner_id", currentUser.id);
-
-  if (getInvoiceId()) {
-    query = query.eq("id", getInvoiceId());
-  } else {
-    query = query.eq("invoice_number", currentInvoice.invoice_number);
-  }
-
-  const { error } = await query;
+    .eq("owner_id", currentUser.id)
+    .eq("id", currentInvoice.id);
 
   if (error) {
     alert("Opslaan mislukt: " + error.message);
     return;
   }
 
+  currentInvoice = { ...currentInvoice, ...payload };
+
   alert("Wijzigingen opgeslagen.");
   disableInvoiceEdit();
-
-  currentInvoice = {
-    ...currentInvoice,
-    ...payload
-  };
-}
-
-function getInvoiceId() {
-  return currentInvoice?.id || null;
 }
 
 async function sendInvoiceEmail() {
@@ -378,18 +400,18 @@ async function sendInvoiceEmail() {
 
   const companyName = currentProfile?.company_name || "ZorgRapp";
   const companyIban = currentProfile?.iban || "";
-  const clientName = currentInvoice.client_name || "cliënt";
+  const clientName = getClientName();
   const invoiceNumber = currentInvoice.invoice_number || "";
-  const amount = formatEuro(currentInvoice.total || currentInvoice.amount || 0);
+  const amount = formatEuro(getInvoiceTotal());
 
   const visibleEmail =
     document.getElementById("invoiceClientEmail")?.textContent?.trim();
 
   const email =
-    currentInvoice.client_email ||
-    currentInvoice.email ||
-    currentInvoice.invoice_email ||
-    currentInvoice.billing_email ||
+    currentClient?.invoice_email ||
+    currentClient?.email ||
+    currentClient?.client_email ||
+    currentInvoice?.client_email ||
     visibleEmail ||
     "";
 
@@ -407,9 +429,7 @@ async function sendInvoiceEmail() {
     currentProfile?.boekhouder_email ||
     "";
 
-  const subject = encodeURIComponent(`Factuur ${invoiceNumber}`);
-
-  const body = encodeURIComponent(
+  let bodyText =
 `Beste ${clientName},
 
 Hierbij ontvangt u uw factuur.
@@ -420,10 +440,14 @@ Bedrag: ${amount}
 Wij verzoeken u vriendelijk het bedrag binnen ${currentProfile?.payment_term_days || 14} dagen te voldoen.
 
 Met vriendelijke groet,
+${companyName}`;
 
-${companyName}
-${companyIban ? `IBAN: ${companyIban}` : ""}`
-  );
+  if (companyIban) {
+    bodyText += `\nIBAN: ${companyIban}`;
+  }
+
+  const subject = encodeURIComponent(`Factuur ${invoiceNumber}`);
+  const body = encodeURIComponent(bodyText);
 
   let gmailUrl =
     `https://mail.google.com/mail/?view=cm` +
@@ -431,25 +455,15 @@ ${companyIban ? `IBAN: ${companyIban}` : ""}`
     `&su=${subject}` +
     `&body=${body}`;
 
-const alreadySent =
-  currentInvoice.bookkeeper_copy_sent === true ||
-  !!currentInvoice.bookkeeper_copy_sent_at;
-
-if (sendCopy && alreadySent) {
-  const opnieuw = confirm(
-    "Deze factuur is al eerder naar de boekhouder gestuurd.\n\nWilt u opnieuw een kopie naar de boekhouder sturen?"
-  );
-
-  if (!opnieuw) {
-    return;
+  if (sendCopy && bookkeepingEmail) {
+    gmailUrl += `&cc=${encodeURIComponent(bookkeepingEmail)}`;
   }
-}
 
-const gmailWindow = window.open(gmailUrl, "_blank");
+  const gmailWindow = window.open(gmailUrl, "_blank");
 
-if (!gmailWindow) {
-  window.location.href = gmailUrl;
-}
+  if (!gmailWindow) {
+    window.location.href = gmailUrl;
+  }
 
   const updateData = {
     status: "open",
@@ -464,18 +478,11 @@ if (!gmailWindow) {
     updateData.invoice_changed_after_bookkeeper_sent = false;
   }
 
-  let query = supabaseClient
+  const { error } = await supabaseClient
     .from("invoice_drafts")
     .update(updateData)
-    .eq("owner_id", currentUser.id);
-
-  if (getInvoiceId()) {
-    query = query.eq("id", getInvoiceId());
-  } else {
-    query = query.eq("invoice_number", invoiceNumber);
-  }
-
-  const { error } = await query;
+    .eq("owner_id", currentUser.id)
+    .eq("id", currentInvoice.id);
 
   if (error) {
     alert("Status aanpassen mislukt: " + error.message);
@@ -483,27 +490,7 @@ if (!gmailWindow) {
   }
 
   alert("Gmail geopend. Factuur staat nu bij Wacht op betaling.");
-}
-
-async function markInvoiceAsOpen() {
-  const invoiceNumber = getText("invoiceNumber") || getInvoiceNumberFromUrl();
-
-  const { error } = await supabaseClient
-    .from("invoice_drafts")
-    .update({
-      status: "open",
-      sent_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    })
-    .eq("owner_id", currentUser.id)
-    .eq("invoice_number", invoiceNumber);
-
-  if (error) {
-    alert("Status aanpassen mislukt: " + error.message);
-    return false;
-  }
-
-  return true;
+  window.location.href = "facturen.html";
 }
 
 async function printAndMarkSent() {
@@ -520,8 +507,6 @@ async function printAndMarkSent() {
 
   if (!ok) return;
 
-  const invoiceNumber = currentInvoice.invoice_number;
-
   const { error } = await supabaseClient
     .from("invoice_drafts")
     .update({
@@ -530,7 +515,7 @@ async function printAndMarkSent() {
       updated_at: new Date().toISOString()
     })
     .eq("owner_id", currentUser.id)
-    .eq("invoice_number", invoiceNumber);
+    .eq("id", currentInvoice.id);
 
   if (error) {
     alert("Status aanpassen mislukt: " + error.message);
@@ -538,7 +523,6 @@ async function printAndMarkSent() {
   }
 
   alert("Factuur staat nu bij Wacht op betaling.");
-
   window.location.href = "facturen.html";
 }
 
