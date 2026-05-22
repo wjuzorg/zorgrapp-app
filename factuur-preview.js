@@ -80,7 +80,7 @@ async function loadBusinessProfile() {
     .from("business_profiles")
     .select("*")
     .eq("owner_id", currentUser.id)
-    .Single();
+    .single();
 
   if (error) {
     alert("Bedrijfsprofiel laden mislukt: " + error.message);
