@@ -1426,6 +1426,29 @@ body {
   line-height: 1.5;
 }
 
+@media (max-width: 768px) {
+
+  .invoice-table,
+  .invoice-table tbody,
+  .invoice-table tr,
+  .invoice-table td,
+  .invoice-table th {
+    display: block;
+    width: 100%;
+  }
+
+  .invoice-table tr {
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+  }
+
+  .invoice-table td,
+  .invoice-table th {
+    border-bottom: 1px solid #e5e7eb;
+  }
+}
+
 .invoice-total {
   margin-top: 30px;
   padding-top: 20px;

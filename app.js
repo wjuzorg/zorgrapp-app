@@ -452,6 +452,7 @@ async function loadDashboard() {
   .eq("owner_id", currentUser.id)
   .neq("status", "verwijderd")
   .neq("status", "afgerond")
+  .neq("status", "voltooid")
   .order("appointment_date", { ascending: true })
   .order("appointment_time", { ascending: true });
 
