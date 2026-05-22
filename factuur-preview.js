@@ -539,11 +539,7 @@ async function sendInvoice() {
     alert("Verzenden mislukt: " + error.message);
     return;
   }
-function sendInvoiceEmail() {
-  if (!currentInvoice) {
-    alert("Geen factuur geladen.");
-    return;
-  }
+
 
   const clientName = currentInvoice.client_name || "cliënt";
   const email = currentInvoice.client_email || "";
