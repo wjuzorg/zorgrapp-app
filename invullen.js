@@ -370,7 +370,7 @@ async function createInvoiceDraftFromAppointment() {
 
   alert("Factuur is aangemaakt. U vindt deze terug bij Facturen.");
 
-  window.location.href = "./facturen.html";
+  window.location.href = "./index.html";
 });
 
   el("saveDraftBtn")?.addEventListener("click", async () => {
