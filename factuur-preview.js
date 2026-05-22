@@ -100,7 +100,7 @@ async function loadInvoiceDraft() {
   .eq("invoice_number", invoiceNumber)
   .order("created_at", { ascending: false })
   .limit(1)
-  .single();
+  .maybesingle();
 
   if (error) {
     alert("Factuur laden mislukt: " + error.message);
@@ -431,11 +431,7 @@ ${companyIban ? `IBAN: ${companyIban}` : ""}`
     `&su=${subject}` +
     `&body=${body}`;
 
-    const alreadySent =
-  currentInvoice.bookkeeper_copy_sent === true ||
-  !!currentInvoice.bookkeeper_copy_sent_at;
-
-  const alreadySent =
+const alreadySent =
   currentInvoice.bookkeeper_copy_sent === true ||
   !!currentInvoice.bookkeeper_copy_sent_at;
 
@@ -449,7 +445,7 @@ if (sendCopy && alreadySent) {
   }
 }
 
-  const gmailWindow = window.open(gmailUrl, "_blank");
+const gmailWindow = window.open(gmailUrl, "_blank");
 
 if (!gmailWindow) {
   window.location.href = gmailUrl;
