@@ -294,20 +294,84 @@ document.addEventListener("DOMContentLoaded", async () => {
   el("invoice_same_as_client_address")?.addEventListener("change", toggleInvoiceFields);
   el("signal_status")?.addEventListener("change", applySignalStatusBehavior);
 
+async function createInvoiceDraftFromAppointment() {
+  const { data: appointment, error: appointmentError } = await supabaseClient
+    .from("Appointments")
+    .select("*")
+    .eq("id", appointmentId)
+    .eq("owner_id", currentUser.id)
+    .maybeSingle();
+
+  if (appointmentError || !appointment) {
+    showMessage("Afspraak ophalen voor factuur mislukt.", true);
+    return false;
+  }
+
+  const { data: existing } = await supabaseClient
+    .from("invoice_drafts")
+    .select("id")
+    .eq("appointment_id", appointmentId)
+    .maybeSingle();
+
+  if (existing) {
+    return true;
+  }
+
+  const minutes = Number(appointment.worked_minutes || appointment.duration_minutes || 0);
+  const hourlyRate = Number(currentClient?.hourly_rate || 49);
+  const amount = (minutes / 60) * hourlyRate;
+
+  const km = Number(appointment.km || 0);
+  const kmAmount = Number(appointment.km_amount || 0);
+  const materialCost = Number(appointment.material_cost || 0);
+  const parkingCost = Number(appointment.parking_cost || 0);
+
+  const invoiceNumber = `TEST-${Date.now()}`;
+
+  const { error: insertError } = await supabaseClient
+    .from("invoice_drafts")
+    .insert([{
+      owner_id: appointment.owner_id,
+      client_id: appointment.client_id,
+      client_name: appointment.client_name,
+      appointment_id: appointment.id,
+      invoice_number: invoiceNumber,
+      minutes,
+      hourly_rate: hourlyRate,
+      amount,
+      km,
+      km_amount: kmAmount,
+      material_cost: materialCost,
+      parking_cost: parkingCost,
+      payment_type: appointment.payment_type || "particulier",
+      status: "klaar"
+    }]);
+
+  if (insertError) {
+    showMessage("Factuur maken mislukt: " + insertError.message, true);
+    return false;
+  }
+
+  return true;
+}
+
   el("fillForm")?.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    showMessage("Afronden...");
+  showMessage("Afspraak afronden...");
 
-    const ok = await saveAppointment("ingevuld");
-    if (!ok) return;
+  const saved = await saveAppointment("voltooid");
+  if (!saved) return;
 
-    showMessage("Afspraak ingevuld. U kunt nu afronden op het dashboard.");
+  showMessage("Factuur wordt aangemaakt...");
 
-    setTimeout(() => {
-      window.location.href = "./index.html";
-    }, 800);
-  });
+  const invoiceOk = await createInvoiceDraftFromAppointment();
+  if (!invoiceOk) return;
+
+  alert("Factuur is aangemaakt. U vindt deze terug bij Facturen.");
+
+  window.location.href = "./facturen.html";
+});
 
   el("saveDraftBtn")?.addEventListener("click", async () => {
     showMessage("Concept opslaan...");
