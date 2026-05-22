@@ -249,7 +249,7 @@ function renderInvoiceLines() {
       <tr>
         <td>Kilometervergoeding (${km} km × €0,23)</td>
         <td>${km} km</td>
-        <td>${euro(kmAmount)}</td>
+        <td>${formateuro(kmAmount)}</td>
       </tr>
     `;
   }
@@ -380,7 +380,7 @@ async function sendInvoiceEmail() {
   const companyIban = currentProfile?.iban || "";
   const clientName = currentInvoice.client_name || "cliënt";
   const invoiceNumber = currentInvoice.invoice_number || "";
-  const amount = euro(currentInvoice.total || currentInvoice.amount || 0);
+  const amount = formatEuro(currentInvoice.total || currentInvoice.amount || 0);
 
   const visibleEmail =
     document.getElementById("invoiceClientEmail")?.textContent?.trim();
@@ -506,73 +506,6 @@ async function markInvoiceAsOpen() {
   return true;
 }
 
-async function sendInvoice() {
-  const { data: sessionData } = await supabaseClient.auth.getSession();
-  const user = sessionData?.session?.user;
-
-  if (!user) {
-    alert("Niet ingelogd");
-    return;
-  }
-
-  const invoiceNumber = document
-    .getElementById("invoiceNumber")
-    ?.textContent?.replace("Factuurnummer:", "")
-    .trim();
-
-  if (!invoiceNumber) {
-    alert("Factuurnummer niet gevonden");
-    return;
-  }
-
-  const { error } = await supabaseClient
-    .from("invoice_drafts")
-    .update({
-      status: "open",
-      sent_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    })
-    .eq("owner_id", user.id)
-    .eq("invoice_number", invoiceNumber);
-
-  if (error) {
-    alert("Verzenden mislukt: " + error.message);
-    return;
-  }
-
-
-  const clientName = currentInvoice.client_name || "cliënt";
-  const email = currentInvoice.client_email || "";
-  const invoiceNumber = currentInvoice.invoice_number || "";
-  const amount = `€${Number(currentInvoice.total || 0).toFixed(2).replace(".", ",")}`;
-
-  const subject = encodeURIComponent(`Factuur ${invoiceNumber}`);
-
-  const body = encodeURIComponent(
-`Beste ${clientName},
-
-Hierbij ontvangt u uw factuur.
-
-Factuurnummer: ${invoiceNumber}
-Bedrag: ${amount}
-
-Wij verzoeken u vriendelijk het bedrag binnen 14 dagen te voldoen.
-
-Met vriendelijke groet,
-${currentInvoice.company_name || "WJU Zorg"}`
-  );
-
-  // 👉 Gmail openen
-  window.location.href = `https://mail.google.com/mail/?view=cm&to=${email}&su=${subject}&body=${body}`;
-
-  // 👉 status aanpassen
-  markAsSent(invoiceNumber);
-}
-  
-
-  window.location.href = "facturen.html";
-}
-
 async function printAndMarkSent() {
   if (!currentInvoice) {
     alert("Geen factuur geladen.");
@@ -581,7 +514,9 @@ async function printAndMarkSent() {
 
   window.print();
 
-  const ok = confirm("Is de factuur geprint of opgeslagen als PDF en klaar om per post te versturen?");
+  const ok = confirm(
+    "Is de factuur geprint of opgeslagen als PDF en klaar om per post te versturen?"
+  );
 
   if (!ok) return;
 
@@ -603,6 +538,7 @@ async function printAndMarkSent() {
   }
 
   alert("Factuur staat nu bij Wacht op betaling.");
+
   window.location.href = "facturen.html";
 }
 
