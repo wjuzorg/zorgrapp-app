@@ -540,15 +540,6 @@ const { error } = await supabaseClient
   .eq("owner_id", currentUser.id)
   .eq("id", currentInvoice.id);
 
-  const { error } = await supabaseClient
-    .from("invoice_drafts")
-    .update({
-      status: "open",
-      sent_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    })
-    .eq("owner_id", currentUser.id)
-    .eq("id", currentInvoice.id);
 
   if (error) {
     alert("Status aanpassen mislukt: " + error.message);
