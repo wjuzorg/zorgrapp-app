@@ -267,29 +267,31 @@ const fridayMessages = [
 
 async function setWelcomeText(user) {
   let name = "Gebruiker";
-
-  if (user?.email) {
-    name = user.email.split("@")[0];
-    name = name.charAt(0).toUpperCase() + name.slice(1);
-  }
+  let displayEmail = user?.email || "";
 
   try {
     if (user?.id) {
-      const { data: profileRows, error } = await supabaseClient
-        .from("profiles")
-        .select("full_name")
-        .eq("user_id", user.id)
-        .limit(1);
+      const { data: businessProfile, error } = await supabaseClient
+        .from("business_profiles")
+        .select("owner_name, company_name")
+        .eq("owner_id", user.id)
+        .maybeSingle();
 
-      if (!error && profileRows && profileRows.length > 0) {
-        const dbName = profileRows[0].full_name;
-        if (dbName && dbName.trim() !== "") {
-          name = dbName.trim();
+      if (!error && businessProfile) {
+        if (businessProfile.owner_name && businessProfile.owner_name.trim() !== "") {
+          name = businessProfile.owner_name.trim();
+        } else if (businessProfile.company_name && businessProfile.company_name.trim() !== "") {
+          name = businessProfile.company_name.trim();
         }
       }
     }
   } catch (err) {
-    console.error("Profiel laden mislukt:", err);
+    console.error("Bedrijfsprofiel laden mislukt:", err);
+  }
+
+  if (name === "Gebruiker" && user?.email) {
+    name = user.email.split("@")[0];
+    name = name.charAt(0).toUpperCase() + name.slice(1);
   }
 
   if (welcomeTitleEl) {
@@ -304,8 +306,8 @@ async function setWelcomeText(user) {
     btnUserProfile.textContent = name;
   }
 
-  if (profileEmail && user?.email) {
-    profileEmail.textContent = user.email;
+  if (profileEmail) {
+    profileEmail.textContent = displayEmail;
   }
 }
 
