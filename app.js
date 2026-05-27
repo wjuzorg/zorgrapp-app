@@ -699,7 +699,7 @@ async function startApp() {
 
   await checkProcessorAgreement(user.id);
 
-  await setWelcomeText(currentUser);
+  await setWelcomeText(user);
   await loadDashboard();
 }
 
