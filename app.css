@@ -3138,20 +3138,21 @@ button.finish-btn:disabled,
   white-space: nowrap;
 }
 
-.forgot-btn {
-  width: 100%;
-  margin-top: 14px;
-  border: 1px solid #e5e7eb;
-  background: #f9fafb;
-  color: #374151;
-  border-radius: 14px;
-  padding: 13px 16px;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: 0.2s;
+button.forgot-btn {
+  width: 100% !important;
+  display: block !important;
+  margin-top: 14px !important;
+  border: 1px solid #e5e7eb !important;
+  background: #f9fafb !important;
+  color: #374151 !important;
+  border-radius: 14px !important;
+  padding: 13px 16px !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: 0.2s !important;
 }
 
-.forgot-btn:hover {
-  background: #f3f4f6;
+button.forgot-btn:hover {
+  background: #f3f4f6 !important;
 }
