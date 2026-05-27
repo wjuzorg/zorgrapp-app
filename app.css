@@ -3078,3 +3078,47 @@ button.finish-btn:disabled,
 #saveClientEditBtn:hover {
   background: #1e293b;
 }
+
+@media (max-width: 768px) {
+  .topbar h1 {
+    font-size: 3rem;
+    line-height: 1.05;
+    word-break: break-word;
+  }
+
+  .topbar p {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .report-header {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .company-block,
+  .report-meta {
+    width: 100%;
+  }
+
+  .report-meta p {
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+}
+
+@media (max-width: 768px) {
+  .company-block,
+  .report-meta,
+  #companyInfo {
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  #companyInfo {
+    line-height: 1.5;
+    font-size: 0.98rem;
+  }
+}
