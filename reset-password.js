@@ -1,11 +1,34 @@
 const SUPABASE_URL = "https://bqqoxawgjxxvolljkqnp.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxcW94YXdnanh4dm9sbGprcW5wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODc0OTMsImV4cCI6MjA5MjA2MzQ5M30.WLTELxD32HFtyV1pbsB-60nF_k4Zq7DSvaR87-kj2es";
 
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const newPasswordEl = document.getElementById("newPassword");
 const savePasswordBtn = document.getElementById("savePasswordBtn");
 const msgEl = document.getElementById("msg");
+
+async function restoreRecoverySession() {
+  const hash = window.location.hash;
+
+  if (!hash) return;
+
+  const params = new URLSearchParams(hash.substring(1));
+  const access_token = params.get("access_token");
+  const refresh_token = params.get("refresh_token");
+
+  if (access_token && refresh_token) {
+    const { error } = await supabaseClient.auth.setSession({
+      access_token,
+      refresh_token
+    });
+
+    if (error) {
+      msgEl.textContent = "De resetlink is verlopen of ongeldig.";
+    }
+  }
+}
+
+restoreRecoverySession();
 
 savePasswordBtn.addEventListener("click", async () => {
   const newPassword = newPasswordEl.value;
@@ -30,5 +53,5 @@ savePasswordBtn.addEventListener("click", async () => {
 
   setTimeout(() => {
     window.location.href = "./login.html";
-  }, 1800);
+  }, 1500);
 });
