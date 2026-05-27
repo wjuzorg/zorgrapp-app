@@ -3122,3 +3122,18 @@ button.finish-btn:disabled,
     font-size: 0.98rem;
   }
 }
+
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-wrap table {
+  min-width: 720px;
+}
+
+.table-wrap th,
+.table-wrap td {
+  white-space: nowrap;
+}
