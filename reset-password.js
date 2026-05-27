@@ -7,28 +7,37 @@ const newPasswordEl = document.getElementById("newPassword");
 const savePasswordBtn = document.getElementById("savePasswordBtn");
 const msgEl = document.getElementById("msg");
 
-async function restoreRecoverySession() {
-  const hash = window.location.hash;
+supabaseClient.auth.onAuthStateChange(async (event, session) => {
+  if (event === "PASSWORD_RECOVERY") {
+    msgEl.textContent = "Resetlink herkend. Kies een nieuw wachtwoord.";
+  }
+});
 
-  if (!hash) return;
+async function restoreSessionFromUrl() {
+  const hash = window.location.hash.substring(1);
+  const params = new URLSearchParams(hash);
 
-  const params = new URLSearchParams(hash.substring(1));
   const access_token = params.get("access_token");
   const refresh_token = params.get("refresh_token");
 
-  if (access_token && refresh_token) {
-    const { error } = await supabaseClient.auth.setSession({
-      access_token,
-      refresh_token
-    });
+  if (!access_token || !refresh_token) {
+    msgEl.textContent = "Open deze pagina via de resetlink uit je e-mail.";
+    return;
+  }
 
-    if (error) {
-      msgEl.textContent = "De resetlink is verlopen of ongeldig.";
-    }
+  const { error } = await supabaseClient.auth.setSession({
+    access_token,
+    refresh_token
+  });
+
+  if (error) {
+    msgEl.textContent = "De resetlink is verlopen of ongeldig.";
+  } else {
+    msgEl.textContent = "Resetlink herkend. Kies een nieuw wachtwoord.";
   }
 }
 
-restoreRecoverySession();
+restoreSessionFromUrl();
 
 savePasswordBtn.addEventListener("click", async () => {
   const newPassword = newPasswordEl.value;
