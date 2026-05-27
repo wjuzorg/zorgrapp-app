@@ -100,4 +100,28 @@ submitBtn.addEventListener("click", async () => {
   setMode("login");
 });
 
+const forgotPasswordBtn = document.getElementById("forgotPasswordBtn");
+
+forgotPasswordBtn?.addEventListener("click", async () => {
+  const email = emailEl.value.trim();
+
+  if (!email) {
+    msgEl.textContent = "Vul eerst je e-mailadres in.";
+    return;
+  }
+
+  msgEl.textContent = "Resetmail versturen...";
+
+  const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+    redirectTo: "https://app.zorgrapp.nl/reset-password.html"
+  });
+
+  if (error) {
+    msgEl.textContent = `Fout: ${error.message}`;
+    return;
+  }
+
+  msgEl.textContent = "Er is een e-mail verstuurd om je wachtwoord opnieuw in te stellen.";
+});
+
 checkExistingSession();

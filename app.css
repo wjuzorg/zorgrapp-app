@@ -3137,3 +3137,14 @@ button.finish-btn:disabled,
 .table-wrap td {
   white-space: nowrap;
 }
+
+.forgot-btn {
+  width: 100%;
+  margin-top: 12px;
+  border: none;
+  background: transparent;
+  color: #111827;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+}
