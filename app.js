@@ -538,43 +538,6 @@ if (signalCountEl) {
   }
 }
 
-async function setWelcomeText() {
-  const { data } = await supabaseClient.auth.getSession();
-  const user = data.session?.user;
-
-  let name = "Gebruiker";
-
-  if (user?.id) {
-    const { data: profileData, error: profileError } = await supabaseClient
-      .from("profiles")
-      .select("full_name")
-      .eq("user_id", user.id)
-      .maybeSingle();
-
-    if (!profileError && profileData?.full_name && profileData.full_name.trim() !== "") {
-      name = profileData.full_name.trim();
-    } else if (user?.email) {
-      name = user.email.split("@")[0];
-      name = name.charAt(0).toUpperCase() + name.slice(1);
-    }
-  }
-
-  if (welcomeTitleEl) {
-    welcomeTitleEl.textContent = `${getGreeting()} ${name}`;
-  }
-
-  if (welcomeTextEl) {
-    welcomeTextEl.textContent = getMotivation(name);
-  }
-
-  if (btnUserProfile) {
-    btnUserProfile.textContent = name;
-  }
-
-  if (profileEmail && user?.email) {
-    profileEmail.textContent = user.email;
-  }
-}
 
 async function checkProcessorAgreement(userId) {
   const warningEl = document.getElementById("agreementWarning");
@@ -736,7 +699,7 @@ async function startApp() {
 
   await checkProcessorAgreement(user.id);
 
-  setWelcomeText();
+  await setWelcomeText(currentUser);
   await loadDashboard();
 }
 
