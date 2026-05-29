@@ -30,6 +30,9 @@ const btnUserProfile = document.getElementById("btnUserProfile");
 const profileDropdown = document.getElementById("profileDropdown");
 const menuProfile = document.getElementById("menuProfile");
 const menuPassword = document.getElementById("menuPassword");
+menuPassword?.addEventListener("click", () => {
+  window.location.href = "./reset-password.html";
+});
 const menuLogout = document.getElementById("menuLogout");
 const profileEmail = document.getElementById("profileEmail");
 

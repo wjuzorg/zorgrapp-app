@@ -13,6 +13,24 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
   }
 });
 
+checkLoggedInUser().then((loggedIn) => {
+  if (!loggedIn) {
+    restoreSessionFromUrl();
+  }
+});
+
+async function checkLoggedInUser() {
+  const { data } = await supabaseClient.auth.getUser();
+
+  if (data.user) {
+    msgEl.textContent = "Kies hieronder een nieuw wachtwoord.";
+    savePasswordBtn.disabled = false;
+    return true;
+  }
+
+  return false;
+}
+
 async function restoreSessionFromUrl() {
   const hash = window.location.hash.substring(1);
   const params = new URLSearchParams(hash);
@@ -37,7 +55,6 @@ async function restoreSessionFromUrl() {
   }
 }
 
-restoreSessionFromUrl();
 
 savePasswordBtn.addEventListener("click", async () => {
   const newPassword = newPasswordEl.value;
