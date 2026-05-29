@@ -333,10 +333,16 @@ async function createInvoiceDraftFromAppointment() {
 
   const minutes = Number(appointment.worked_minutes || appointment.duration_minutes || 0);
   const hourlyRate = Number(currentClient?.hourly_rate || 49);
-  const amount = (minutes / 60) * hourlyRate;
+  const workAmount = (minutes / 60) * hourlyRate;
+
+const amount =
+  workAmount +
+  kmAmount +
+  materialCost +
+  parkingCost;
 
   const km = Number(appointment.km || 0);
-  const kmAmount = Number(appointment.km_amount || 0);
+const kmAmount = km * 0.23;
   const materialCost = Number(appointment.material_cost || 0);
   const parkingCost = Number(appointment.parking_cost || 0);
 
