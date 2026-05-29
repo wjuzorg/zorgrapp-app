@@ -423,23 +423,78 @@ async function sendInvoiceEmail() {
   const sendCopy =
     document.getElementById("sendAccountingCopy")?.checked === true;
 
+const serviceName =
+  currentInvoice?.service_name ||
+  currentInvoice?.service_type ||
+  currentInvoice?.appointment_type ||
+  currentInvoice?.type ||
+  currentInvoice?.title ||
+  "Ondersteuning";
+
   const bookkeepingEmail =
     currentProfile?.bookkeeping_email ||
     currentProfile?.bookkeeper_email ||
     currentProfile?.boekhouder_email ||
     "";
 
-  let bodyText =
+ const paymentType = currentInvoice?.payment_type || currentInvoice?.funding_type || "";
+const fundingDescription = currentInvoice?.funding_description || "";
+
+let extraCostsText = "";
+
+if (Number(currentInvoice?.km || 0) > 0) {
+  extraCostsText += `\nKilometervergoeding: ${currentInvoice.km} km`;
+}
+
+if (Number(currentInvoice?.km_amount || 0) > 0) {
+  extraCostsText += ` - ${euro(Number(currentInvoice.km_amount))}`;
+}
+
+if (Number(currentInvoice?.material_cost || 0) > 0) {
+  extraCostsText += `\nMaterialen: ${euro(Number(currentInvoice.material_cost))}`;
+}
+
+if (Number(currentInvoice?.parking_cost || 0) > 0) {
+  extraCostsText += `\nParkeerkosten: ${euro(Number(currentInvoice.parking_cost))}`;
+}
+
+let fundingText = "";
+
+if (paymentType === "wmo") {
+  fundingText = `\nBetalingsvorm: Wmo${fundingDescription ? `\n${fundingDescription}` : ""}`;
+}
+
+if (paymentType === "pgb") {
+  fundingText = `\nBetalingsvorm: PGB${fundingDescription ? `\n${fundingDescription}` : ""}`;
+}
+
+
+
+let bodyText =
 `Beste ${clientName},
 
-Hierbij ontvangt u uw factuur.
+Hierbij ontvangt u uw factuur voor de uitgevoerde werkzaamheden.
 
 Factuurnummer: ${invoiceNumber}
-Bedrag: ${amount}
+
+Omschrijving werkzaamheden:
+${currentInvoice?.work_done || serviceName || "Werkzaamheden uitgevoerd"}
+
+Dienst: ${serviceName || "-"}
+Datum afspraak: ${currentInvoice?.appointment_date || "-"}
+Gewerkte tijd: ${currentInvoice?.worked_minutes || 0} minuten
+${fundingText}
+${extraCostsText}
+
+Factuurbedrag:
+${amount}
 
 Wij verzoeken u vriendelijk het bedrag binnen ${currentProfile?.payment_term_days || 14} dagen te voldoen.
 
+Heeft u vragen over deze factuur? Neem gerust contact op.
+
 Met vriendelijke groet,
+
 ${companyName}`;
 
   if (companyIban) {
