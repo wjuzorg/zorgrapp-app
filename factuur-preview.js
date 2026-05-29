@@ -427,47 +427,56 @@ const serviceName =
   currentInvoice?.service_name ||
   currentInvoice?.service_type ||
   currentInvoice?.appointment_type ||
-  currentInvoice?.type ||
-  currentInvoice?.title ||
+  currentInvoice?.appointment_title ||
+  currentInvoice?.description ||
   "Ondersteuning";
 
-  const bookkeepingEmail =
-    currentProfile?.bookkeeping_email ||
-    currentProfile?.bookkeeper_email ||
-    currentProfile?.boekhouder_email ||
-    "";
+const workDone =
+  currentInvoice?.work_done ||
+  currentInvoice?.work_description ||
+  "";
 
- const paymentType = currentInvoice?.payment_type || currentInvoice?.funding_type || "";
-const fundingDescription = currentInvoice?.funding_description || "";
+const workedMinutes = Number(
+  currentInvoice?.worked_minutes ||
+  currentInvoice?.duration_minutes ||
+  0
+);
+
+const km = Number(currentInvoice?.km || 0);
+const kmRate = 0.23;
+const kmAmount = km > 0 ? km * kmRate : 0;
+
+const materialCost = Number(currentInvoice?.material_cost || 0);
+const parkingCost = Number(currentInvoice?.parking_cost || 0);
 
 let extraCostsText = "";
 
-if (Number(currentInvoice?.km || 0) > 0) {
-  extraCostsText += `\nKilometervergoeding: ${currentInvoice.km} km`;
+if (km > 0) {
+  extraCostsText += `\nKilometervergoeding: ${km} km × €0,23 = ${euro(kmAmount)}`;
 }
 
-if (Number(currentInvoice?.km_amount || 0) > 0) {
-  extraCostsText += ` - ${euro(Number(currentInvoice.km_amount))}`;
+if (materialCost > 0) {
+  extraCostsText += `\nMaterialen: ${euro(materialCost)}`;
 }
 
-if (Number(currentInvoice?.material_cost || 0) > 0) {
-  extraCostsText += `\nMaterialen: ${euro(Number(currentInvoice.material_cost))}`;
+if (parkingCost > 0) {
+  extraCostsText += `\nParkeerkosten: ${euro(parkingCost)}`;
 }
 
-if (Number(currentInvoice?.parking_cost || 0) > 0) {
-  extraCostsText += `\nParkeerkosten: ${euro(Number(currentInvoice.parking_cost))}`;
-}
+const paymentType =
+  currentInvoice?.payment_type ||
+  currentInvoice?.funding_type ||
+  "";
 
 let fundingText = "";
 
 if (paymentType === "wmo") {
-  fundingText = `\nBetalingsvorm: Wmo${fundingDescription ? `\n${fundingDescription}` : ""}`;
+  fundingText = `\nBetalingsvorm: Wmo`;
 }
 
 if (paymentType === "pgb") {
-  fundingText = `\nBetalingsvorm: PGB${fundingDescription ? `\n${fundingDescription}` : ""}`;
+  fundingText = `\nBetalingsvorm: PGB`;
 }
-
 
 
 let bodyText =
@@ -478,11 +487,11 @@ Hierbij ontvangt u uw factuur voor de uitgevoerde werkzaamheden.
 Factuurnummer: ${invoiceNumber}
 
 Omschrijving werkzaamheden:
-${currentInvoice?.work_done || serviceName || "Werkzaamheden uitgevoerd"}
+${workDone || serviceName}
 
-Dienst: ${serviceName || "-"}
+Dienst: ${serviceName}
 Datum afspraak: ${currentInvoice?.appointment_date || "-"}
-Gewerkte tijd: ${currentInvoice?.worked_minutes || 0} minuten
+Gewerkte tijd: ${workedMinutes} minuten
 ${fundingText}
 ${extraCostsText}
 
@@ -511,7 +520,7 @@ ${companyName}`;
     `&body=${body}`;
 
   if (sendCopy && bookkeepingEmail) {
-    gmailUrl += `&cc=${encodeURIComponent(bookkeepingEmail)}`;
+    gmailUrl += `&bcc=${encodeURIComponent(bookkeepingEmail)}`;
   }
 
   const alreadySent =
