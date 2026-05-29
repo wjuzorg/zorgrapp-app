@@ -520,8 +520,8 @@ ${companyName}`;
     `&body=${body}`;
 
   if (sendCopy && bookkeepingEmail) {
-    gmailUrl += `&bcc=${encodeURIComponent(bookkeepingEmail)}`;
-  }
+  gmailUrl += `&bcc=${encodeURIComponent(bookkeepingEmail.trim())}`;
+}
 
   const alreadySent =
     currentInvoice.bookkeeper_copy_sent === true ||
