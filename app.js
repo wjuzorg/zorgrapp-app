@@ -483,8 +483,8 @@ async function loadDashboard() {
     const todayAppointments = appointments.filter(item => item.appointment_date === today);
     todayCountEl.textContent = clients.length;
 
-    if (todayTitleEl) {
-  todayTitleEl.textContent = `Vandaag (${appointmentsListEl.querySelectorAll(".appointment-card").length})`;
+  if (todayTitleEl) {
+  todayTitleEl.textContent = `Vandaag (${todayAppointments.length})`;
 }
 
    const signalCountByClient = {};
