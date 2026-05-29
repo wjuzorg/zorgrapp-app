@@ -247,9 +247,7 @@ function renderInvoiceLines() {
 
   let rows = `
     <tr>
-      <td><span id="invoiceDescription">${currentInvoice.description || "Praktische ondersteuning"}</span></td>
-      <td><span id="invoiceMinutes">${minutes}</span> minuten</td>
-      <td><span id="invoiceAmount">${formatEuro(laborAmount)}</span></td>
+      <td><span id="invoiceDescription">${currentInvoice.work_done || currentInvoice.description || currentInvoice.service_name || "Praktische ondersteuning"}</span></td>
     </tr>
   `;
 
@@ -520,22 +518,21 @@ ${companyName}`;
     `&body=${body}`;
 
   if (sendCopy && bookkeepingEmail) {
-  gmailUrl += `&bcc=${encodeURIComponent(bookkeepingEmail.trim())}`;
+  gmailUrl += `&cc=${encodeURIComponent(bookkeepingEmail.trim())}`;
 }
 
-  const alreadySent =
-    currentInvoice.bookkeeper_copy_sent === true ||
-    !!currentInvoice.bookkeeper_copy_sent_at;
+  // const alreadySent =
+//   currentInvoice.bookkeeper_copy_sent === true ||
+//   !!currentInvoice.bookkeeper_copy_sent_at;
 
-  if (sendCopy && alreadySent) {
-    const opnieuw = confirm(
-      "Deze factuur is al eerder naar de boekhouder gestuurd.\n\nWilt u opnieuw een kopie naar de boekhouder sturen?"
-    );
-
-    if (!opnieuw) {
-      return;
-    }
-  }
+// if (sendCopy && alreadySent) {
+//   const opnieuw = confirm(
+//     "Deze factuur is al eerder naar de boekhouder gestuurd.\n\nWilt u opnieuw een kopie naar de boekhouder sturen?"
+//   );
+//   if (!opnieuw) {
+//     return;
+//   }
+// }
 
   const gmailWindow = window.open(gmailUrl, "_blank");
 
