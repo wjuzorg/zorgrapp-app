@@ -398,12 +398,12 @@ async function sendInvoiceEmail() {
 
   const companyName = currentProfile?.company_name || "ZorgRapp";
   const companyIban = currentProfile?.iban || "";
+  const bookkeeperEmail = currentProfile?.bookkeeper_email || ""; // FIX: Haal de boekhouder netjes op uit het profiel
   const clientName = getClientName();
   const invoiceNumber = currentInvoice.invoice_number || "";
   const amount = formatEuro(getInvoiceTotal());
 
-  const visibleEmail =
-    document.getElementById("invoiceClientEmail")?.textContent?.trim();
+  const visibleEmail = document.getElementById("invoiceClientEmail")?.textContent?.trim();
 
   const email =
     currentClient?.invoice_email ||
@@ -418,66 +418,54 @@ async function sendInvoiceEmail() {
     return;
   }
 
-  const sendCopy =
-    document.getElementById("sendAccountingCopy")?.checked === true;
+  const sendCopy = document.getElementById("sendAccountingCopy")?.checked === true;
 
-const serviceName =
-  currentInvoice?.service_name ||
-  currentInvoice?.service_type ||
-  currentInvoice?.appointment_type ||
-  currentInvoice?.appointment_title ||
-  currentInvoice?.description ||
-  "Ondersteuning";
+  const serviceName =
+    currentInvoice?.service_name ||
+    currentInvoice?.service_type ||
+    currentInvoice?.appointment_type ||
+    currentInvoice?.appointment_title ||
+    currentInvoice?.description ||
+    "Ondersteuning";
 
-const workDone =
-  currentInvoice?.work_done ||
-  currentInvoice?.work_description ||
-  "";
+  const workDone = currentInvoice?.work_done || currentInvoice?.description || "";
 
-const workedMinutes = Number(
-  currentInvoice?.worked_minutes ||
-  currentInvoice?.duration_minutes ||
-  0
-);
+  // FIX: Gebruik hier 'minutes' zoals gedefinieerd in je database en de rest van de code
+  const workedMinutes = Number(currentInvoice?.minutes || 0); 
 
-const km = Number(currentInvoice?.km || 0);
-const kmRate = 0.23;
-const kmAmount = km > 0 ? km * kmRate : 0;
+  const km = Number(currentInvoice?.km || 0);
+  const kmRate = 0.23;
+  const kmAmount = km > 0 ? km * kmRate : 0;
 
-const materialCost = Number(currentInvoice?.material_cost || 0);
-const parkingCost = Number(currentInvoice?.parking_cost || 0);
+  const materialCost = Number(currentInvoice?.material_cost || 0);
+  const parkingCost = Number(currentInvoice?.parking_cost || 0);
 
-let extraCostsText = "";
+  let extraCostsText = "";
 
-if (km > 0) {
-  extraCostsText += `\nKilometervergoeding: ${km} km × €0,23 = ${euro(kmAmount)}`;
-}
+  // FIX: Veranderd van euro() naar jouw bestaande formatEuro() functie
+  if (km > 0) {
+    extraCostsText += `\nKilometervergoeding: ${km} km × €0,23 = ${formatEuro(kmAmount)}`;
+  }
 
-if (materialCost > 0) {
-  extraCostsText += `\nMaterialen: ${euro(materialCost)}`;
-}
+  if (materialCost > 0) {
+    extraCostsText += `\nMaterialen: ${formatEuro(materialCost)}`;
+  }
 
-if (parkingCost > 0) {
-  extraCostsText += `\nParkeerkosten: ${euro(parkingCost)}`;
-}
+  if (parkingCost > 0) {
+    extraCostsText += `\nParkeerkosten: ${formatEuro(parkingCost)}`;
+  }
 
-const paymentType =
-  currentInvoice?.payment_type ||
-  currentInvoice?.funding_type ||
-  "";
+  const paymentType = currentInvoice?.payment_type || currentInvoice?.funding_type || "";
 
-let fundingText = "";
+  let fundingText = "";
+  if (paymentType === "wmo") {
+    fundingText = `\nBetalingsvorm: Wmo`;
+  }
+  if (paymentType === "pgb") {
+    fundingText = `\nBetalingsvorm: PGB`;
+  }
 
-if (paymentType === "wmo") {
-  fundingText = `\nBetalingsvorm: Wmo`;
-}
-
-if (paymentType === "pgb") {
-  fundingText = `\nBetalingsvorm: PGB`;
-}
-
-
-let bodyText =
+  let bodyText =
 `Beste ${clientName},
 
 Hierbij ontvangt u uw factuur voor de uitgevoerde werkzaamheden.
@@ -517,22 +505,10 @@ ${companyName}`;
     `&su=${subject}` +
     `&body=${body}`;
 
-  if (sendCopy && bookkeepingEmail) {
-  gmailUrl += `&cc=${encodeURIComponent(bookkeepingEmail.trim())}`;
-}
-
-  // const alreadySent =
-//   currentInvoice.bookkeeper_copy_sent === true ||
-//   !!currentInvoice.bookkeeper_copy_sent_at;
-
-// if (sendCopy && alreadySent) {
-//   const opnieuw = confirm(
-//     "Deze factuur is al eerder naar de boekhouder gestuurd.\n\nWilt u opnieuw een kopie naar de boekhouder sturen?"
-//   );
-//   if (!opnieuw) {
-//     return;
-//   }
-// }
+  // FIX: Gebruik nu de juiste, veilige 'bookkeeperEmail' variabele
+  if (sendCopy && bookkeeperEmail) {
+    gmailUrl += `&cc=${encodeURIComponent(bookkeeperEmail.trim())}`;
+  }
 
   const gmailWindow = window.open(gmailUrl, "_blank");
 
@@ -546,10 +522,10 @@ ${companyName}`;
     updated_at: new Date().toISOString()
   };
 
-  if (sendCopy && bookkeepingEmail) {
+  if (sendCopy && bookkeeperEmail) {
     updateData.bookkeeper_copy_sent = true;
     updateData.bookkeeper_copy_sent_at = new Date().toISOString();
-    updateData.bookkeeper_email = bookkeepingEmail;
+    updateData.bookkeeper_email = bookkeeperEmail;
     updateData.invoice_changed_after_bookkeeper_sent = false;
   }
 
