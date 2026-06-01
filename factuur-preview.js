@@ -236,8 +236,11 @@ function renderInvoiceLines() {
   const tbody = document.getElementById("invoiceLines");
   if (!tbody || !currentInvoice) return;
 
+  // Haal de juiste waarden op uit de factuur
   const minutes = Number(currentInvoice.minutes || 0);
   const hourlyRate = Number(currentInvoice.hourly_rate || 0);
+  
+  // Bereken het bedrag (of pak het opgeslagen bedrag)
   const laborAmount = Number(currentInvoice.amount || ((minutes / 60) * hourlyRate));
 
   const km = Number(currentInvoice.km || 0);
@@ -245,9 +248,26 @@ function renderInvoiceLines() {
   const materialCost = Number(currentInvoice.material_cost || 0);
   const parkingCost = Number(currentInvoice.parking_cost || 0);
 
+  // Formatteer minuten naar een fijne leesbare tekst (bijv. "30 min" of "1 u 30 min")
+  let durationText = "";
+  if (minutes > 0) {
+    if (minutes >= 60) {
+      const hours = Math.floor(minutes / 60);
+      const remMinutes = minutes % 60;
+      durationText = remMinutes > 0 ? `${hours} u ${remMinutes} min` : `${hours} u`;
+    } else {
+      durationText = `${minutes} min`;
+    }
+  } else {
+    durationText = "-";
+  }
+
+  // De eerste rij toont nu ook netjes de minuten en het arbeidsbedrag!
   let rows = `
     <tr>
       <td><span id="invoiceDescription">${currentInvoice.work_done || currentInvoice.description || currentInvoice.service_name || "Praktische ondersteuning"}</span></td>
+      <td>${durationText}</td>
+      <td>${formatEuro(laborAmount)}</td>
     </tr>
   `;
 
@@ -507,7 +527,7 @@ ${companyName}`;
 
   // FIX: Gebruik nu de juiste, veilige 'bookkeeperEmail' variabele
   if (sendCopy && bookkeeperEmail) {
-    gmailUrl += `&cc=${encodeURIComponent(bookkeeperEmail.trim())}`;
+    gmailUrl += `&bcc=${encodeURIComponent(bookkeeperEmail.trim())}`;
   }
 
   const gmailWindow = window.open(gmailUrl, "_blank");
@@ -564,10 +584,10 @@ async function printAndMarkSent() {
   updated_at: new Date().toISOString()
 };
 
-if (sendCopy && bookkeepingEmail) {
+if (sendCopy && bookkeeperEmail) {
   updateData.bookkeeper_copy_sent = true;
   updateData.bookkeeper_copy_sent_at = new Date().toISOString();
-  updateData.bookkeeper_email = bookkeepingEmail;
+  updateData.bookkeeper_email = bookkeeperEmail; // Let op de spelling hier
   updateData.invoice_changed_after_bookkeeper_sent = false;
 }
 
