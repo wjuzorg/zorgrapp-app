@@ -20,7 +20,7 @@ function getText(id) {
 
 function formatEuro(value) {
   const n = Number(value || 0);
-  return `€${n.toFixed(2).replace(".", ",")} *`;
+  return `€${n.toFixed(2).replace(".", ",")} `;
 }
 
 function getInvoiceNumberFromUrl() {
