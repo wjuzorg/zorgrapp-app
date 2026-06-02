@@ -345,39 +345,39 @@ async function searchExistingClients() {
   }
 
   resultsBox.innerHTML = data.map(client => `
-    <div class="client-result-card">
-      <strong>${client.full_name || "Naam onbekend"}</strong><br>
-      <span>${client.address || ""}</span><br>
-      <span>${client.phone || ""}</span><br><br>
+  <div class="client-result-card">
+    <strong style="font-size:18px;">${client.full_name || "Naam onbekend"}</strong><br>
+    <span>${client.address || ""}</span><br>
+    <span>${client.phone || ""}</span>
 
-      <div style="display:flex; gap:10px; margin:12px 0 18px 0; flex-wrap:wrap;">
-  <button
-    type="button"
-    class="btn btn-dark"
-    onclick="window.location.href='plan-afspraak.html?client_id=${client.id}'"
-  >
-    Nieuwe afspraak plannen
-  </button>
+    <div style="display:flex; gap:10px; margin:14px 0 4px 0; flex-wrap:wrap;">
+      <button
+        type="button"
+        class="btn btn-dark"
+        onclick="window.location.href='plan-afspraak.html?client_id=${client.id}'"
+      >
+        Nieuwe afspraak plannen
+      </button>
 
-  <button
-    type="button"
-    class="btn btn-secondary"
-    onclick="window.location.href='clientkaart.html?id=${client.id}'"
-  >
-    Cliëntenkaart openen
-  </button>
+      <button
+        type="button"
+        class="btn btn-secondary"
+        onclick="window.location.href='clientkaart.html?id=${client.id}'"
+      >
+        Cliëntenkaart openen
+      </button>
 
-  <button
-  type="button"
-  class="btn btn-secondary"
-  onclick="window.location.href='client-geschiedenis.html?id=${client.id}'"
->
-  Cliëntgeschiedenis
-</button>
-</div>
+      <button
+        type="button"
+        class="btn btn-secondary"
+        onclick="window.location.href='client-geschiedenis.html?id=${client.id}'"
+      >
+        Cliëntgeschiedenis
+      </button>
     </div>
-  `).join("");
-}
+  </div>
+`).join("");
+  }
 
 function newClientFormHasData() {
   const fields = document.querySelectorAll(
