@@ -277,7 +277,8 @@ clientId = data.id;
       const appointments = dates.map(d => ({
         owner_id: user.id,
         client_id: clientId,
-        client_name: full_name,
+        client_name: selectedClient?.full_name || full_name,
+        client_salutation: selectedClient?.salutation || val("salutation") || "",
         appointment_date: d,
         appointment_time: time,
         service_type: val("service_type"),

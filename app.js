@@ -324,6 +324,25 @@ function renderAppointments(items, clients = []) {
     return;
   }
 
+  function getDisplayName(item) {
+  const name = item.full_name || item.client_name || "Onbekende cliënt";
+  const salutation = item.salutation || item.client_salutation || "";
+
+  if (name.startsWith("Mevr.") || name.startsWith("Dhr.")) {
+    return name;
+  }
+
+  if (salutation === "mevrouw") {
+    return `Mevr. ${name}`;
+  }
+
+  if (salutation === "meneer") {
+    return `Dhr. ${name}`;
+  }
+
+  return name;
+}
+
   appointmentsListEl.innerHTML = items.map(item => {
     const client = clients.find(c => c.id === item.client_id);
     const filled =
@@ -344,8 +363,7 @@ function renderAppointments(items, clients = []) {
         <div class="appointment-top">
           <div>
             <div class="appointment-time">${item.appointment_time || "-"}</div>
-            <h4 class="appointment-name">${item.client_name || "Onbekende cliënt"}</h4>
-            <div class="appointment-service">${item.service_type || "Geen diensttype"}</div>
+<h4 class="appointment-name">${getDisplayName(item)}</h4>            <div class="appointment-service">${item.service_type || "Geen diensttype"}</div>
           </div>
           ${getStatusLabel(item)}
         </div>
