@@ -218,9 +218,11 @@ async function saveClient() {
       return;
     }
 
+    // FIX 1: salutation (aanhef) toegevoegd aan de database payload voor de cliënt
     const clientPayload = {
       owner_id: user.id,
       full_name,
+      salutation: val("salutation"), 
       address: val("address"),
       postal_code: val("postal_code"),
       city: val("city"),
@@ -239,20 +241,23 @@ async function saveClient() {
     let clientId = selectedClientId;
 
     if (clientId) {
+      // Update bestaande cliënt
       await supabaseClient.from("Clients").update(clientPayload).eq("id", clientId);
     } else {
+      // Maak nieuwe cliënt aan
       const { data, error } = await supabaseClient
-  .from("Clients")
-  .insert([clientPayload])
-  .select()
-  .single();
+        .from("Clients")
+        .insert([clientPayload])
+        .select()
+        .single();
 
-if (error || !data) {
-  showSaveMessage("Opslaan cliënt mislukt: " + (error?.message || "geen data"), true);
-  return;
-}
+      if (error || !data) {
+        showSaveMessage("Opslaan cliënt mislukt: " + (error?.message || "geen data"), true);
+        return;
+      }
 
-clientId = data.id;
+      clientId = data.id;
+      selectedClientId = clientId; // Direct vasthouden om dubbelingen bij snel nogmaals klikken te voorkomen
     }
 
     const date = val("appointment_date");
@@ -274,11 +279,11 @@ clientId = data.id;
         }
       }
 
-      const appointments = dates.map(d => ({
+     const appointments = dates.map(d => ({
         owner_id: user.id,
         client_id: clientId,
-        client_name: selectedClient?.full_name || full_name,
-        client_salutation: selectedClient?.salutation || val("salutation") || "",
+        client_name: full_name,
+        client_salutation: val("salutation") || "", 
         appointment_date: d,
         appointment_time: time,
         service_type: val("service_type"),
@@ -288,8 +293,15 @@ clientId = data.id;
 
       await supabaseClient.from("Appointments").insert(appointments);
     }
+    
     clientSaved = true;
-showSaveMessage("Cliënt opgeslagen ✅");
+    showSaveMessage("Cliënt en afspraak opgeslagen ✅");
+    
+    // Optioneel: Stuur de gebruiker na 1.5 seconde terug naar het dashboard
+    setTimeout(() => {
+      window.location.href = "index.html"; 
+    }, 1500);
+
   } catch (err) {
     console.error(err);
     showSaveMessage(err.message, true);
@@ -419,6 +431,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   if (!ok) return;
 
+  // FIX 3: Check bij het laden van de pagina of er een client_id in de URL staat!
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlClientId = urlParams.get("client_id") || urlParams.get("id");
+  
+  if (urlClientId) {
+    console.log("Bestaande cliënt ID gevonden in URL:", urlClientId);
+    await loadClient(urlClientId); // Laadt direct alle cliëntgegevens in het formulier
+  }
+
   toggleRecurrenceFields();
   toggleInvoiceFields();
 
@@ -435,11 +456,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   el("invoice_delivery_method")?.addEventListener("change", toggleInvoiceFields);
-el("invoice_same_as_client_address")?.addEventListener("change", toggleInvoiceFields);
-toggleInvoiceFields();
+  el("invoice_same_as_client_address")?.addEventListener("change", toggleInvoiceFields);
+  toggleInvoiceFields();
 
- window.showNewClientForm = showNewClientForm;
-window.showExistingClientSearch = showExistingClientSearch;
-window.searchExistingClients = searchExistingClients;
-window.saveClient = saveClient;
+  window.showNewClientForm = showNewClientForm;
+  window.showExistingClientSearch = showExistingClientSearch;
+  window.searchExistingClients = searchExistingClients;
+  window.saveClient = saveClient;
 });
