@@ -519,22 +519,15 @@ ${companyName}`;
   const subject = encodeURIComponent(`Factuur ${invoiceNumber}`);
   const body = encodeURIComponent(bodyText);
 
-  let gmailUrl =
-    `https://mail.google.com/mail/?view=cm` +
-    `&to=${encodeURIComponent(email)}` +
-    `&su=${subject}` +
-    `&body=${body}`;
+  // DIT WORDT HET (Werkt perfect op mobiel én pc):
+  let mailtoUrl = `mailto:${encodeURIComponent(email)}?subject=${subject}&body=${body}`;
 
-  // FIX: Gebruik nu de juiste, veilige 'bookkeeperEmail' variabele
   if (sendCopy && bookkeeperEmail) {
-    gmailUrl += `&bcc=${encodeURIComponent(bookkeeperEmail.trim())}`;
+    mailtoUrl += `&bcc=${encodeURIComponent(bookkeeperEmail.trim())}`;
   }
 
-  const gmailWindow = window.open(gmailUrl, "_blank");
-
-  if (!gmailWindow) {
-    window.location.href = gmailUrl;
-  }
+  // Dit opent direct de Mail/Gmail-app op je telefoon of je mailprogramma op de computer
+  window.location.href = mailtoUrl;
 
   const updateData = {
     status: "open",
