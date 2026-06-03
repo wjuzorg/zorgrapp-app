@@ -344,10 +344,10 @@ function renderAppointments(items, clients = []) {
 }
 
   appointmentsListEl.innerHTML = items.map(item => {
-    // 1. Zoek de cliënt op in de lijst
+    // 1. Zoek de bijbehorende cliënt
     const client = clients.find(c => c.id === item.client_id);
-    
-    // 2. FIX: Combineer afspraak en cliëntgegevens voor de juiste naamweergave
+
+    // 2. Maak de displayName aan (Let op de kleine 'd' aan het begin!)
     const displayName = getDisplayName({
       ...item,
       ...client
@@ -366,12 +366,14 @@ function renderAppointments(items, clients = []) {
 
     const mapsLink = buildMapsLink(addressLine);
 
+    // 3. Hier wordt de HTML gebouwd
     return `
       <article class="appointment-card">
         <div class="appointment-top">
           <div>
             <div class="appointment-time">${item.appointment_time || "-"}</div>
-<h4 class="appointment-name">${DisplayName(item)}</h4>            <div class="appointment-service">${item.service_type || "Geen diensttype"}</div>
+            <h4 class="appointment-name">${displayName}</h4> 
+            <div class="appointment-service">${item.service_type || "Geen diensttype"}</div>
           </div>
           ${getStatusLabel(item)}
         </div>
@@ -387,17 +389,11 @@ function renderAppointments(items, clients = []) {
               : ``
           }
         </div>
-
-        <div class="card-note">
-          ${item.signal_notes ? `Signaal: ${item.signal_notes}` : "Nog geen signalering toegevoegd."}
-        </div>
-
-        <div class="card-actions">
-          <button class="btn btn-secondary" onclick="window.location.href='./invullen.html?id=${item.id}'">
-            Invullen
+        <div class="appointment-actions">
+          <button class="btn ${filled ? "btn-secondary" : "btn-primary"}" onclick="window.location.href='invullen.html?id=${item.id}'">
+            ${filled ? "Aanpassen" : "Invullen"}
           </button>
-
-          <button class="btn btn-outline" onclick="window.location.href='./clientkaart.html?id=${item.client_id}'">
+          <button class="btn btn-secondary" onclick="window.location.href='clientkaart.html?id=${item.client_id}'">
             Cliëntenkaart
           </button>
         </div>
