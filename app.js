@@ -344,13 +344,21 @@ function renderAppointments(items, clients = []) {
 }
 
   appointmentsListEl.innerHTML = items.map(item => {
+    // 1. Zoek de cliënt op in de lijst
     const client = clients.find(c => c.id === item.client_id);
+    
+    // 2. FIX: Combineer afspraak en cliëntgegevens voor de juiste naamweergave
+    const displayName = getDisplayName({
+      ...item,
+      ...client
+    });
+
     const filled =
-  item.status === "ingevuld" ||
-  item.status === "voltooid" ||
-  !!item.work_done ||
-  !!item.worked_minutes ||
-  !!item.signal_notes;
+      item.status === "ingevuld" ||
+      item.status === "voltooid" ||
+      !!item.work_done ||
+      !!item.worked_minutes ||
+      !!item.signal_notes;
 
     const addressLine = client
       ? [client.address, client.postal_code, client.city].filter(Boolean).join(", ")
@@ -363,7 +371,7 @@ function renderAppointments(items, clients = []) {
         <div class="appointment-top">
           <div>
             <div class="appointment-time">${item.appointment_time || "-"}</div>
-<h4 class="appointment-name">${getDisplayName(item)}</h4>            <div class="appointment-service">${item.service_type || "Geen diensttype"}</div>
+<h4 class="appointment-name">${DisplayName(item)}</h4>            <div class="appointment-service">${item.service_type || "Geen diensttype"}</div>
           </div>
           ${getStatusLabel(item)}
         </div>
