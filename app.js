@@ -403,12 +403,15 @@ appointmentsListEl.innerHTML = items.map(item => {
         ${addressLine ? `<a class="route-mini-btn" href="${mapsLink}" target="_blank">🧭</a>` : ``}
       </div>
 
-      <div class="appointment-actions">
+     <div class="appointment-actions">
         <button class="btn ${isFilled ? "btn-secondary" : "btn-primary"}" 
+                style="color: black !important;"
                 onclick="window.location.href='invullen.html?id=${item.id}'">
           ${isFilled ? "Aanpassen" : "Invullen"}
         </button>
+        
         <button class="btn btn-secondary" 
+                style="color: black !important;"
                 onclick="window.location.href='clientkaart.html?id=${item.client_id}'">
           Cliëntenkaart
         </button>
