@@ -343,63 +343,79 @@ function renderAppointments(items, clients = []) {
   return name;
 }
 
-  appointmentsListEl.innerHTML = items.map(item => {
-    // 1. Zoek de bijbehorende cliënt
-    const client = clients.find(c => c.id === item.client_id);
+ /* --- VERBETERDE DISPLAYNAME FUNCTIE --- */
+function getDisplayName(item) {
+  const name = item.full_name || item.client_name || "Onbekende cliënt";
+  // Pak de salutation en maak hem klein voor de check
+  const sal = (item.salutation || item.client_salutation || "").toLowerCase().trim();
 
-    // 2. Maak de displayName aan (Let op de kleine 'd' aan het begin!)
-    const displayName = getDisplayName({
-      ...item,
-      ...client
-    });
+  // Als de naam zelf al begint met Mevr. of Dhr., niet dubbelop doen
+  if (name.startsWith("Mevr.") || name.startsWith("Dhr.")) {
+    return name;
+  }
 
-    const filled =
-      item.status === "ingevuld" ||
-      item.status === "voltooid" ||
-      !!item.work_done ||
-      !!item.worked_minutes ||
-      !!item.signal_notes;
+  if (sal === "mevrouw" || sal === "mw") {
+    return `Mevr. ${name}`;
+  }
 
-    const addressLine = client
-      ? [client.address, client.postal_code, client.city].filter(Boolean).join(", ")
-      : "";
+  if (sal === "meneer" || sal === "dhr") {
+    return `Dhr. ${name}`;
+  }
 
-    const mapsLink = buildMapsLink(addressLine);
+  return name;
+}
 
-    // 3. Hier wordt de HTML gebouwd
-    return `
-      <article class="appointment-card">
-        <div class="appointment-top">
-          <div>
-            <div class="appointment-time">${item.appointment_time || "-"}</div>
-            <h4 class="appointment-name">${displayName}</h4> 
-            <div class="appointment-service">${item.service_type || "Geen diensttype"}</div>
-          </div>
-          ${getStatusLabel(item)}
+/* --- DE RENDERER --- */
+appointmentsListEl.innerHTML = items.map(item => {
+  const client = clients.find(c => c.id === item.client_id) || {};
+
+  // We sturen alle mogelijke namen en aanheffen mee naar de functie
+  const displayName = getDisplayName({
+    ...item,
+    salutation: client.salutation || item.client_salutation || ""
+  });
+
+  // Knopkleur logica: check of er al iets is ingevuld
+  const isFilled = item.status === "ingevuld" || item.status === "voltooid";
+
+  const addressLine = [client.address, client.postal_code, client.city]
+    .filter(Boolean)
+    .join(", ");
+
+  const mapsLink = buildMapsLink(addressLine);
+
+  return `
+    <article class="appointment-card">
+      <div class="appointment-top">
+        <div>
+          <div class="appointment-time">${item.appointment_time || "-"}</div>
+          <h4 class="appointment-name">${displayName}</h4> 
+          <div class="appointment-service">${item.service_type || "Geen diensttype"}</div>
         </div>
+        ${getStatusLabel(item)}
+      </div>
 
-        <div class="route-mini-card">
-          <div class="route-mini-left">
-            <div class="route-mini-label">Adres</div>
-            <div class="route-mini-address">${addressLine || "Adres nog niet ingevuld"}</div>
-          </div>
-          ${
-            addressLine
-              ? `<a class="route-mini-btn" href="${mapsLink}" target="_blank" rel="noopener noreferrer" aria-label="Open route in Google Maps">🧭</a>`
-              : ``
-          }
+      <div class="route-mini-card">
+        <div class="route-mini-left">
+          <div class="route-mini-label">Adres</div>
+          <div class="route-mini-address">${addressLine || "Adres nog niet ingevuld"}</div>
         </div>
-        <div class="appointment-actions">
-          <button class="btn ${filled ? "btn-secondary" : "btn-primary"}" onclick="window.location.href='invullen.html?id=${item.id}'">
-            ${filled ? "Aanpassen" : "Invullen"}
-          </button>
-          <button class="btn btn-secondary" onclick="window.location.href='clientkaart.html?id=${item.client_id}'">
-            Cliëntenkaart
-          </button>
-        </div>
-      </article>
-    `;
-  }).join("");
+        ${addressLine ? `<a class="route-mini-btn" href="${mapsLink}" target="_blank">🧭</a>` : ``}
+      </div>
+
+      <div class="appointment-actions">
+        <button class="btn ${isFilled ? "btn-secondary" : "btn-primary"}" 
+                onclick="window.location.href='invullen.html?id=${item.id}'">
+          ${isFilled ? "Aanpassen" : "Invullen"}
+        </button>
+        <button class="btn btn-secondary" 
+                onclick="window.location.href='clientkaart.html?id=${item.client_id}'">
+          Cliëntenkaart
+        </button>
+      </div>
+    </article>
+  `;
+}).join("");
 
   document.querySelectorAll(".btn-finish").forEach(btn => {
     btn.addEventListener("click", async () => {
