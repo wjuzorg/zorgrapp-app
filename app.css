@@ -3156,3 +3156,18 @@ button.forgot-btn {
 button.forgot-btn:hover {
   background: #f3f4f6 !important;
 }
+
+/* Ruimte tussen de knoppen op het dashboard */
+.appointment-actions {
+  display: flex;          /* Zet de knoppen naast elkaar */
+  flex-wrap: wrap;       /* Laat ze onder elkaar zakken als het écht te smal wordt */
+  gap: 10px;             /* De ruimte tussen de knoppen */
+  margin-top: 15px;      /* Ruimte boven de knoppen */
+}
+
+.appointment-actions .btn {
+  flex: 1;               /* Zorgt dat ze beide even breed zijn en de ruimte vullen */
+  min-width: 120px;      /* Voorkomt dat ze te smal worden op kleine telefoons */
+  color: black !important; /* Zorgt dat de tekst zwart blijft */
+  padding: 10px 5px;     /* Iets compacter voor mobiel */
+}
