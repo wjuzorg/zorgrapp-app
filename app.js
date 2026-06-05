@@ -517,16 +517,21 @@ async function loadDashboard() {
       return;
     }
 
-    const appointments = data || [];
+   const appointments = data || [];
     const clients = clientsData || [];
     allAppointmentsCache = appointments;
 
+    // Filter de afspraken van vandaag
     const todayAppointments = appointments.filter(item => item.appointment_date === today);
-    todayCountEl.textContent = clients.length;
+    
+    // FIX: Toon het aantal afspraken van vandaag in plaats van alle cliënten!
+    if (todayCountEl) {
+      todayCountEl.textContent = todayAppointments.length;
+    }
 
-  if (todayTitleEl) {
-  todayTitleEl.textContent = `Vandaag (${todayAppointments.length})`;
-}
+    if (todayTitleEl) {
+      todayTitleEl.textContent = `Vandaag (${todayAppointments.length})`;
+    }
 
    const signalCountByClient = {};
 
@@ -713,22 +718,34 @@ async function loadInvoiceDashboardTotal(userId) {
   const invoiceTotalEl = document.getElementById("invoiceTotal");
   if (!invoiceTotalEl) return;
 
+  // FIX 1: Vraag ook de km, parking_cost en material_cost op uit de database
   const { data, error } = await supabaseClient
     .from("invoice_drafts")
-    .select("amount, status")
+    .select("amount, status, km, parking_cost, material_cost")
     .eq("owner_id", userId)
-    .in("status", ["klaar", "open", "herinnering"]);
+    .in("status", ["klaar", "open", "herinnering", "wacht_op_betaling", "wacht op betaling"]); // Veiligheidshalve alle open varianten
 
   if (error) {
     console.error("Factuurtotaal laden mislukt:", error.message);
-    invoiceTotalEl.textContent = "€0";
+    invoiceTotalEl.textContent = "€0,00";
     return;
   }
 
+  const KM_TARIEF = 0.23;
+
+  // FIX 2: Tel hier de reiskosten en andere kosten netjes mee in het totaal
   const total = (data || []).reduce((sum, item) => {
-    return sum + Number(item.amount || 0);
+    const kaalBedrag = Number(item.amount || 0);
+    const kilometers = Number(item.km || 0);
+    const berekendeReiskosten = kilometers * KM_TARIEF;
+    const parkeerkosten = Number(item.parking_cost || 0);
+    const materiaalkosten = Number(item.material_cost || 0);
+    
+    const inclusiefKosten = kaalBedrag + berekendeReiskosten + parkeerkosten + materiaalkosten;
+    return sum + inclusiefKosten;
   }, 0);
 
+  // Zet het nette bedrag op je dashboard (bijv. €53,60)
   invoiceTotalEl.textContent = `€${total.toFixed(2).replace(".", ",")}`;
 }
 
