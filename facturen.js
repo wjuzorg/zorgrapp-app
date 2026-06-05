@@ -118,7 +118,12 @@ function formatDateTime(dateString) {
 }
 
 function makeInvoiceRow(factuur, buttons) {
-  const bedrag = Number(factuur.amount || factuur.total || 0);
+  // FIX: Tel het kale bedrag, de reiskosten en eventuele btw bij elkaar op
+  const kaalBedrag = Number(factuur.amount || factuur.total || 0);
+  const reiskosten = Number(factuur.travel_expenses || factuur.reiskosten || 0);
+  const btwBedrag = Number(factuur.vat_amount || factuur.btw_bedrag || 0);
+  
+  const bedrag = kaalBedrag + reiskosten + btwBedrag;
 
   const boekhouderStatus = factuur.bookkeeper_copy_sent_at
     ? `
@@ -161,7 +166,65 @@ function makeInvoiceRow(factuur, buttons) {
       ${buttons}
     </div>
   `;
+  return row; // Zorg dat de row netjes gereturned wordt
+}
+// Instelling voor de kilometervergoeding (pas aan naar jouw tarief indien nodig)
+const KM_TARIEF = 0.23; 
 
+function makeInvoiceRow(factuur, buttons) {
+  // Pak de basisbedragen uit jouw 'Appointments' tabelkolommen
+  const kaalBedrag = Number(factuur.amount || 0);
+  const kilometers = Number(factuur.km || 0);
+  const parkeerkosten = Number(factuur.parking_cost || 0);
+  const materiaalkosten = Number(factuur.material_cost || 0);
+
+  // Bereken de reiskosten: kilometers * tarief
+  const berekendeReiskosten = kilometers * KM_TARIEF;
+
+  // FIX: Tel alles bij elkaar op voor het échte totaalbedrag op de rij
+  const bedrag = kaalBedrag + berekendeReiskosten + parkeerkosten + materiaalkosten;
+
+  const boekhouderStatus = factuur.bookkeeper_copy_sent_at
+    ? `
+      <div class="invoice-meta bookkeeper-ok">
+        Boekhouderkopie verzonden naar: ${factuur.bookkeeper_email || "boekhouder"}<br>
+        Datum: ${formatDateTime(factuur.bookkeeper_copy_sent_at)}
+      </div>
+    `
+    : factuur.send_bookkeeper_copy
+      ? `
+        <div class="invoice-meta bookkeeper-wait">
+          Boekhouderkopie staat klaar om te verzenden
+        </div>
+      `
+      : "";
+
+  const row = document.createElement("div");
+  row.className = "invoice-row";
+
+  row.innerHTML = `
+    <div class="invoice-main">
+      <strong>${factuur.client_name || "Onbekende cliënt"}</strong><br>
+      <small>${factuur.invoice_number || "Concept"}</small>
+
+      ${
+        factuur.reminder_sent_at
+          ? `<div class="invoice-meta">
+              Laatste herinnering: ${formatDateTime(factuur.reminder_sent_at)}
+            </div>`
+          : ""
+      }
+
+      ${boekhouderStatus}
+    </div>
+
+    <div class="invoice-minutes">${factuur.worked_minutes || factuur.minutes || 0} minuten</div>
+    <div class="invoice-amount">${euro(bedrag)}</div>
+
+    <div class="invoice-actions">
+      ${buttons}
+    </div>
+  `;
   return row;
 }
 
@@ -185,15 +248,20 @@ function renderFacturen(facturen) {
 
   facturen.forEach((factuur) => {
     const status = factuur.status || "klaar";
-    const bedrag = Number(factuur.total || factuur.amount || 0);
+    
+    // FIX: Bereken ook hier exact dezelfde optelsom voor de totalen-kaarten bovenin!
+    const kaalBedrag = Number(factuur.amount || 0);
+    const kilometers = Number(factuur.km || 0);
+    const parkeerkosten = Number(factuur.parking_cost || 0);
+    const materiaalkosten = Number(factuur.material_cost || 0);
+    
+    const berekendeReiskosten = kilometers * KM_TARIEF;
+    const bedrag = kaalBedrag + berekendeReiskosten + parkeerkosten + materiaalkosten;
 
     const invoiceUrl =
-      "factuur-preview.html?invoice=" + encodeURIComponent(factuur.invoice_number);
+      "factuur-preview.html?invoice=" + encodeURIComponent(factuur.invoice_number || factuur.id);
 
-    const reminderUrl =
-      "herinnering.html?invoice=" + encodeURIComponent(factuur.invoice_number);
-
-    if (status === "klaar") {
+    if (status === "klaar" || factuur.ready_for_invoice === true) {
       readyTotal += bedrag;
       readyCount++;
 
@@ -206,6 +274,16 @@ function renderFacturen(facturen) {
         )
       );
     }
+    // Voeg hier eventueel je checks voor 'open' of 'reminder' statussen toe als je die gebruikt,
+    // en zorg dat ze ook 'readyTotal += bedrag' of 'openTotal += bedrag' doen.
+  });
+
+  // Dit zorgt dat de grote teller op het dashboard (Facturen: €...) ook direct naar €53,60 springt!
+  const facturenTotaalEl = document.getElementById("facturenTotaal"); // of hoe jouw element ook heet
+  if (facturenTotaalEl) {
+    facturenTotaalEl.textContent = euro(readyTotal);
+  }
+}
 
     if (status === "open") {
       openTotal += bedrag;
