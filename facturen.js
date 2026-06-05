@@ -228,14 +228,16 @@ function makeInvoiceRow(factuur, buttons) {
   return row;
 }
 
+const KM_TARIEF = 0.23; 
+
 function renderFacturen(facturen) {
   const ready = document.getElementById("readyInvoices");
   const open = document.getElementById("openInvoices");
   const reminder = document.getElementById("reminderInvoices");
 
-  ready.innerHTML = "";
-  open.innerHTML = "";
-  reminder.innerHTML = "";
+  if (ready) ready.innerHTML = "";
+  if (open) open.innerHTML = "";
+  if (reminder) reminder.innerHTML = "";
 
   let readyTotal = 0;
   let openTotal = 0;
@@ -247,98 +249,101 @@ function renderFacturen(facturen) {
   let reminderCount = 0;
 
   facturen.forEach((factuur) => {
-    const status = factuur.status || "klaar";
-    
-    // FIX: Bereken ook hier exact dezelfde optelsom voor de totalen-kaarten bovenin!
+    // 1. Bereken het ECHTE totaalbedrag inclusief reiskosten per afspraak
     const kaalBedrag = Number(factuur.amount || 0);
     const kilometers = Number(factuur.km || 0);
+    const berekendeReiskosten = kilometers * KM_TARIEF;
     const parkeerkosten = Number(factuur.parking_cost || 0);
     const materiaalkosten = Number(factuur.material_cost || 0);
     
-    const berekendeReiskosten = kilometers * KM_TARIEF;
     const bedrag = kaalBedrag + berekendeReiskosten + parkeerkosten + materiaalkosten;
 
     const invoiceUrl =
       "factuur-preview.html?invoice=" + encodeURIComponent(factuur.invoice_number || factuur.id);
 
-    if (status === "klaar" || factuur.ready_for_invoice === true) {
+    const reminderUrl =
+      "herinnering.html?invoice=" + encodeURIComponent(factuur.invoice_number || factuur.id);
+
+    const status = factuur.status || "klaar";
+
+    // 2. Sorteer ze netjes terug in de juiste bakjes op je scherm met jouw originele knoppen
+    if (status === "klaar") {
       readyTotal += bedrag;
       readyCount++;
 
-      ready.appendChild(
-        makeInvoiceRow(
-          factuur,
-          `<button class="dark-btn" onclick="window.location.href='${invoiceUrl}'">
-            Controleren en verzenden
-          </button>`
-        )
-      );
-    }
-    // Voeg hier eventueel je checks voor 'open' of 'reminder' statussen toe als je die gebruikt,
-    // en zorg dat ze ook 'readyTotal += bedrag' of 'openTotal += bedrag' doen.
-  });
-
-  // Dit zorgt dat de grote teller op het dashboard (Facturen: €...) ook direct naar €53,60 springt!
-  const facturenTotaalEl = document.getElementById("facturenTotaal"); // of hoe jouw element ook heet
-  if (facturenTotaalEl) {
-    facturenTotaalEl.textContent = euro(readyTotal);
-  }
-}
-
-    if (status === "open") {
+      if (ready) {
+        ready.appendChild(
+          makeInvoiceRow(
+            factuur,
+            `<button class="dark-btn" onclick="window.location.href='${invoiceUrl}'">
+              Controleren en verzenden
+            </button>`
+          )
+        );
+      }
+    } 
+    
+    else if (status === "open") {
       openTotal += bedrag;
       openCount++;
 
-      open.appendChild(
-        makeInvoiceRow(
-          factuur,
-          `<button class="light-btn" onclick="window.location.href='${invoiceUrl}'">
-            Factuur bekijken
-          </button>
-          <button class="light-btn" onclick="markAsPaid('${factuur.invoice_number}')">
-            Markeer betaald
-          </button>`
-        )
-      );
-    }
-
-    if (status === "herinnering") {
+      if (open) {
+        open.appendChild(
+          makeInvoiceRow(
+            factuur,
+            `<button class="light-btn" onclick="window.location.href='${invoiceUrl}'">
+              Factuur bekijken
+            </button>
+            <button class="light-btn" onclick="markAsPaid('${factuur.invoice_number}')">
+              Markeer betaald
+            </button>`
+          )
+        );
+      }
+    } 
+    
+    else if (status === "herinnering") {
       reminderTotal += bedrag;
       reminderCount++;
 
-      reminder.appendChild(
-        makeInvoiceRow(
-          factuur,
-          `<button class="light-btn" onclick="window.location.href='${invoiceUrl}'">
-            Bekijk factuur
-          </button>
-          <button class="light-btn" onclick="window.location.href='${reminderUrl}'">
-            Herinnering sturen
-          </button>
-          <button class="light-btn" onclick="markAsPaid('${factuur.invoice_number}')">
-            Markeer betaald
-          </button>`
-        )
-      );
-    }
-
-    if (status === "betaald") {
+      if (reminder) {
+        reminder.appendChild(
+          makeInvoiceRow(
+            factuur,
+            `<button class="light-btn" onclick="window.location.href='${invoiceUrl}'">
+              Bekijk factuur
+            </button>
+            <button class="light-btn" onclick="window.location.href='${reminderUrl}'">
+              Herinnering sturen
+            </button>
+            <button class="light-btn" onclick="markAsPaid('${factuur.invoice_number}')">
+              Markeer betaald
+            </button>`
+          )
+        );
+      }
+    } 
+    
+    else if (status === "betaald") {
       paidTotal += bedrag;
     }
   });
 
-  document.getElementById("readyTotal").textContent = euro(readyTotal);
-  document.getElementById("openTotal").textContent = euro(openTotal);
-  document.getElementById("reminderTotal").textContent = euro(reminderTotal);
-  document.getElementById("paidTotal").textContent = euro(paidTotal);
+  // 3. Update alle bedrag-totalen op het scherm (Nu overal inclusief reiskosten!)
+  if (document.getElementById("readyTotal")) document.getElementById("readyTotal").textContent = euro(readyTotal);
+  if (document.getElementById("openTotal")) document.getElementById("openTotal").textContent = euro(openTotal);
+  if (document.getElementById("reminderTotal")) document.getElementById("reminderTotal").textContent = euro(reminderTotal);
+  if (document.getElementById("paidTotal")) document.getElementById("paidTotal").textContent = euro(paidTotal);
 
-  document.getElementById("readyCount").textContent = `${readyCount} facturen`;
-  document.getElementById("openCount").textContent = `${openCount} facturen`;
-  document.getElementById("reminderCount").textContent = `${reminderCount} facturen`;
+  // 4. Update de aantal-tellers op het scherm
+  if (document.getElementById("readyCount")) document.getElementById("readyCount").textContent = `${readyCount} facturen`;
+  if (document.getElementById("openCount")) document.getElementById("openCount").textContent = `${openCount} facturen`;
+  if (document.getElementById("reminderCount")) document.getElementById("reminderCount").textContent = `${reminderCount} facturen`;
 
-  if (!ready.innerHTML) ready.innerHTML = `<p class="empty-state">Geen facturen klaar om te verzenden.</p>`;
-  if (!open.innerHTML) open.innerHTML = `<p class="empty-state">Geen openstaande facturen.</p>`;
-  if (!reminder.innerHTML) reminder.innerHTML = `<p class="empty-state">Geen herinneringen nodig.</p>`;
+  // 5. Toon lege status meldingen als er geen facturen in een lijst staan
+  if (ready && !ready.innerHTML) ready.innerHTML = `<p class="empty-state">Geen facturen klaar om te verzenden.</p>`;
+  if (open && !open.innerHTML) open.innerHTML = `<p class="empty-state">Geen openstaande facturen.</p>`;
+  if (reminder && !reminder.innerHTML) reminder.innerHTML = `<p class="empty-state">Geen herinneringen nodig.</p>`;
 }
 
 async function markAsPaid(invoiceNumber) {
