@@ -228,7 +228,6 @@ function makeInvoiceRow(factuur, buttons) {
   return row;
 }
 
-const KM_TARIEF = 0.23; 
 
 function renderFacturen(facturen) {
   const ready = document.getElementById("readyInvoices");
