@@ -416,16 +416,19 @@ async function sendInvoiceEmail() {
   const companyName = currentProfile?.company_name || "ZorgRapp";
   const companyIban = currentProfile?.iban || "";
   
-  // FIX: Haalt bookkeeping_email op uit de database
+  // 1. Haal de e-mailadressen en de vinkjes op
   const bookkeeperEmail = currentProfile?.bookkeeping_email || ""; 
-  
+  const sendCopy = document.getElementById("sendAccountingCopy")?.checked === true;
+  const onlyToBookkeeper = document.getElementById("onlyToBookkeeper")?.checked === true; // JE NIEUWE VINKJE
+
   const clientName = getClientName();
   const invoiceNumber = currentInvoice.invoice_number || "";
   const amount = formatEuro(getInvoiceTotal());
 
   const visibleEmail = document.getElementById("invoiceClientEmail")?.textContent?.trim();
 
-  const email =
+  // Haal het e-mailadres van de cliënt op
+  const clientEmail =
     currentClient?.invoice_email ||
     currentClient?.email ||
     currentClient?.client_email ||
@@ -433,13 +436,25 @@ async function sendInvoiceEmail() {
     visibleEmail ||
     "";
 
-  if (!email || !email.includes("@")) {
-    alert("Geen geldig e-mailadres gevonden bij deze cliënt.");
-    return;
+  // 2. Bepaal naar wie de e-mail ECHT verzonden moet worden
+  let email = "";
+
+  if (onlyToBookkeeper) {
+    // Als het nieuwe vinkje aanstaat, MOET er een boekhouder-mail zijn ingesteld
+    if (!bookkeeperEmail || !bookkeeperEmail.includes("@")) {
+      alert("Fout: Je wilt de factuur alleen naar de boekhouder sturen, maar er is geen geldig boekhouder e-mailadres ingesteld in je bedrijfsprofiel!");
+      return;
+    }
+    // De hoofdontvanger wordt nu de boekhouder!
+    email = bookkeeperEmail;
+  } else {
+    // Normale situatie: De hoofdontvanger is de cliënt
+    if (!clientEmail || !clientEmail.includes("@")) {
+      alert("Geen geldig e-mailadres gevonden bij deze cliënt. Vul deze aan of kies voor alleen boekhouder.");
+      return;
+    }
+    email = clientEmail;
   }
-
-  const sendCopy = document.getElementById("sendAccountingCopy")?.checked === true;
-
   const serviceName =
     currentInvoice?.service_name ||
     currentInvoice?.service_type ||
