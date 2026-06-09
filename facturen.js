@@ -151,7 +151,10 @@ function makeInvoiceRow(factuur, buttons) {
   row.innerHTML = `
     <strong>${factuur.client_name || "Onbekende cliënt"}</strong><br>
 <small>${factuur.invoice_number || ""}</small><br>
-<small style="color:#666;">${deliveryText}</small>
+<small style="color:#6b7280;">
+  ${deliveryText}
+</small>
+<
 
       ${
         factuur.reminder_sent_at
