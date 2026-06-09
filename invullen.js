@@ -369,6 +369,10 @@ appointment_date: appointment.appointment_date || null,
       material_cost: materialCost,
       parking_cost: parkingCost,
       payment_type: appointment.payment_type || "particulier",
+     invoice_delivery_method:
+  appointment.invoice_delivery_method ||
+  currentClient?.invoice_delivery_method ||
+  "nog_niet_afgesproken",
       funding_reference: appointment.funding_reference || null,
 funding_holder_name: appointment.funding_holder_name || null,
 funding_organization: appointment.funding_organization || null,

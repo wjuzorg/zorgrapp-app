@@ -140,13 +140,18 @@ function makeInvoiceRow(factuur, buttons) {
       `
       : "";
 
+      const deliveryText =
+  factuur.invoice_delivery_method === "post"
+    ? "📮 Factuur per adres"
+    : "📧 Factuur per mail";
+
   const row = document.createElement("div");
   row.className = "invoice-row";
 
   row.innerHTML = `
-    <div class="invoice-main">
-      <strong>${factuur.client_name || "Onbekende cliënt"}</strong><br>
-      <small>${factuur.invoice_number || ""}</small>
+    <strong>${factuur.client_name || "Onbekende cliënt"}</strong><br>
+<small>${factuur.invoice_number || ""}</small><br>
+<small style="color:#666;">${deliveryText}</small>
 
       ${
         factuur.reminder_sent_at
