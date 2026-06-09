@@ -154,7 +154,6 @@ function makeInvoiceRow(factuur, buttons) {
 <small style="color:#6b7280;">
   ${deliveryText}
 </small>
-<
 
       ${
         factuur.reminder_sent_at
