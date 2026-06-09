@@ -616,4 +616,22 @@ async function printAndMarkSent() {
   window.location.href = "facturen.html";
 }
 
+// Zorgt ervoor dat je maar één van de twee vinkjes tegelijk kunt selecteren
+document.addEventListener("change", function(e) {
+  const sendCopyEl = document.getElementById("sendAccountingCopy");
+  const onlyBookkeeperEl = document.getElementById("onlyToBookkeeper");
+
+  if (!sendCopyEl || !onlyBookkeeperEl) return;
+
+  // Als vinkje 1 wordt aangezet, zet vinkje 2 uit
+  if (e.target === sendCopyEl && sendCopyEl.checked) {
+    onlyBookkeeperEl.checked = false;
+  }
+  
+  // Als vinkje 2 wordt aangezet, zet vinkje 1 uit
+  if (e.target === onlyBookkeeperEl && onlyBookkeeperEl.checked) {
+    sendCopyEl.checked = false;
+  }
+});
+
 document.addEventListener("DOMContentLoaded", initInvoicePreview);
