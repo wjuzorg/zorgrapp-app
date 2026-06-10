@@ -117,84 +117,22 @@ function formatDateTime(dateString) {
   });
 }
 
-function makeInvoiceRow(factuur, buttons) {
-  console.log("FACTUUR RIJ:", factuur.client_name, factuur.invoice_delivery_method);
-  // FIX: Tel het kale bedrag, de reiskosten en eventuele btw bij elkaar op
-  const kaalBedrag = Number(factuur.amount || factuur.total || 0);
-  const reiskosten = Number(factuur.travel_expenses || factuur.reiskosten || 0);
-  const btwBedrag = Number(factuur.vat_amount || factuur.btw_bedrag || 0);
-  
-  const bedrag = kaalBedrag + reiskosten + btwBedrag;
-
-  const boekhouderStatus = factuur.bookkeeper_copy_sent_at
-    ? `
-      <div class="invoice-meta bookkeeper-ok">
-        Boekhouderkopie verzonden naar: ${factuur.bookkeeper_email || "boekhouder"}<br>
-        Datum: ${formatDateTime(factuur.bookkeeper_copy_sent_at)}
-      </div>
-    `
-    : factuur.send_bookkeeper_copy
-      ? `
-        <div class="invoice-meta bookkeeper-wait">
-          Boekhouderkopie staat klaar om te verzenden
-        </div>
-      `
-      : "";
-
-      const deliveryText =
-  factuur.invoice_delivery_method === "post"
-    ? "📮 Factuur per adres"
-    : factuur.invoice_delivery_method === "email"
-      ? "📧 Factuur per mail"
-      : "Factuurwijze nog niet afgesproken";
-
-  const row = document.createElement("div");
-  row.className = "invoice-row";
-
-row.innerHTML = `
-  <div class="invoice-main">
-    <strong>${factuur.client_name || "Onbekende cliënt"}</strong><br>
-    <small>${factuur.invoice_number || ""}</small><br>
-
-    <div style="margin-top:6px;color:#6b7280;font-size:14px;">
-      ${deliveryText}
-    </div>
-
-    ${
-      factuur.reminder_sent_at
-        ? `<div class="invoice-meta">
-            Laatste herinnering: ${formatDateTime(factuur.reminder_sent_at)}
-          </div>`
-        : ""
-    }
-
-    ${boekhouderStatus}
-  </div>
-
-  <div class="invoice-minutes">${factuur.minutes || 0} minuten</div>
-  <div class="invoice-amount">${euro(bedrag)}</div>
-
-  <div class="invoice-actions">
-    ${buttons}
-  </div>
-`;
-  return row; // Zorg dat de row netjes gereturned wordt
-}
-// Instelling voor de kilometervergoeding (pas aan naar jouw tarief indien nodig)
-const KM_TARIEF = 0.23; 
 
 function makeInvoiceRow(factuur, buttons) {
-  // Pak de basisbedragen uit jouw 'Appointments' tabelkolommen
   const kaalBedrag = Number(factuur.amount || 0);
   const kilometers = Number(factuur.km || 0);
+  const reiskosten = kilometers * KM_TARIEF;
   const parkeerkosten = Number(factuur.parking_cost || 0);
   const materiaalkosten = Number(factuur.material_cost || 0);
 
-  // Bereken de reiskosten: kilometers * tarief
-  const berekendeReiskosten = kilometers * KM_TARIEF;
+  const bedrag = kaalBedrag + reiskosten + parkeerkosten + materiaalkosten;
 
-  // FIX: Tel alles bij elkaar op voor het échte totaalbedrag op de rij
-  const bedrag = kaalBedrag + berekendeReiskosten + parkeerkosten + materiaalkosten;
+  const deliveryText =
+    factuur.invoice_delivery_method === "post"
+      ? "📮 Factuur per adres"
+      : factuur.invoice_delivery_method === "email"
+        ? "📧 Factuur per mail"
+        : "Factuurwijze nog niet afgesproken";
 
   const boekhouderStatus = factuur.bookkeeper_copy_sent_at
     ? `
@@ -217,7 +155,11 @@ function makeInvoiceRow(factuur, buttons) {
   row.innerHTML = `
     <div class="invoice-main">
       <strong>${factuur.client_name || "Onbekende cliënt"}</strong><br>
-      <small>${factuur.invoice_number || "Concept"}</small>
+      <small>${factuur.invoice_number || ""}</small><br>
+
+      <div style="margin-top:6px;color:#6b7280;font-size:14px;">
+        ${deliveryText}
+      </div>
 
       ${
         factuur.reminder_sent_at
@@ -230,13 +172,14 @@ function makeInvoiceRow(factuur, buttons) {
       ${boekhouderStatus}
     </div>
 
-    <div class="invoice-minutes">${factuur.worked_minutes || factuur.minutes || 0} minuten</div>
+    <div class="invoice-minutes">${factuur.minutes || 0} minuten</div>
     <div class="invoice-amount">${euro(bedrag)}</div>
 
     <div class="invoice-actions">
       ${buttons}
     </div>
   `;
+
   return row;
 }
 
