@@ -118,6 +118,7 @@ function formatDateTime(dateString) {
 }
 
 function makeInvoiceRow(factuur, buttons) {
+  console.log("FACTUUR RIJ:", factuur.client_name, factuur.invoice_delivery_method);
   // FIX: Tel het kale bedrag, de reiskosten en eventuele btw bij elkaar op
   const kaalBedrag = Number(factuur.amount || factuur.total || 0);
   const reiskosten = Number(factuur.travel_expenses || factuur.reiskosten || 0);
