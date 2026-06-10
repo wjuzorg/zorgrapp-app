@@ -117,6 +117,7 @@ function formatDateTime(dateString) {
   });
 }
 
+const KM_TARIEF = 0.23;
 
 function makeInvoiceRow(factuur, buttons) {
   const kaalBedrag = Number(factuur.amount || 0);
