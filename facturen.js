@@ -129,11 +129,12 @@ function makeInvoiceRow(factuur, buttons) {
   const bedrag = kaalBedrag + reiskosten + parkeerkosten + materiaalkosten;
 
   const deliveryText =
-    factuur.invoice_delivery_method === "post"
-      ? "📮 Factuur per adres"
-      : factuur.invoice_delivery_method === "email"
-        ? "📧 Factuur per mail"
-        : "Factuurwijze nog niet afgesproken";
+  factuur.invoice_delivery_method === "post" ||
+  factuur.invoice_delivery_method === "address"
+    ? "📮 Factuur per adres"
+    : factuur.invoice_delivery_method === "email"
+      ? "📧 Factuur per mail"
+      : "Factuurwijze nog niet afgesproken";
 
   const boekhouderStatus = factuur.bookkeeper_copy_sent_at
     ? `
