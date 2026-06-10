@@ -151,31 +151,33 @@ function makeInvoiceRow(factuur, buttons) {
   const row = document.createElement("div");
   row.className = "invoice-row";
 
-  row.innerHTML = `
+row.innerHTML = `
+  <div class="invoice-main">
     <strong>${factuur.client_name || "Onbekende cliënt"}</strong><br>
-<small>${factuur.invoice_number || ""}</small><br>
-<div style="margin-top:6px;color:#6b7280;font-size:14px;">
-  ${deliveryText}
-</div>
+    <small>${factuur.invoice_number || ""}</small><br>
 
-      ${
-        factuur.reminder_sent_at
-          ? `<div class="invoice-meta">
-              Laatste herinnering: ${formatDateTime(factuur.reminder_sent_at)}
-            </div>`
-          : ""
-      }
-
-      ${boekhouderStatus}
+    <div style="margin-top:6px;color:#6b7280;font-size:14px;">
+      ${deliveryText}
     </div>
 
-    <div class="invoice-minutes">${factuur.minutes || 0} minuten</div>
-    <div class="invoice-amount">${euro(bedrag)}</div>
+    ${
+      factuur.reminder_sent_at
+        ? `<div class="invoice-meta">
+            Laatste herinnering: ${formatDateTime(factuur.reminder_sent_at)}
+          </div>`
+        : ""
+    }
 
-    <div class="invoice-actions">
-      ${buttons}
-    </div>
-  `;
+    ${boekhouderStatus}
+  </div>
+
+  <div class="invoice-minutes">${factuur.minutes || 0} minuten</div>
+  <div class="invoice-amount">${euro(bedrag)}</div>
+
+  <div class="invoice-actions">
+    ${buttons}
+  </div>
+`;
   return row; // Zorg dat de row netjes gereturned wordt
 }
 // Instelling voor de kilometervergoeding (pas aan naar jouw tarief indien nodig)
