@@ -576,7 +576,9 @@ async function printAndMarkSent() {
     return;
   }
 
+  setTimeout(() => {
   window.print();
+}, 300);
 
   const ok = confirm(
     "Is de factuur geprint of opgeslagen als PDF en klaar om per post te versturen?"
