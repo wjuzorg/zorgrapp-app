@@ -164,27 +164,6 @@ function euro(value) {
   return `€${Number(value || 0).toFixed(2).replace(".", ",")}`;
 }
 
-function enableInvoiceEdit() {
-  const ids = [
-    "invoiceNumber",
-    "invoiceClientName",
-    "invoiceDescription",
-    "invoiceMinutes",
-    "invoiceAmount",
-    "invoiceTotal"
-  ];
-
-  ids.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.contentEditable = true;
-  });
-
-  alert("Factuur staat nu in bewerkmodus.");
-}
-
-function euro(value) {
-  return `€${Number(value || 0).toFixed(2).replace(".", ",")}`;
-}
 
 async function sendInvoiceEmail() {
   if (!currentInvoice) {

@@ -3171,3 +3171,55 @@ button.forgot-btn:hover {
   color: black !important; /* Zorgt dat de tekst zwart blijft */
   padding: 10px 5px;     /* Iets compacter voor mobiel */
 }
+
+/* Factuur preview mobiel */
+.invoice-table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.invoice-table th,
+.invoice-table td {
+  padding: 10px 8px;
+  vertical-align: top;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+
+.invoice-table td:first-child,
+.invoice-table th:first-child {
+  width: 55%;
+}
+
+.invoice-table td:nth-child(2),
+.invoice-table th:nth-child(2) {
+  width: 20%;
+}
+
+.invoice-table td:nth-child(3),
+.invoice-table th:nth-child(3) {
+  width: 25%;
+}
+
+#invoiceDescription {
+  display: block;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+@media (max-width: 768px) {
+  .invoice-table {
+    font-size: 14px;
+  }
+
+  .invoice-table th,
+  .invoice-table td {
+    padding: 8px 4px;
+  }
+
+  body {
+    overflow-x: hidden;
+  }
+}
