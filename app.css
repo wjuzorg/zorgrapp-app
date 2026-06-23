@@ -3223,3 +3223,27 @@ button.forgot-btn:hover {
     overflow-x: hidden;
   }
 }
+
+@media print {
+
+  .dark-btn,
+  .light-btn,
+  .mint-btn,
+  .topbar,
+  .settings-nav,
+  .preview-actions,
+  .invoice-actions {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+  }
+
+  .invoice-card,
+  .invoice-preview,
+  .invoice-box {
+    box-shadow: none !important;
+    border: none !important;
+  }
+}
