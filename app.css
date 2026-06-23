@@ -3251,3 +3251,7 @@ button.forgot-btn:hover {
 .preview-actions .btn.btn-primary {
   color: #111827 !important;
 }
+
+.preview-actions .btn.btn-primary:hover {
+  color: #111827 !important;
+}
