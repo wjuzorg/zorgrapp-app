@@ -3248,10 +3248,16 @@ button.forgot-btn:hover {
   }
 }
 
-.preview-actions .btn.btn-primary {
+.reminder-mail-btn {
+  background: #f3f4f6 !important;
   color: #111827 !important;
+  border: 1px solid #e5e7eb !important;
+  opacity: 1 !important;
+  filter: none !important;
+  font-weight: 700 !important;
 }
 
-.preview-actions .btn.btn-primary:hover {
+.reminder-mail-btn:disabled {
   color: #111827 !important;
+  opacity: 1 !important;
 }
