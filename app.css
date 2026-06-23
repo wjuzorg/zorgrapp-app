@@ -3225,14 +3225,14 @@ button.forgot-btn:hover {
 }
 
 @media print {
-
   .dark-btn,
   .light-btn,
   .mint-btn,
   .topbar,
   .settings-nav,
   .preview-actions,
-  .invoice-actions {
+  .invoice-actions,
+  button {
     display: none !important;
   }
 

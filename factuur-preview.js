@@ -576,9 +576,15 @@ async function printAndMarkSent() {
     return;
   }
 
+  document.body.classList.add("print-mode");
+
   setTimeout(() => {
-  window.print();
-}, 300);
+    window.print();
+  }, 800);
+
+  setTimeout(() => {
+    document.body.classList.remove("print-mode");
+  }, 2000);
 
   const ok = confirm(
     "Is de factuur geprint of opgeslagen als PDF en klaar om per post te versturen?"
@@ -592,7 +598,6 @@ async function printAndMarkSent() {
     updated_at: new Date().toISOString()
   };
 
-  // FIX: Zorgt dat printen ook rekening houdt met bookkeeping_email
   const bookkeeperEmail = currentProfile?.bookkeeping_email || "";
   const sendCopy = document.getElementById("sendAccountingCopy")?.checked === true;
 
