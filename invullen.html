@@ -22,7 +22,7 @@
       <div class="form-header">
         <div class="form-title-wrap">
           <h2>Afspraak invullen</h2>
-          <p>Werk de afspraak netjes bij en sla interne signalen veilig op.</p>
+          <p>Rond je afspraak af, noteer signalen en zet de factuurgegevens klaar.</p>
         </div>
       </div>
 
@@ -45,10 +45,12 @@
       </div>
 
       <form id="fillForm">
-        <div class="section section-work">
-          <h3>Wat heb je gedaan?</h3>
 
-          <label class="form-label" for="work_done">Werkzaamheden</label>
+        <!-- BLOK 1 -->
+        <div class="section section-work">
+          <h3>1. Afspraak afronden</h3>
+
+          <label class="form-label" for="work_done">Wat heb je gedaan?</label>
           <textarea id="work_done" class="form-textarea" rows="5"
             placeholder="Bijvoorbeeld: boodschappen gedaan, samen koffie gedronken, medicatie opgehaald..."></textarea>
 
@@ -62,44 +64,25 @@
             <option value="90">90 minuten</option>
             <option value="120">120 minuten</option>
           </select>
+
+          <label class="form-label" for="km">Aantal gereden km</label>
+          <input type="number" id="km" class="form-input" min="0" placeholder="Bijv. 12" />
+
+          <label class="form-label" for="material_cost">Materiaal / overige kosten (€)</label>
+          <input type="number" id="material_cost" class="form-input" min="0" step="0.01" placeholder="Bijv. 4,50" />
+
+          <label class="form-label" for="parking_cost">Parkeerkosten (€)</label>
+          <input type="number" id="parking_cost" class="form-input" min="0" step="0.01" placeholder="Bijv. 2,50" />
+
+          <p class="helper-text">
+            Kilometervergoeding wordt automatisch berekend met €0,23 per km.
+            Materiaal en parkeren zijn optioneel.
+          </p>
         </div>
 
-        <label class="form-label" for="km">Aantal gereden km</label>
-<input
-  type="number"
-  id="km"
-  class="form-input"
-  min="0"
-  placeholder="Bijv. 12"
-/>
-
-<label class="form-label" for="material_cost">Materiaal / overige kosten (€)</label>
-<input
-  type="number"
-  id="material_cost"
-  class="form-input"
-  min="0"
-  step="0.01"
-  placeholder="Bijv. 4,50"
-/>
-
-<label class="form-label" for="parking_cost">Parkeerkosten (€)</label>
-<input
-  type="number"
-  id="parking_cost"
-  class="form-input"
-  min="0"
-  step="0.01"
-  placeholder="Bijv. 2,50"
-/>
-
-<p class="helper-text">
-  Kilometervergoeding wordt later automatisch berekend met €0,23 per km.
-  Materiaal en parkeren zijn optioneel.
-</p>
-
+        <!-- BLOK 2 -->
         <div class="section">
-          <h3>Interne signaleringen</h3>
+          <h3>2. Signalen en bijzonderheden</h3>
 
           <div class="form-grid-two">
             <div>
@@ -123,18 +106,15 @@
             </div>
           </div>
 
-          <label class="form-label" for="signal_status">Actiestatus signaal</label>
+          <label class="form-label" for="signal_status">Is er opvolging nodig?</label>
           <select id="signal_status" class="form-input">
-            <option value="geen">Geen actief signaal</option>
-            <option value="actief">Actiesignaal actief</option>
+            <option value="geen">Geen bijzonderheden</option>
+            <option value="actief">Aandachtspunt / opvolging nodig</option>
             <option value="verbeterd">Situatie verbeterd</option>
             <option value="afgesloten">Signaal afgesloten</option>
           </select>
-        </div>
 
-        <div class="section">
-          <h3>Specificatie</h3>
-
+          <h3>Wat viel concreet op?</h3>
           <div class="signal-grid checkbox-list">
             <label class="signal-chip"><input type="checkbox" value="vergeetachtig"> Vergeetachtig</label>
             <label class="signal-chip"><input type="checkbox" value="somber"> Somber</label>
@@ -150,44 +130,30 @@
             placeholder="Extra observaties of bijzonderheden..."></textarea>
         </div>
 
+        <!-- BLOK 3 -->
         <div class="section">
-  <h3>Betaling</h3>
+          <h3>3. Betaling en factuur</h3>
 
-  <label class="form-label" for="payment_type">Betalingsvorm</label>
-  <select id="payment_type" class="form-input">
-    <option value="">Kies een optie</option>
-    <option value="particulier">Particulier</option>
-    <option value="pgb">PGB</option>
-    <option value="wmo">Wmo</option>
-  </select>
+          <label class="form-label" for="payment_type">Betalingsvorm</label>
+          <select id="payment_type" class="form-input">
+            <option value="">Kies een optie</option>
+            <option value="particulier">Particulier</option>
+            <option value="pgb">PGB</option>
+            <option value="wmo">Wmo</option>
+          </select>
 
-  <label class="form-label" for="funding_reference">
-    Beschikkingsnummer / referentie
-  </label>
-  <input id="funding_reference" class="form-input" type="text">
+          <label class="form-label" for="funding_reference">Beschikkingsnummer / referentie</label>
+          <input id="funding_reference" class="form-input" type="text">
 
-  <label class="form-label" for="funding_holder_name">
-    Budgethouder / contactpersoon betaling
-  </label>
-  <input id="funding_holder_name" class="form-input" type="text">
+          <label class="form-label" for="funding_holder_name">Budgethouder / contactpersoon betaling</label>
+          <input id="funding_holder_name" class="form-input" type="text">
 
-  <label class="form-label" for="funding_organization">
-    Gemeente / SVB / organisatie
-  </label>
-  <input id="funding_organization" class="form-input" type="text">
+          <label class="form-label" for="funding_organization">Gemeente / SVB / organisatie</label>
+          <input id="funding_organization" class="form-input" type="text">
 
-  <label class="form-label" for="funding_period">
-    Periode Wmo/PGB
-  </label>
-  <input
-    id="funding_period"
-    class="form-input"
-    type="text"
-    placeholder="Bijvoorbeeld: mei 2026"
-  >
-</div>
+          <label class="form-label" for="funding_period">Periode Wmo/PGB</label>
+          <input id="funding_period" class="form-input" type="text" placeholder="Bijvoorbeeld: juni 2026">
 
-        <div class="section">
           <h3>Factuuradres</h3>
 
           <label class="form-label" for="invoice_delivery_method">Factuur ontvangen via</label>
@@ -223,34 +189,21 @@
         </div>
 
         <div id="saveMessage" class="helper-text" style="margin: 12px 0 18px;"></div>
-<div class="action-stack">
-  <button
-    type="button"
-    class="btn btn-outline danger-outline"
-    id="deleteAppointmentBtn"
-  >
-    Afspraak verwijderen
-  </button>
 
-  <button
-    type="button"
-    class="btn btn-secondary"
-    id="saveDraftBtn"
-  >
-    Opslaan concept
-  </button>
+        <div class="action-stack">
+          <button type="submit" id="finishBtn" class="btn" style="background:#16a34a; color:#ffffff; border:none;">
+            Afronden
+          </button>
 
-  <button
-    type="submit"
-    id="finishBtn"
-    class="btn"
-    style="background:#16a34a; color:#ffffff; border:none;"
-  >
-    Afronden
-  </button>
-</div>
-        
+          <button type="button" class="btn btn-outline danger-outline" id="deleteAppointmentBtn">
+            Afspraak verwijderen
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="./invullen.js?v=2"></script>
+  <script src="./invullen.js?v=3"></script>
 </body>
 </html>

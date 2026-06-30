@@ -406,14 +406,5 @@ funding_period: appointment.funding_period || null,
   window.location.href = "./index.html";
 });
 
-  el("saveDraftBtn")?.addEventListener("click", async () => {
-    showMessage("Concept opslaan...");
-
-    const ok = await saveAppointment("ingevuld");
-    if (!ok) return;
-
-    showMessage("Concept opgeslagen.");
-  });
-
   el("deleteAppointmentBtn")?.addEventListener("click", deleteAppointment);
 });

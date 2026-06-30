@@ -67,6 +67,21 @@ async function requireLogin() {
   return data.session.user;
 }
 
+async function loadBusinessProfile(userId) {
+  const { data, error } = await supabaseClient
+    .from("business_profiles")
+    .select("hourly_rate")
+    .eq("owner_id", userId)
+    .maybeSingle();
+
+  if (error) {
+    console.warn("Bedrijfsprofiel ophalen mislukt:", error.message);
+    return null;
+  }
+
+  return data;
+}
+
 /* ---------------- TIME CHECK ---------------- */
 
 async function checkTimeSlot(date, time, userId) {
@@ -219,24 +234,30 @@ async function saveClient() {
     }
 
     // FIX 1: salutation (aanhef) toegevoegd aan de database payload voor de cliënt
-    const clientPayload = {
-      owner_id: user.id,
-      full_name,
-      salutation: val("salutation"), 
-      address: val("address"),
-      postal_code: val("postal_code"),
-      city: val("city"),
-      client_email: val("client_email"),
-      iban: val("iban"),
-      funding_type: val("funding_type"),
-      emergency_contact: val("emergency_contact"),
-      invoice_delivery_method: val("invoice_delivery_method"),
-      invoice_email: val("invoice_email"),
-      invoice_same_as_client_address: val("invoice_same_as_client_address") !== "false",
-      invoice_address: val("invoice_address"),
-      invoice_postal_code: val("invoice_postal_code"),
-      invoice_city: val("invoice_city")
-    };
+    const businessProfile = await loadBusinessProfile(user.id);
+const defaultHourlyRate = Number(businessProfile?.hourly_rate || 0);
+
+const clientPayload = {
+  owner_id: user.id,
+  full_name,
+  salutation: val("salutation"),
+  hourly_rate: selectedClientId
+    ? Number(val("hourly_rate") || defaultHourlyRate || 0)
+    : defaultHourlyRate,
+  address: val("address"),
+  postal_code: val("postal_code"),
+  city: val("city"),
+  client_email: val("client_email"),
+  iban: val("iban"),
+  funding_type: val("funding_type"),
+  emergency_contact: val("emergency_contact"),
+  invoice_delivery_method: val("invoice_delivery_method"),
+  invoice_email: val("invoice_email"),
+  invoice_same_as_client_address: val("invoice_same_as_client_address") !== "false",
+  invoice_address: val("invoice_address"),
+  invoice_postal_code: val("invoice_postal_code"),
+  invoice_city: val("invoice_city")
+};
 
     let clientId = selectedClientId;
 
