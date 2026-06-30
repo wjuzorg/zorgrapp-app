@@ -256,7 +256,10 @@ const clientPayload = {
   invoice_same_as_client_address: val("invoice_same_as_client_address") !== "false",
   invoice_address: val("invoice_address"),
   invoice_postal_code: val("invoice_postal_code"),
-  invoice_city: val("invoice_city")
+ invoice_city: val("invoice_city"),
+
+invoice_contact_type: val("invoice_contact_type"),
+invoice_contact_name: val("invoice_contact_name")
 };
 
     let clientId = selectedClientId;

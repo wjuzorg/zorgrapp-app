@@ -500,6 +500,32 @@
     <input id="invoice_city" class="input" type="text" />
   </div>
    </div>
+   <div class="section">
+    
+  <h3>Factuurontvanger</h3>
+  <p class="helper-text">
+    Vul in wie de factuur moet ontvangen of controleren. Dit kan de cliënt zijn,
+    een budgethouder, vertegenwoordiger, gemeente of organisatie.
+  </p>
+
+  <label class="form-label" for="invoice_contact_type">Type ontvanger</label>
+  <select id="invoice_contact_type" class="form-input">
+    <option value="">Kies een optie</option>
+    <option value="client">Cliënt</option>
+    <option value="budgethouder">Budgethouder / vertegenwoordiger</option>
+    <option value="gemeente">Gemeente</option>
+    <option value="zorgorganisatie">Zorgorganisatie</option>
+    <option value="anders">Anders</option>
+  </select>
+
+  <label class="form-label" for="invoice_contact_name">Naam ontvanger</label>
+  <input
+    id="invoice_contact_name"
+    class="form-input"
+    type="text"
+    placeholder="Bijvoorbeeld: dochter van cliënt, budgethouder of contactpersoon gemeente"
+  >
+</div>
     </div>
 
       </form>
