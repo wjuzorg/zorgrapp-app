@@ -502,13 +502,13 @@
    </div>
   <div class="section">
   <h3>Factuurontvanger</h3>
+
   <p class="helper-text">
-    Vul in wie de factuur moet ontvangen of controleren. Dit kan de cliënt zijn,
-    een budgethouder, vertegenwoordiger, gemeente of organisatie.
+    Vul in wie de factuur moet ontvangen of controleren.
   </p>
 
   <label for="invoice_contact_type">Type ontvanger</label>
-  <select id="invoice_contact_type" class="input">
+  <select id="invoice_contact_type" class="input" style="width:100%; display:block;">
     <option value="">Kies een optie</option>
     <option value="client">Cliënt</option>
     <option value="budgethouder">Budgethouder / vertegenwoordiger</option>
@@ -521,6 +521,7 @@
   <input
     id="invoice_contact_name"
     class="input"
+    style="width:100%; display:block;"
     type="text"
     placeholder="Bijvoorbeeld: dochter van cliënt of contactpersoon gemeente"
   />
