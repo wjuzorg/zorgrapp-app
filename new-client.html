@@ -500,43 +500,36 @@
     <input id="invoice_city" class="input" type="text" />
   </div>
    </div>
-   <div class="section">
-
+  <div class="section">
   <h3>Factuurontvanger</h3>
   <p class="helper-text">
     Vul in wie de factuur moet ontvangen of controleren. Dit kan de cliënt zijn,
     een budgethouder, vertegenwoordiger, gemeente of organisatie.
   </p>
 
- <label class="form-label" for="invoice_contact_type">
-  Type ontvanger
-</label>
+  <label for="invoice_contact_type">Type ontvanger</label>
+  <select id="invoice_contact_type" class="input">
+    <option value="">Kies een optie</option>
+    <option value="client">Cliënt</option>
+    <option value="budgethouder">Budgethouder / vertegenwoordiger</option>
+    <option value="gemeente">Gemeente</option>
+    <option value="zorgorganisatie">Zorgorganisatie</option>
+    <option value="anders">Anders</option>
+  </select>
 
-<select id="invoice_contact_type" class="form-input">
-  <option value="">Kies een optie</option>
-  <option value="client">Cliënt</option>
-  <option value="budgethouder">Budgethouder / vertegenwoordiger</option>
-  <option value="gemeente">Gemeente</option>
-  <option value="zorgorganisatie">Zorgorganisatie</option>
-  <option value="anders">Anders</option>
-</select>
-
-<label class="form-label" for="invoice_contact_name">
-  Naam ontvanger
-</label>
-
-<input
-  id="invoice_contact_name"
-  class="form-input"
-  type="text"
-  placeholder="Bijvoorbeeld: dochter van cliënt of contactpersoon gemeente"
-/>
+  <label for="invoice_contact_name">Naam ontvanger</label>
+  <input
+    id="invoice_contact_name"
+    class="input"
+    type="text"
+    placeholder="Bijvoorbeeld: dochter van cliënt of contactpersoon gemeente"
+  />
 </div>
       </form>
     </section>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="./new-client.js?v=4"></script>
+  <script src="./new-client.js?v=5"></script>
 </body>
 </html>
