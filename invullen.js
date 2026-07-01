@@ -331,8 +331,12 @@ async function createInvoiceDraftFromAppointment() {
     return true;
   }
 
-  const minutes = Number(appointment.worked_minutes || appointment.duration_minutes || 0);
-const hourlyRate = Number(currentClient?.hourly_rate || 49);
+  const hourlyRate = Number(businessProfile?.hourly_rate);
+
+if (!hourlyRate) {
+  showMessage("Geen standaard uurtarief ingesteld in het bedrijfsprofiel.", true);
+  return false;
+}
 
 const km = Number(appointment.km || 0);
 const kmAmount = km * 0.23;
