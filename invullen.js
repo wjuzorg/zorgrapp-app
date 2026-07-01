@@ -373,6 +373,17 @@ appointment_date: appointment.appointment_date || null,
   appointment.invoice_delivery_method ||
   currentClient?.invoice_delivery_method ||
   "nog_niet_afgesproken",
+  invoice_contact_type:
+  currentClient?.invoice_contact_type || null,
+
+invoice_contact_name:
+  currentClient?.invoice_contact_name || null,
+
+invoice_contact_email:
+  currentClient?.invoice_contact_email || null,
+
+invoice_contact_phone:
+  currentClient?.invoice_contact_phone || null,
       funding_reference: appointment.funding_reference || null,
 funding_holder_name: appointment.funding_holder_name || null,
 funding_organization: appointment.funding_organization || null,

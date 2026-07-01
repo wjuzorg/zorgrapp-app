@@ -259,7 +259,9 @@ const clientPayload = {
  invoice_city: val("invoice_city"),
 
 invoice_contact_type: val("invoice_contact_type"),
-invoice_contact_name: val("invoice_contact_name")
+invoice_contact_name: val("invoice_contact_name"),
+invoice_contact_email: val("invoice_contact_email"),
+invoice_contact_phone: val("invoice_contact_phone")
 };
 
     let clientId = selectedClientId;
