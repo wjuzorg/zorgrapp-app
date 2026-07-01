@@ -353,12 +353,12 @@ function renderInvoiceRecipient() {
   const phone = currentInvoice.invoice_contact_phone || "-";
 
   box.innerHTML = `
-    <div class="notice-card">
-      <strong>📨 Factuur wordt verzonden naar</strong><br>
-      <span>${type}</span><br>
-      <span>${name}</span><br>
-      <span>📧 ${email}</span><br>
-      <span>📞 ${phone}</span>
+    <div class="invoice-check-row" style="display:block;">
+      <strong>📨 Factuur wordt verzonden naar</strong>
+      <p style="margin:10px 0 4px;"><strong>Type:</strong> ${type}</p>
+      <p style="margin:4px 0;"><strong>Naam:</strong> ${name}</p>
+      <p style="margin:4px 0;"><strong>E-mail:</strong> ${email}</p>
+      <p style="margin:4px 0;"><strong>Telefoon:</strong> ${phone}</p>
     </div>
   `;
 }
