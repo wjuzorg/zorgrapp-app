@@ -94,15 +94,25 @@
   Wij verzoeken u vriendelijk het bedrag binnen 14 dagen te voldoen.
 </p>
 
-    <label class="invoice-check-row no-print">
-      <input type="checkbox" id="sendAccountingCopy" checked>
-      Ook kopie naar boekhouding sturen
-    </label>
+   <div class="section no-print">
+  <h3>📤 Factuur verzenden</h3>
 
-    <label class="invoice-check-row no-print">
-      <input type="checkbox" id="onlyToBookkeeper">
-      Stuur factuur alleen naar boekhouder (Cliënt ontvangt geen e-mail)
-    </label>
+  <div id="invoiceRecipientBox"></div>
+
+  <label class="invoice-check-row">
+    <input type="checkbox" id="sendAccountingCopy" checked>
+    Stuur ook een kopie naar mijn boekhouder
+  </label>
+
+  <label class="invoice-check-row">
+    <input type="checkbox" id="onlyToBookkeeper">
+    Alleen naar mijn boekhouder sturen
+  </label>
+
+  <p class="helper-text">
+    De cliënt of factuurontvanger ontvangt dan geen e-mail.
+  </p>
+</div>
 
     <!-- Knoppen -->
     <div class="preview-actions">

@@ -213,7 +213,8 @@ function fillInvoicePreview() {
   );
 
   renderInvoiceLines();
-  renderFundingText();
+renderFundingText();
+renderInvoiceRecipient();
 }
 
 // FIX: Hier worden alle reiskosten en extra kosten weer netjes meegerekend voor het totaalbedrag!
@@ -334,6 +335,34 @@ function renderFundingText() {
   box.innerHTML = "";
 }
 
+function renderInvoiceRecipient() {
+  const box = document.getElementById("invoiceRecipientBox");
+  if (!box || !currentInvoice) return;
+
+  const typeLabels = {
+    client: "Cliënt",
+    budgethouder: "Budgethouder / vertegenwoordiger",
+    gemeente: "Gemeente",
+    zorgorganisatie: "Zorgorganisatie",
+    anders: "Anders"
+  };
+
+  const type = typeLabels[currentInvoice.invoice_contact_type] || "Niet ingesteld";
+  const name = currentInvoice.invoice_contact_name || "-";
+  const email = currentInvoice.invoice_contact_email || "-";
+  const phone = currentInvoice.invoice_contact_phone || "-";
+
+  box.innerHTML = `
+    <div class="notice-card">
+      <strong>📨 Factuur wordt verzonden naar</strong><br>
+      <span>${type}</span><br>
+      <span>${name}</span><br>
+      <span>📧 ${email}</span><br>
+      <span>📞 ${phone}</span>
+    </div>
+  `;
+}
+
 function enableInvoiceEdit() {
   const fields = document.querySelectorAll(
     "#invoiceNumber, #invoiceClientName, #invoiceClientAddress, #invoiceClientPostcode, #invoiceClientCity, #invoiceClientEmail, #invoiceDescription, #invoiceMinutes, #invoiceAmount, #invoiceTotal"
@@ -428,13 +457,15 @@ async function sendInvoiceEmail() {
   const visibleEmail = document.getElementById("invoiceClientEmail")?.textContent?.trim();
 
   // Haal het e-mailadres van de cliënt op
-  const clientEmail =
-    currentClient?.invoice_email ||
-    currentClient?.email ||
-    currentClient?.client_email ||
-    currentInvoice?.client_email ||
-    visibleEmail ||
-    "";
+ const clientEmail =
+  currentInvoice?.invoice_contact_email ||
+  currentClient?.invoice_contact_email ||
+  currentClient?.invoice_email ||
+  currentClient?.email ||
+  currentClient?.client_email ||
+  currentInvoice?.client_email ||
+  visibleEmail ||
+  "";
 
   // 2. Bepaal naar wie de e-mail ECHT verzonden moet worden
   let email = "";
