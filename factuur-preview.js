@@ -220,8 +220,8 @@ function fillInvoicePreview() {
 function getInvoiceTotal() {
   const minutes = Number(currentInvoice.minutes || 0);
   const hourlyRate = Number(currentInvoice.hourly_rate || 0);
-  const laborAmount = Number(currentInvoice.amount || ((minutes / 60) * hourlyRate));
 
+  const laborAmount = (minutes / 60) * hourlyRate;
   const kmAmount = Number(currentInvoice.km_amount || 0);
   const materialCost = Number(currentInvoice.material_cost || 0);
   const parkingCost = Number(currentInvoice.parking_cost || 0);
@@ -240,7 +240,7 @@ function renderInvoiceLines() {
   const minutes = Number(currentInvoice.minutes || 0);
   const hourlyRate = Number(currentInvoice.hourly_rate || 0);
   
-  const laborAmount = Number(currentInvoice.amount || ((minutes / 60) * hourlyRate));
+const laborAmount = (minutes / 60) * hourlyRate;
 
   const km = Number(currentInvoice.km || 0);
   const kmAmount = Number(currentInvoice.km_amount || 0);
