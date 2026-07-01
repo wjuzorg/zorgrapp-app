@@ -329,9 +329,27 @@ async function createInvoiceDraftFromAppointment() {
 
   if (existing) {
     return true;
-  }
+     }
 
-  const hourlyRate = Number(businessProfile?.hourly_rate);
+    const minutes = Number(
+  appointment.worked_minutes ||
+  appointment.duration_minutes ||
+  0
+);
+ 
+
+  const { data: businessProfile, error: businessError } = await supabaseClient
+  .from("business_profiles")
+  .select("hourly_rate")
+  .eq("owner_id", currentUser.id)
+  .maybeSingle();
+
+if (businessError) {
+  showMessage("Bedrijfsprofiel kon niet worden opgehaald.", true);
+  return false;
+}
+
+const hourlyRate = Number(businessProfile?.hourly_rate || 0);
 
 if (!hourlyRate) {
   showMessage("Geen standaard uurtarief ingesteld in het bedrijfsprofiel.", true);
