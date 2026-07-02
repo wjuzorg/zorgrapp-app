@@ -122,30 +122,45 @@ async function loadAppointment() {
     return;
   }
 
-  currentAppointment = data;
+ currentAppointment = data;
 
+  // STAP 1: Haal EERST de cliënt op, zodat we de gegevens bij de hand hebben
+  await loadClient(data.client_id);
+
+  // STAP 2: Vul de algemene info in op het scherm
   setText("infoClientName", data.client_name || "-");
   setText("infoTime", data.appointment_time || "-");
   setText("infoServiceType", data.service_type || "-");
 
+  // STAP 3: Vul de invoervelden in
   setValue("work_done", data.work_done || "");
   setValue("worked_minutes", data.worked_minutes || data.duration_minutes || "");
   setValue("person_status", data.person_status || "");
   setValue("house_status", data.house_status || "");
   setValue("signal_notes", data.signal_notes || "");
-  setValue("payment_type", data.payment_type || "");
+
+  // Slimme check: pak de betalingsvorm van de afspraak, of van de cliënt (als die al eerder is opgeslagen)
+  setValue("payment_type", data.payment_type || currentClient?.payment_type || "");
+
+  // Vul de PGB/Wmo gegevens in (pakt nu écht de gegevens van de cliënt als de afspraak nog leeg is!)
   setValue("funding_reference", data.funding_reference || currentClient?.funding_reference || "");
-setValue("funding_holder_name", data.funding_holder_name || currentClient?.funding_holder_name || "");
-setValue("funding_organization", data.funding_organization || currentClient?.funding_organization || "");
-setValue("funding_period", data.funding_period || currentClient?.funding_period || "");
+  setValue("funding_holder_name", data.funding_holder_name || currentClient?.invoice_contact_name || currentClient?.funding_holder_name || "");
+  setValue("funding_organization", data.funding_organization || currentClient?.funding_organization || "");
+
+  // Periode gokken we slim op basis van de afspraakdatum als deze nog niet specifiek is ingevuld
+  if (!data.funding_period && data.appointment_date) {
+    const date = new Date(data.appointment_date);
+    const opties = { month: 'long', year: 'numeric' };
+    setValue("funding_period", date.toLocaleDateString('nl-NL', opties));
+  } else {
+    setValue("funding_period", data.funding_period || currentClient?.funding_period || "");
+  }
 
   setSelectedSignals(data.internal_signals || "");
 
- setValue("km", data.km || "");
-setValue("material_cost", data.material_cost || "");
-setValue("parking_cost", data.parking_cost || "");
-
-  await loadClient(data.client_id);
+  setValue("km", data.km || "");
+  setValue("material_cost", data.material_cost || "");
+  setValue("parking_cost", data.parking_cost || "");
 }
 
 async function loadClient(clientId) {
@@ -406,12 +421,13 @@ invoice_contact_email:
 
 invoice_contact_phone:
   currentClient?.invoice_contact_phone || null,
-      funding_reference: appointment.funding_reference || null,
-funding_holder_name: appointment.funding_holder_name || null,
-funding_organization: appointment.funding_organization || null,
-funding_period: appointment.funding_period || null,
-      status: "klaar"
-    }]);
+
+funding_reference: document.getElementById("funding_reference")?.value || null,
+funding_holder_name: document.getElementById("funding_holder_name")?.value || null,
+funding_organization: document.getElementById("funding_organization")?.value || null,
+funding_period: document.getElementById("funding_period")?.value || null,
+status: "klaar"
+}]);
 
   if (insertError) {
     showMessage("Factuur maken mislukt: " + insertError.message, true);
