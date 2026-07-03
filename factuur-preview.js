@@ -351,36 +351,165 @@ function renderInvoiceRecipient() {
   const name = currentInvoice.invoice_contact_name || "-";
   const email = currentInvoice.invoice_contact_email || "-";
   const phone = currentInvoice.invoice_contact_phone || "-";
+  
+  const ref = currentInvoice.funding_reference || "-";
+  const org = currentInvoice.funding_organization || "-";
+  const period = currentInvoice.funding_period || "-";
 
   box.innerHTML = `
-    <div class="invoice-check-row" style="display:block;">
+    <div class="invoice-check-row" style="display:block; position: relative; padding-bottom: 25px;">
       <strong>📨 Factuur wordt verzonden naar</strong>
       <p style="margin:10px 0 4px;"><strong>Type:</strong> ${type}</p>
-      <p style="margin:4px 0;"><strong>Naam:</strong> ${name}</p>
-      <p style="margin:4px 0;"><strong>E-mail:</strong> ${email}</p>
-      <p style="margin:4px 0;"><strong>Telefoon:</strong> ${phone}</p>
+      <p style="margin:4px 0;"><strong>Naam:</strong> <span id="preview_recipient_name">${name}</span></p>
+      <p style="margin:4px 0;"><strong>E-mail:</strong> <span id="preview_recipient_email">${email}</span></p>
+      <p style="margin:4px 0;"><strong>Telefoon:</strong> <span id="preview_recipient_phone">${phone}</span></p>
+      
+      <div style="margin-top: 10px; padding-top: 8px; border-top: 1px dashed #ccc;">
+        <strong>📄 Financieringsgegevens</strong>
+        <p style="margin:4px 0;"><strong>Beschikkingsnummer:</strong> <span id="preview_funding_reference">${ref}</span></p>
+        <p style="margin:4px 0;"><strong>Instantie/Gemeente:</strong> <span id="preview_funding_organization">${org}</span></p>
+        <p style="margin:4px 0;"><strong>Periode:</strong> <span id="preview_funding_period">${period}</span></p>
+      </div>
+
+      <!-- Lichte letters RECHTSONDERIN het grijze vak -->
+      <div style="position: absolute; bottom: 8px; right: 12px;">
+        <span id="recipientQuickActionBtn" onclick="handleRecipientQuickAction()" style="color: #888; cursor: pointer; font-size: 0.85em; text-decoration: underline;">
+          Kloppen deze gegevens nog?
+        </span>
+      </div>
     </div>
   `;
 }
 
+async function handleRecipientQuickAction() {
+  const btn = document.getElementById("recipientQuickActionBtn");
+  if (!btn) return;
+
+  // Stond hij nog niet op bewerken? Zet hem aan!
+  if (btn.textContent.includes("Kloppen deze gegevens nog")) {
+    enableInvoiceEdit(); // Start de algemene bewerkmodus (minuten, bedragen en ontvanger worden geel)
+    btn.textContent = "💾 Gegevens opslaan";
+    btn.style.color = "#28a745";
+    btn.style.fontWeight = "bold";
+  } 
+  // Staat hij al open en wordt er geklikt om op te slaan?
+  else {
+    if (!currentUser || !currentInvoice) {
+      alert("Geen factuur geladen.");
+      return;
+    }
+
+    // Live data van het scherm plukken
+    const updatedName = document.getElementById("preview_recipient_name")?.textContent || "";
+    const updatedEmail = document.getElementById("preview_recipient_email")?.textContent || "";
+    const updatedPhone = document.getElementById("preview_recipient_phone")?.textContent || "";
+    const updatedRef = document.getElementById("preview_funding_reference")?.textContent || "";
+    const updatedOrg = document.getElementById("preview_funding_organization")?.textContent || "";
+    const updatedPeriod = document.getElementById("preview_funding_period")?.textContent || "";
+
+    // Jouw exacte pop-up vraag
+    const saveToCard = confirm(
+      "Hoe wilt u deze wijziging verwerken?\n\n" +
+      "Klik op 'OK' om de gegevens aan te passen in de cliëntenkaart (voor altijd en zichtbaar in geschiedenis).\n\n" +
+      "Klik op 'Annuleren' om dit eenmalig voor deze factuur aan te passen."
+    );
+
+    const payload = {
+      invoice_contact_name: updatedName,
+      invoice_contact_email: updatedEmail,
+      invoice_contact_phone: updatedPhone,
+      funding_reference: updatedRef,
+      funding_organization: updatedOrg,
+      funding_period: updatedPeriod,
+      updated_at: new Date().toISOString()
+    };
+
+    // Altijd de huidige factuur bijwerken
+    const { error: invoiceError } = await supabaseClient
+      .from("invoice_drafts")
+      .update(payload)
+      .eq("owner_id", currentUser.id)
+      .eq("id", currentInvoice.id);
+
+    if (invoiceError) {
+      alert("Fout bij bijwerken factuur: " + invoiceError.message);
+      return;
+    }
+
+    // Als de ZZP'er kiest voor ALTIJD (Cliëntenkaart & Geschiedenis):
+    if (saveToCard && currentInvoice.client_id) {
+      
+      // 1. Update de basis cliëntenkaart
+      const { error: clientError } = await supabaseClient
+        .from("clients")
+        .update({
+          invoice_contact_name: updatedName,
+          invoice_contact_email: updatedEmail,
+          invoice_contact_phone: updatedPhone,
+          funding_reference: updatedRef,
+          funding_organization: updatedOrg,
+          funding_period: updatedPeriod
+        })
+        .eq("id", currentInvoice.client_id);
+
+      // 2. We updaten ook de gekoppelde afspraak (zodat het direct in de geschiedenis klopt)
+      if (currentInvoice.appointment_id) {
+        await supabaseClient
+          .from("appointments")
+          .update({
+            funding_reference: updatedRef,
+            funding_organization: updatedOrg,
+            funding_period: updatedPeriod,
+            work_done: document.getElementById("invoiceDescription")?.textContent || ""
+          })
+          .eq("id", currentInvoice.appointment_id);
+      }
+
+      if (clientError) {
+        alert("Factuur aangepast, maar opslaan op cliëntenkaart mislukt: " + clientError.message);
+      } else {
+        alert("Gegevens succesvol aangepast in de cliëntenkaart en verwerkt in de geschiedenis!");
+      }
+    } else {
+      alert("Gegevens eenmalig voor deze factuur aangepast.");
+    }
+
+    // Bewerkmodus sluiten en scherm resetten naar normale weergave
+    disableInvoiceEdit();
+    currentInvoice = { ...currentInvoice, ...payload };
+    renderInvoiceRecipient();
+    if (typeof renderInvoiceLines === "function") renderInvoiceLines(); // Zorgt dat bedragen/minuten ook refreshen
+  }
+}
+
 function enableInvoiceEdit() {
+  // We voegen hier ALLE ID's toe, inclusief minuten, bedrag, betaalvorm en de budgethouder-gegevens
   const fields = document.querySelectorAll(
-    "#invoiceNumber, #invoiceClientName, #invoiceClientAddress, #invoiceClientPostcode, #invoiceClientCity, #invoiceClientEmail, #invoiceDescription, #invoiceMinutes, #invoiceAmount, #invoiceTotal"
+    "#invoiceNumber, #invoiceClientName, #invoiceClientAddress, #invoiceClientPostcode, #invoiceClientCity, #invoiceClientEmail, #invoiceDescription, #invoiceMinutes, #invoiceAmount, #invoiceTotal, #preview_recipient_name, #preview_recipient_email, #preview_recipient_phone, #preview_payment_type, #preview_funding_reference, #preview_funding_organization, #preview_funding_period"
   );
 
   fields.forEach((field) => {
     field.contentEditable = "true";
     field.style.background = "#fff8dc";
-    field.style.padding = "4px 6px";
-    field.style.borderRadius = "6px";
+    field.style.padding = "2px 4px";
+    field.style.borderRadius = "4px";
   });
 
-  alert("Factuur staat nu in bewerkmodus.");
+  // Luister live naar wijzigingen in het budgethouder-vak om het verzendvak direct bij te werken
+  const liveName = document.getElementById("preview_recipient_name");
+  const liveEmail = document.getElementById("preview_recipient_email");
+  const livePhone = document.getElementById("preview_recipient_phone");
+
+  if (liveName) liveName.addEventListener("input", () => { updateLiveBox("name", liveName.textContent); });
+  if (liveEmail) liveEmail.addEventListener("input", () => { updateLiveBox("email", liveEmail.textContent); });
+  if (livePhone) livePhone.addEventListener("input", () => { updateLiveBox("phone", livePhone.textContent); });
+
+  alert("Factuur staat nu in bewerkmodus. U kunt alle gele velden aanpassen.");
 }
 
 function disableInvoiceEdit() {
   const fields = document.querySelectorAll(
-    "#invoiceNumber, #invoiceClientName, #invoiceClientAddress, #invoiceClientPostcode, #invoiceClientCity, #invoiceClientEmail, #invoiceDescription, #invoiceMinutes, #invoiceAmount, #invoiceTotal"
+    "#invoiceNumber, #invoiceClientName, #invoiceClientAddress, #invoiceClientPostcode, #invoiceClientCity, #invoiceClientEmail, #invoiceDescription, #invoiceMinutes, #invoiceAmount, #invoiceTotal, #preview_recipient_name, #preview_recipient_email, #preview_recipient_phone, #preview_payment_type, #preview_funding_reference, #preview_funding_organization, #preview_funding_period"
   );
 
   fields.forEach((field) => {
@@ -389,6 +518,22 @@ function disableInvoiceEdit() {
     field.style.padding = "";
     field.style.borderRadius = "";
   });
+}
+
+// Handige extra functie die het verzendvak BOVENAAN live bijwerkt tijdens het typen
+function updateLiveBox(type, value) {
+  if (type === "name") {
+    const el = document.getElementById("top_box_name");
+    if (el) el.textContent = value;
+  }
+  if (type === "email") {
+    const el = document.getElementById("top_box_email");
+    if (el) el.textContent = value;
+  }
+  if (type === "phone") {
+    const el = document.getElementById("top_box_phone");
+    if (el) el.textContent = value;
+  }
 }
 
 async function saveInvoiceDraft() {
