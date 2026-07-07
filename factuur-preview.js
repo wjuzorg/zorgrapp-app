@@ -661,7 +661,15 @@ ${companyName}`;
 
   window.location.href = mailtoUrl;
 
-  const updateData = {
+const confirmed = confirm(
+  "Is de e-mail geopend en verzonden?\n\nKlik op OK om de factuur op 'Wacht op betaling' te zetten."
+);
+
+if (!confirmed) {
+  return;
+}
+
+const updateData = {
     status: "open",
     sent_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
@@ -685,8 +693,8 @@ ${companyName}`;
     return;
   }
 
-  alert("Gmail geopend. Factuur staat nu bij Wacht op betaling.");
-  window.location.href = "facturen.html";
+  alert("Factuur staat nu bij Wacht op betaling.");
+window.location.href = "facturen.html";
 }
 
 async function printAndMarkSent() {
