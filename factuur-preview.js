@@ -799,14 +799,6 @@ function showRecipientSavePopup(payload) {
       </p>
 
       <button type="button" class="btn" style="width:100%; margin-bottom:10px;"
-        onclick="saveRecipientChoice('client')">
-        Cliëntenkaart bijwerken
-      </button>
-      <p style="margin:0 0 14px; color:#777; font-size:13px;">
-        Nieuwe facturen gebruiken voortaan deze gegevens.
-      </p>
-
-      <button type="button" class="btn" style="width:100%; margin-bottom:10px;"
         onclick="saveRecipientChoice('open_admin')">
         Cliëntenkaart + open administratie
       </button>
@@ -849,7 +841,7 @@ async function saveRecipientChoice(choice) {
     return;
   }
 
-  if (choice === "client" || choice === "open_admin") {
+  if (choice === "open_admin") {
     const { error: clientError } = await supabaseClient
       .from("Clients")
       .update({
@@ -912,12 +904,10 @@ async function saveRecipientChoice(choice) {
   renderInvoiceRecipient();
 
   alert(
-    choice === "invoice"
-      ? "Wijziging is alleen voor deze factuur opgeslagen."
-      : choice === "client"
-        ? "Wijziging is opgeslagen in de cliëntenkaart."
-        : "Wijziging is opgeslagen in de cliëntenkaart en open administratie."
-  );
+  choice === "invoice"
+    ? "Wijziging is alleen voor deze factuur opgeslagen."
+    : "Wijziging is opgeslagen in de cliëntenkaart en open administratie."
+);
 }
 
 document.addEventListener("DOMContentLoaded", initInvoicePreview);
