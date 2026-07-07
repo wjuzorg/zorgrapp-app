@@ -410,11 +410,22 @@ appointment_date: appointment.appointment_date || null,
   appointment.invoice_delivery_method ||
   currentClient?.invoice_delivery_method ||
   "nog_niet_afgesproken",
-  invoice_contact_type:
-  currentClient?.invoice_contact_type || null,
+ invoice_contact_type:
+  currentClient?.invoice_contact_type ||
+  (
+    appointment.payment_type === "wmo"
+      ? "gemeente"
+      : appointment.payment_type === "pgb"
+        ? "budgethouder"
+        : "client"
+  ),
 
 invoice_contact_name:
-  currentClient?.invoice_contact_name || null,
+  currentClient?.invoice_contact_name ||
+  appointment.funding_holder_name ||
+  appointment.funding_organization ||
+  appointment.client_name ||
+  null,
 
 invoice_contact_email:
   currentClient?.invoice_contact_email || null,
