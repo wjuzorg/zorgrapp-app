@@ -659,39 +659,24 @@ ${companyName}`;
     mailtoUrl += `&bcc=${encodeURIComponent(bookkeeperEmail.trim())}`;
   }
 
-  window.location.href = mailtoUrl;
+const updateData = {
+  status: "open",
+  sent_at: new Date().toISOString(),
+  updated_at: new Date().toISOString()
+};
 
-const confirmed = confirm(
-  "Is de e-mail geopend en verzonden?\n\nKlik op OK om de factuur op 'Wacht op betaling' te zetten."
-);
-
-if (!confirmed) {
-  return;
+if (sendCopy && bookkeeperEmail) {
+  updateData.bookkeeper_copy_sent = true;
+  updateData.bookkeeper_copy_sent_at = new Date().toISOString();
+  updateData.bookkeeper_email = bookkeeperEmail;
+  updateData.invoice_changed_after_bookkeeper_sent = false;
 }
 
-const updateData = {
-    status: "open",
-    sent_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  };
+window.location.href = mailtoUrl;
 
-  if (sendCopy && bookkeeperEmail) {
-    updateData.bookkeeper_copy_sent = true;
-    updateData.bookkeeper_copy_sent_at = new Date().toISOString();
-    updateData.bookkeeper_email = bookkeeperEmail;
-    updateData.invoice_changed_after_bookkeeper_sent = false;
-  }
+showMailConfirmPopup(updateData);
 
-  const { error } = await supabaseClient
-    .from("invoice_drafts")
-    .update(updateData)
-    .eq("owner_id", currentUser.id)
-    .eq("id", currentInvoice.id);
-
-  if (error) {
-    alert("Status aanpassen mislukt: " + error.message);
-    return;
-  }
+return;
 
   alert("Factuur staat nu bij Wacht op betaling.");
 window.location.href = "facturen.html";
@@ -734,20 +719,6 @@ async function printAndMarkSent() {
     updateData.bookkeeper_email = bookkeeperEmail;
     updateData.invoice_changed_after_bookkeeper_sent = false;
   }
-
-  const { error } = await supabaseClient
-    .from("invoice_drafts")
-    .update(updateData)
-    .eq("owner_id", currentUser.id)
-    .eq("id", currentInvoice.id);
-
-  if (error) {
-    alert("Status aanpassen mislukt: " + error.message);
-    return;
-  }
-
-  alert("Factuur staat nu bij Wacht op betaling.");
-  window.location.href = "facturen.html";
 }
 
 // Zorgt ervoor dat je maar één van de twee vinkjes tegelijk kunt selecteren
@@ -827,6 +798,85 @@ function showRecipientSavePopup(payload) {
 
 function closeRecipientSavePopup() {
   const popup = document.getElementById("recipientSavePopup");
+  if (popup) popup.remove();
+}
+
+function showMailConfirmPopup(updateData) {
+  const oldPopup = document.getElementById("mailConfirmPopup");
+  if (oldPopup) oldPopup.remove();
+
+  const overlay = document.createElement("div");
+  overlay.id = "mailConfirmPopup";
+  overlay.className = "no-print";
+  overlay.style.position = "fixed";
+  overlay.style.inset = "0";
+  overlay.style.background = "rgba(0,0,0,0.35)";
+  overlay.style.zIndex = "9999";
+  overlay.style.display = "flex";
+  overlay.style.alignItems = "center";
+  overlay.style.justifyContent = "center";
+  overlay.style.padding = "18px";
+
+  overlay.innerHTML = `
+    <div style="background:#fff; border-radius:18px; padding:22px; max-width:420px; width:100%; box-shadow:0 20px 50px rgba(0,0,0,0.25);">
+      <h3 style="margin:0 0 8px;">E-mail controleren</h3>
+      <p style="margin:0 0 18px; color:#555; line-height:1.45;">
+        Gmail of uw e-mailprogramma wordt geopend. Verstuur de factuur daar eerst handmatig.
+      </p>
+
+      <button type="button" class="btn" style="width:100%; margin-bottom:10px;"
+        onclick="confirmMailSent()">
+        Factuur is verzonden, zet op Wacht op betaling
+      </button>
+
+      <button type="button" class="btn btn-secondary" style="width:100%; margin-bottom:10px;"
+        onclick="retryMailOpen()">
+        Gmail opnieuw openen
+      </button>
+
+      <button type="button" class="btn btn-secondary" style="width:100%;"
+        onclick="closeMailConfirmPopup()">
+        Annuleren
+      </button>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+  window.pendingMailUpdateData = updateData;
+  window.pendingMailtoUrl = mailtoUrl;
+}
+
+async function confirmMailSent() {
+  const updateData = window.pendingMailUpdateData;
+
+  if (!updateData || !currentInvoice || !currentUser) {
+    alert("Geen factuur gevonden.");
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("invoice_drafts")
+    .update(updateData)
+    .eq("owner_id", currentUser.id)
+    .eq("id", currentInvoice.id);
+
+  if (error) {
+    alert("Status aanpassen mislukt: " + error.message);
+    return;
+  }
+
+  alert("Factuur staat nu bij Wacht op betaling.");
+  window.location.href = "facturen.html";
+}
+
+function retryMailOpen() {
+  if (window.pendingMailtoUrl) {
+    window.location.href = window.pendingMailtoUrl;
+  }
+}
+
+function closeMailConfirmPopup() {
+  const popup = document.getElementById("mailConfirmPopup");
   if (popup) popup.remove();
 }
 
