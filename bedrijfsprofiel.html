@@ -1,195 +1,498 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
   <title>Bedrijfsprofiel - ZorgRapp</title>
-  <link rel="stylesheet" href="app.css?v=120" />
+
+  <link
+    rel="stylesheet"
+    href="app.css?v=120"
+  >
 </head>
 
 <body>
   <main class="container">
+
     <header class="topbar">
       <div>
         <h1>Bedrijfsprofiel</h1>
-        <p>Gegevens voor facturen en bedrijfsinstellingen.</p>
-      </div>
 
+        <p>
+          Gegevens voor facturen en bedrijfsinstellingen.
+        </p>
+      </div>
     </header>
 
-   <section class="form-card">
-  <div class="form-title-wrap">
-    <h2>Bedrijfsgegevens</h2>
-    <p>Deze gegevens worden later automatisch gebruikt op de factuur.</p>
-  </div>
+    <section class="form-card">
 
-  <!-- ALGEMEEN -->
-  <div class="section">
-    <h3>Algemeen</h3>
+      <div class="form-title-wrap">
+        <h2>Bedrijfsgegevens</h2>
 
-    <label class="form-label" for="company_name">Bedrijfsnaam</label>
-    <input id="company_name" class="form-input" type="text" required
-      placeholder="">
+        <p>
+          Deze gegevens worden automatisch gebruikt op uw facturen.
+        </p>
+      </div>
 
-    <label class="form-label" for="owner_name">Naam ondernemer</label>
-    <input id="owner_name" class="form-input" type="text" required
-      placeholder="Naam ZZP'er">
+      <!-- ALGEMEEN -->
+      <div class="section">
+        <h3>Algemeen</h3>
 
-    <label class="form-label" for="kvk_number">KVK-nummer</label>
-    <input id="kvk_number" class="form-input" type="text" required
-      placeholder="Bijvoorbeeld: 12345678">
+        <label
+          class="form-label"
+          for="company_name"
+        >
+          Bedrijfsnaam
+        </label>
 
-    <label class="form-label" for="btw_number">BTW-nummer</label>
-    <input id="btw_number" class="form-input" type="text" required
-      placeholder="NL123456789B01">
-  </div>
+        <input
+          id="company_name"
+          class="form-input"
+          type="text"
+          required
+        >
 
-  <!-- FACTUURGEGEVENS -->
-  <div class="section">
-    <h3>Factuurgegevens</h3>
+        <label
+          class="form-label"
+          for="owner_name"
+        >
+          Naam ondernemer
+        </label>
 
-    <label class="form-label" for="iban">Rekeningnummer / IBAN</label>
-    <input id="iban" class="form-input" type="text" required
-      placeholder="NL00 BANK 0000 0000 00">
+        <input
+          id="owner_name"
+          class="form-input"
+          type="text"
+          required
+          placeholder="Naam zzp'er"
+        >
 
-    <label class="form-label" for="hourly_rate">Standaard uurtarief</label>
-    <input id="hourly_rate" class="form-input" type="number"
-      placeholder="Bijvoorbeeld: 50">
+        <label
+          class="form-label"
+          for="kvk_number"
+        >
+          KVK-nummer
+        </label>
 
-    <label class="form-label" for="payment_term_days">Betaaltermijn in dagen</label>
-    <input id="payment_term_days" class="form-input" type="number" required value="14">
+        <input
+          id="kvk_number"
+          class="form-input"
+          type="text"
+          required
+          placeholder="Bijvoorbeeld: 12345678"
+        >
 
-  <label class="form-label" for="vat_status">BTW-instelling</label>
+        <label
+          class="form-label"
+          for="btw_number"
+        >
+          Eigen btw-nummer
+        </label>
 
-<select id="vat_status" class="form-input" required onchange="updateVatText()">
-  <option value="">Kies btw-instelling</option>
-  <option value="btw_plichtig">BTW-plichtig</option>
-  <option value="kor">Kleineondernemersregeling / KOR</option>
-  <option value="vrijgesteld">BTW-vrijgesteld</option>
-  <option value="verlegd">BTW verlegd</option>
-</select>
+        <input
+          id="btw_number"
+          class="form-input"
+          type="text"
+          placeholder="Bijvoorbeeld: NL123456789B01"
+        >
+      </div>
 
-<label class="form-label" for="vat_text">BTW-tekst op factuur</label>
+      <!-- FACTUURGEGEVENS -->
+      <div class="section">
+        <h3>Factuurgegevens</h3>
 
-<textarea id="vat_text" class="form-textarea" rows="3"></textarea>
+        <label
+          class="form-label"
+          for="iban"
+        >
+          Rekeningnummer / IBAN
+        </label>
 
-<div id="vatCustomerWrap" style="display:none;">
-  <label class="form-label" for="vat_customer_number">
-    BTW-nummer afnemer
-  </label>
+        <input
+          id="iban"
+          class="form-input"
+          type="text"
+          required
+          placeholder="NL00 BANK 0000 0000 00"
+        >
 
-  <input
-    id="vat_customer_number"
-    class="form-input"
-    type="text"
-    placeholder="Bijvoorbeeld NL123456789B01"
-  >
-</div>
+        <label
+          class="form-label"
+          for="hourly_rate"
+        >
+          Standaard uurtarief
+        </label>
 
-<label class="form-label" for="accountant_name">
-  Naam boekhouder
-</label>
-<input
-  id="accountant_name"
-  class="form-input"
-  type="text"
-  placeholder="Bijvoorbeeld: De Jong Administratie"
->
+        <input
+          id="hourly_rate"
+          class="form-input"
+          type="number"
+          min="0"
+          step="0.01"
+          placeholder="Bijvoorbeeld: 50"
+        >
 
-      <label class="form-label" for="bookkeeping_email">
-E-mailadres boekhouding
-</label>
+        <label
+          class="form-label"
+          for="payment_term_days"
+        >
+          Betaaltermijn in dagen
+        </label>
 
-<input
-  id="bookkeeping_email"
-  class="form-input"
-  type="email"
-  placeholder="Bijvoorbeeld boekhouder of Moneybird"
->
+        <input
+          id="payment_term_days"
+          class="form-input"
+          type="number"
+          min="0"
+          required
+          value="14"
+        >
 
+        <label
+          class="form-label"
+          for="vat_status"
+        >
+          BTW-instelling
+        </label>
+
+        <select
+          id="vat_status"
+          class="form-input"
+          required
+        >
+          <option value="">
+            Kies btw-instelling
+          </option>
+
+          <option value="btw_plichtig">
+            BTW-plichtig
+          </option>
+
+          <option value="kor">
+            Kleineondernemersregeling / KOR
+          </option>
+
+          <option value="vrijgesteld">
+            BTW-vrijgesteld
+          </option>
+
+          <option value="verlegd">
+            BTW verlegd
+          </option>
+        </select>
+
+        <!-- BTW-PERCENTAGE -->
+        <div
+          id="vatRateWrap"
+          style="display:none;"
+        >
+          <label
+            class="form-label"
+            for="vat_rate"
+          >
+            BTW-percentage
+          </label>
+
+          <select
+            id="vat_rate"
+            class="form-input"
+          >
+            <option value="21">
+              21%
+            </option>
+
+            <option value="9">
+              9%
+            </option>
+
+            <option value="0">
+              0%
+            </option>
+          </select>
+
+          <p class="form-help">
+            ZorgRapp berekent hiermee automatisch het bedrag
+            exclusief btw, het btw-bedrag en het totaal inclusief btw.
+          </p>
+        </div>
+
+        <!-- BTW-TEKST -->
+        <div
+          id="vatTextWrap"
+          style="display:none;"
+        >
+          <label
+            class="form-label"
+            for="vat_text"
+          >
+            BTW-tekst op factuur
+          </label>
+
+          <textarea
+            id="vat_text"
+            class="form-textarea"
+            rows="3"
+            placeholder="Tekst die onderaan de factuur wordt getoond"
+          ></textarea>
+
+          <p class="form-help">
+            ZorgRapp vult automatisch een standaardtekst in.
+            U kunt deze tekst altijd aanpassen.
+          </p>
+        </div>
+
+        <!-- BTW-NUMMER AFNEMER -->
+        <div
+          id="vatCustomerWrap"
+          style="display:none;"
+        >
+          <label
+            class="form-label"
+            for="vat_customer_number"
+          >
+            BTW-nummer afnemer
+          </label>
+
+          <input
+            id="vat_customer_number"
+            class="form-input"
+            type="text"
+            placeholder="Bijvoorbeeld: NL123456789B01"
+          >
+
+          <p class="form-help">
+            Dit veld wordt gebruikt wanneer de btw naar de afnemer
+            wordt verlegd.
+          </p>
+        </div>
+
+        <label
+          class="form-label"
+          for="accountant_name"
+        >
+          Naam boekhouder
+        </label>
+
+        <input
+          id="accountant_name"
+          class="form-input"
+          type="text"
+          placeholder="Bijvoorbeeld: De Jong Administratie"
+        >
+
+        <label
+          class="form-label"
+          for="bookkeeping_email"
+        >
+          E-mailadres boekhouding
+        </label>
+
+        <input
+          id="bookkeeping_email"
+          class="form-input"
+          type="email"
+          placeholder="Bijvoorbeeld: boekhouding@bedrijf.nl"
+        >
+      </div>
+
+      <!-- CONTACTGEGEVENS -->
       <div class="section">
         <h3>Contactgegevens</h3>
 
-        <label class="form-label" for="company_email">E-mailadres</label>
-        <input id="company_email" class="form-input" type="email" placeholder="info@bedrijf.nl">
+        <label
+          class="form-label"
+          for="company_email"
+        >
+          E-mailadres
+        </label>
 
-        <label class="form-label" for="company_phone">Telefoonnummer</label>
-        <input id="company_phone" class="form-input" type="text" placeholder="06...">
+        <input
+          id="company_email"
+          class="form-input"
+          type="email"
+          placeholder="info@bedrijf.nl"
+        >
 
-        <label class="form-label" for="company_address">Adres</label>
-        <input id="company_address" class="form-input" type="text" placeholder="Straat en huisnummer">
+        <label
+          class="form-label"
+          for="company_phone"
+        >
+          Telefoonnummer
+        </label>
+
+        <input
+          id="company_phone"
+          class="form-input"
+          type="text"
+          placeholder="06..."
+        >
+
+        <label
+          class="form-label"
+          for="company_address"
+        >
+          Adres
+        </label>
+
+        <input
+          id="company_address"
+          class="form-input"
+          type="text"
+          placeholder="Straat en huisnummer"
+        >
 
         <div class="form-grid-two">
           <div>
-            <label class="form-label" for="company_postcode">Postcode</label>
-            <input id="company_postcode" class="form-input" type="text" placeholder="1234 AB">
+            <label
+              class="form-label"
+              for="company_postcode"
+            >
+              Postcode
+            </label>
+
+            <input
+              id="company_postcode"
+              class="form-input"
+              type="text"
+              placeholder="1234 AB"
+            >
           </div>
 
           <div>
-            <label class="form-label" for="company_city">Plaats</label>
-            <input id="company_city" class="form-input" type="text" placeholder="Utrecht">
+            <label
+              class="form-label"
+              for="company_city"
+            >
+              Plaats
+            </label>
+
+            <input
+              id="company_city"
+              class="form-input"
+              type="text"
+              placeholder="Utrecht"
+            >
           </div>
         </div>
       </div>
 
-          <div class="section">
-  <h3>Juridische documenten</h3>
+      <!-- JURIDISCHE DOCUMENTEN -->
+      <div class="section">
+        <h3>Juridische documenten</h3>
 
-  <p>
-    Hier vindt u de privacyverklaring en verwerkersovereenkomst van ZorgRapp.
-  </p>
+        <p>
+          Hier vindt u de privacyverklaring en
+          verwerkersovereenkomst van ZorgRapp.
+        </p>
 
-  <div class="action-stack">
-  <a class="btn btn-secondary" href="./privacy.html">
-    Privacyverklaring bekijken
-  </a>
+        <div class="action-stack">
+          <a
+            class="btn btn-secondary"
+            href="./privacy.html"
+          >
+            Privacyverklaring bekijken
+          </a>
 
-  <a class="btn btn-secondary" href="./verwerkersovereenkomst.html">
-    Verwerkersovereenkomst bekijken
-  </a>
-</div>
+          <a
+            class="btn btn-secondary"
+            href="./verwerkersovereenkomst.html"
+          >
+            Verwerkersovereenkomst bekijken
+          </a>
+        </div>
 
-<div class="info-box" style="margin-top:16px;">
-  <span class="info-label">Status verwerkersovereenkomst</span>
-  <strong id="processorAgreementStatus">Laden...</strong>
+        <div
+          class="info-box"
+          style="margin-top:16px;"
+        >
+          <span class="info-label">
+            Status verwerkersovereenkomst
+          </span>
 
-  <div id="processorAgreementAcceptWrap" style="margin-top:16px;">
-    <label class="signal-chip" style="justify-content:flex-start;">
-      <input type="checkbox" id="processorAgreementCheckbox">
-      Ik ga akkoord met de verwerkersovereenkomst
-    </label>
+          <strong id="processorAgreementStatus">
+            Laden...
+          </strong>
 
-    <button
-      type="button"
-      class="btn btn-primary"
-      id="acceptProcessorAgreementBtn"
-      style="margin-top:12px; background:#0f172a; color:#ffffff; opacity:1;"
-    >
-      Akkoord opslaan
-    </button>
-  </div>
-</div>
+          <div
+            id="processorAgreementAcceptWrap"
+            style="margin-top:16px;"
+          >
+            <label
+              class="signal-chip"
+              style="justify-content:flex-start;"
+            >
+              <input
+                type="checkbox"
+                id="processorAgreementCheckbox"
+              >
 
-</div>
+              Ik ga akkoord met de verwerkersovereenkomst
+            </label>
+
+            <button
+              type="button"
+              class="btn btn-primary"
+              id="acceptProcessorAgreementBtn"
+              style="
+                margin-top:12px;
+                background:#0f172a;
+                color:#ffffff;
+                opacity:1;
+              "
+            >
+              Akkoord opslaan
+            </button>
+          </div>
         </div>
       </div>
 
-      <div class="action-stack">
+      <!-- MELDING -->
+      <div
+        id="profileMessage"
+        class="form-message"
+        style="
+          display:none;
+          margin-top:16px;
+          font-weight:600;
+        "
+      ></div>
+
+      <!-- OPSLAAN -->
+      <div
+        class="action-stack"
+        style="margin-top:20px;"
+      >
         <button
           id="saveBusinessProfileBtn"
           class="btn btn-primary"
           type="button"
-          style="background:#0f172a; color:#ffffff; opacity:1;"
+          style="
+            background:#0f172a;
+            color:#ffffff;
+            opacity:1;
+          "
         >
           Bedrijfsprofiel opslaan
         </button>
       </div>
 
       <div class="profile-back-links">
-        <a href="index.html" class="page-link">
+        <a
+          href="index.html"
+          class="page-link"
+        >
           ← Terug naar dashboard
         </a>
-        <a href="facturen.html" class="page-link">
+
+        <a
+          href="facturen.html"
+          class="page-link"
+        >
           ← Terug naar facturen
         </a>
       </div>
@@ -198,6 +501,7 @@ E-mailadres boekhouding
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="bedrijfsprofiel.js?v=5"></script>
+
+  <script src="bedrijfsprofiel.js?v=6"></script>
 </body>
 </html>
