@@ -142,17 +142,48 @@
             <option value="wmo">Wmo</option>
           </select>
 
-          <label class="form-label" for="funding_reference">Beschikkingsnummer / referentie</label>
-          <input id="funding_reference" class="form-input" type="text">
+          <p id="privatePaymentNotice" class="helper-text hidden">
+  De factuur wordt automatisch gekoppeld aan de cliëntgegevens.
+</p>
 
-          <label class="form-label" for="funding_holder_name">Budgethouder / contactpersoon betaling</label>
-          <input id="funding_holder_name" class="form-input" type="text">
+<div id="fundingDetailsWrap">
+  <label class="form-label" for="funding_reference">
+    Beschikkingsnummer / referentie
+  </label>
+  <input
+    id="funding_reference"
+    class="form-input"
+    type="text"
+  >
 
-          <label class="form-label" for="funding_organization">Gemeente / SVB / organisatie</label>
-          <input id="funding_organization" class="form-input" type="text">
+  <label class="form-label" for="funding_holder_name">
+    Budgethouder / contactpersoon betaling
+  </label>
+  <input
+    id="funding_holder_name"
+    class="form-input"
+    type="text"
+  >
 
-          <label class="form-label" for="funding_period">Periode Wmo/PGB</label>
-          <input id="funding_period" class="form-input" type="text" placeholder="Bijvoorbeeld: juni 2026">
+  <label class="form-label" for="funding_organization">
+    Gemeente / SVB / organisatie
+  </label>
+  <input
+    id="funding_organization"
+    class="form-input"
+    type="text"
+  >
+
+  <label class="form-label" for="funding_period">
+    Periode Wmo/PGB
+  </label>
+  <input
+    id="funding_period"
+    class="form-input"
+    type="text"
+    placeholder="Bijvoorbeeld: juli 2026"
+  >
+</div>
 
           <h3>Factuuradres</h3>
 

@@ -92,6 +92,21 @@ function toggleInvoiceFields() {
   }
 }
 
+function togglePaymentTypeFields() {
+  const paymentType = val("payment_type");
+
+  const fundingWrap = el("fundingDetailsWrap");
+  const privateNotice = el("privatePaymentNotice");
+
+  if (paymentType === "particulier") {
+    fundingWrap?.classList.add("hidden");
+    privateNotice?.classList.remove("hidden");
+  } else {
+    fundingWrap?.classList.remove("hidden");
+    privateNotice?.classList.add("hidden");
+  }
+}
+
 function applySignalStatusBehavior() {
   const status = val("signal_status");
 
@@ -433,7 +448,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   await loadAppointment();
 
+  togglePaymentTypeFields();
+
   el("invoice_delivery_method")?.addEventListener("change", toggleInvoiceFields);
+  el("payment_type")?.addEventListener("change", togglePaymentTypeFields);
   el("invoice_same_as_client_address")?.addEventListener("change", toggleInvoiceFields);
   el("signal_status")?.addEventListener("change", applySignalStatusBehavior);
 
@@ -501,6 +519,66 @@ const amount =
 
 const invoiceNumber = `TEST-${Date.now()}`;
 
+const paymentType =
+  appointment.payment_type ||
+  currentClient?.funding_type ||
+  "particulier";
+
+let invoiceContactType =
+  currentClient?.invoice_contact_type || null;
+
+let invoiceContactName =
+  currentClient?.invoice_contact_name || null;
+
+let invoiceContactEmail =
+  currentClient?.invoice_contact_email || null;
+
+let invoiceContactPhone =
+  currentClient?.invoice_contact_phone || null;
+
+if (paymentType === "particulier") {
+  invoiceContactType = "client";
+
+  invoiceContactName =
+    currentClient?.invoice_name ||
+    currentClient?.full_name ||
+    appointment.client_name ||
+    "Cliënt";
+
+  invoiceContactEmail =
+    currentClient?.invoice_email ||
+    currentClient?.client_email ||
+    currentClient?.email ||
+    null;
+
+  invoiceContactPhone =
+    currentClient?.phone ||
+    currentClient?.emergency_phone ||
+    null;
+}
+
+if (paymentType === "pgb") {
+  invoiceContactType =
+    invoiceContactType || "budgethouder";
+
+  invoiceContactName =
+    invoiceContactName ||
+    appointment.funding_holder_name ||
+    currentClient?.funding_holder_name ||
+    null;
+}
+
+if (paymentType === "wmo") {
+  invoiceContactType =
+    invoiceContactType || "gemeente";
+
+  invoiceContactName =
+    invoiceContactName ||
+    appointment.funding_organization ||
+    currentClient?.funding_organization ||
+    null;
+}
+
   const { error: insertError } = await supabaseClient
     .from("invoice_drafts")
     .insert([{
@@ -519,33 +597,18 @@ appointment_date: appointment.appointment_date || null,
       km_amount: kmAmount,
       material_cost: materialCost,
       parking_cost: parkingCost,
-      payment_type: appointment.payment_type || "particulier",
-     invoice_delivery_method:
+     payment_type: paymentType,
+
+invoice_delivery_method:
   appointment.invoice_delivery_method ||
   currentClient?.invoice_delivery_method ||
   "nog_niet_afgesproken",
- invoice_contact_type:
-  currentClient?.invoice_contact_type ||
-  (
-    appointment.payment_type === "wmo"
-      ? "gemeente"
-      : appointment.payment_type === "pgb"
-        ? "budgethouder"
-        : "client"
-  ),
 
-invoice_contact_name:
-  currentClient?.invoice_contact_name ||
-  appointment.funding_holder_name ||
-  appointment.funding_organization ||
-  appointment.client_name ||
-  null,
+invoice_contact_type: invoiceContactType,
+invoice_contact_name: invoiceContactName,
+invoice_contact_email: invoiceContactEmail,
+invoice_contact_phone: invoiceContactPhone,
 
-invoice_contact_email:
-  currentClient?.invoice_contact_email || null,
-
-invoice_contact_phone:
-  currentClient?.invoice_contact_phone || null,
 
 funding_reference: document.getElementById("funding_reference")?.value || null,
 funding_holder_name: document.getElementById("funding_holder_name")?.value || null,
