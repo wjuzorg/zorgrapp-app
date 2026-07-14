@@ -264,6 +264,120 @@ async function saveClientInvoiceFields() {
   return true;
 }
 
+function clearFieldErrors() {
+  document.querySelectorAll(".field-error").forEach((field) => {
+    field.classList.remove("field-error");
+  });
+}
+
+function markFieldError(id) {
+  const field = el(id);
+  if (!field) return;
+
+  field.classList.add("field-error");
+}
+
+function validatePaymentAndInvoiceFields() {
+  clearFieldErrors();
+
+  const paymentType = val("payment_type");
+  const deliveryMethod = val("invoice_delivery_method");
+
+  const missingFields = [];
+
+  function requireField(id, label) {
+    if (!val(id)) {
+      missingFields.push(label);
+      markFieldError(id);
+    }
+  }
+
+  // Altijd verplicht
+  requireField("payment_type", "Betalingsvorm");
+
+  if (
+    !deliveryMethod ||
+    deliveryMethod === "nog_niet_afgesproken"
+  ) {
+    missingFields.push("Hoe de factuur wordt ontvangen");
+    markFieldError("invoice_delivery_method");
+  }
+
+  // Factuur per e-mail
+  if (deliveryMethod === "email") {
+    requireField("invoice_email", "E-mailadres voor de factuur");
+
+    const email = val("invoice_email");
+    if (email && !email.includes("@")) {
+      missingFields.push("Een geldig factuur e-mailadres");
+      markFieldError("invoice_email");
+    }
+  }
+
+  // Factuur per post
+  if (
+    deliveryMethod === "address" &&
+    val("invoice_same_as_client_address") === "false"
+  ) {
+    requireField("invoice_address", "Factuuradres");
+    requireField("invoice_postal_code", "Postcode factuuradres");
+    requireField("invoice_city", "Plaats factuuradres");
+  }
+
+  // PGB
+  if (paymentType === "pgb") {
+    requireField(
+      "funding_holder_name",
+      "Budgethouder of vertegenwoordiger"
+    );
+    requireField(
+      "funding_organization",
+      "SVB of organisatie"
+    );
+    requireField(
+      "funding_period",
+      "PGB-periode"
+    );
+  }
+
+  // Wmo
+  if (paymentType === "wmo") {
+    requireField(
+      "funding_reference",
+      "Beschikkingsnummer of referentie"
+    );
+    requireField(
+      "funding_organization",
+      "Gemeente of organisatie"
+    );
+    requireField(
+      "funding_period",
+      "Wmo-periode"
+    );
+  }
+
+  if (missingFields.length > 0) {
+    showMessage(
+      `Vul eerst de verplichte betaling- en factuurgegevens in: ${missingFields.join(", ")}.`,
+      true
+    );
+
+    const firstError = document.querySelector(".field-error");
+
+    if (firstError) {
+      firstError.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+      firstError.focus();
+    }
+
+    return false;
+  }
+
+  return true;
+}
+
 async function saveAppointment(statusValue = "open") {
   if (!appointmentId) {
     showMessage("Geen afspraak-ID gevonden.", true);
@@ -448,8 +562,14 @@ status: "klaar"
   return true;
 }
 
-  el("fillForm")?.addEventListener("submit", async (e) => {
+el("fillForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
+
+  const paymentFieldsValid = validatePaymentAndInvoiceFields();
+
+  if (!paymentFieldsValid) {
+    return;
+  }
 
   showMessage("Afspraak afronden...");
 
@@ -462,9 +582,8 @@ status: "klaar"
   if (!invoiceOk) return;
 
   alert("Factuur is aangemaakt. U vindt deze terug bij Facturen.");
-
   window.location.href = "./index.html";
 });
 
-  el("deleteAppointmentBtn")?.addEventListener("click", deleteAppointment);
+el("deleteAppointmentBtn")?.addEventListener("click", deleteAppointment);
 });

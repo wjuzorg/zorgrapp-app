@@ -3261,3 +3261,9 @@ button.forgot-btn:hover {
   color: #111827 !important;
   opacity: 1 !important;
 }
+
+.field-error {
+  border-color: #dc2626 !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12) !important;
+  background-color: #fffafa !important;
+}
