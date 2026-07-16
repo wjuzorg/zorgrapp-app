@@ -672,9 +672,10 @@ if (sendCopy && bookkeeperEmail) {
   updateData.invoice_changed_after_bookkeeper_sent = false;
 }
 
-window.location.href = mailtoUrl;
+window.pendingMailUpdateData = updateData;
+window.pendingMailtoUrl = mailtoUrl;
 
-showMailConfirmPopup(updateData);
+showMailConfirmPopup();
 
 return;
 
@@ -829,10 +830,13 @@ function showMailConfirmPopup(updateData) {
         Factuur is verzonden, zet op Wacht op betaling
       </button>
 
-      <button type="button" class="btn btn-secondary" style="width:100%; margin-bottom:10px;"
-        onclick="retryMailOpen()">
-        Gmail opnieuw openen
-      </button>
+      <button
+type="button"
+class="btn btn-secondary"
+style="width:100%; margin-bottom:10px;"
+onclick="openMailApp()">
+Gmail openen
+</button>
 
       <button type="button" class="btn btn-secondary" style="width:100%;"
         onclick="closeMailConfirmPopup()">
@@ -841,9 +845,11 @@ function showMailConfirmPopup(updateData) {
     </div>
   `;
 
-  document.body.appendChild(overlay);
-  window.pendingMailUpdateData = updateData;
-  window.pendingMailtoUrl = mailtoUrl;
+ document.body.appendChild(overlay);
+
+window.pendingMailUpdateData = updateData;
+window.pendingMailtoUrl = mailtoUrl;
+window.mailOpened = false;
 }
 
 async function confirmMailSent() {
@@ -865,14 +871,35 @@ async function confirmMailSent() {
     return;
   }
 
+  if (!window.mailOpened) {
+  const ok = confirm(
+    "U heeft Gmail nog niet geopend.\n\nWilt u de factuur toch als verzonden markeren?"
+  );
+
+  if (!ok) return;
+}
+
   alert("Factuur staat nu bij Wacht op betaling.");
   window.location.href = "facturen.html";
 }
 
-function retryMailOpen() {
-  if (window.pendingMailtoUrl) {
-    window.location.href = window.pendingMailtoUrl;
+function openMailApp() {
+  if (!window.pendingMailtoUrl) {
+    alert("Geen e-mail gevonden.");
+    return;
   }
+
+  window.mailOpened = true;
+
+  const button = document.getElementById("openMailBtn");
+
+  if (button) {
+    button.textContent = "✓ Gmail geopend";
+    button.disabled = true;
+    button.style.opacity = "0.7";
+  }
+
+  window.location.href = window.pendingMailtoUrl;
 }
 
 function closeMailConfirmPopup() {
