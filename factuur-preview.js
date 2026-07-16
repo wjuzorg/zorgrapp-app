@@ -673,14 +673,11 @@ if (sendCopy && bookkeeperEmail) {
 }
 
 window.pendingMailUpdateData = updateData;
-window.pendingMailtoUrl = mailtoUrl;
+window.pendingInvoiceId = currentInvoice?.id || null;
+window.pendingOwnerId = currentUser?.id || null;
+window.mailOpened = false;
 
-showMailConfirmPopup();
-
-return;
-
-  alert("Factuur staat nu bij Wacht op betaling.");
-window.location.href = "facturen.html";
+showMailConfirmPopup(updateData);
 }
 
 async function printAndMarkSent() {
@@ -855,29 +852,35 @@ window.mailOpened = false;
 async function confirmMailSent() {
   const updateData = window.pendingMailUpdateData;
 
-  if (!updateData || !currentInvoice || !currentUser) {
-    alert("Geen factuur gevonden.");
+  const invoiceId =
+    window.pendingInvoiceId || currentInvoice?.id;
+
+  const ownerId =
+    window.pendingOwnerId || currentUser?.id;
+
+  if (!window.mailOpened) {
+    const ok = confirm(
+      "U heeft Gmail nog niet geopend.\n\nWilt u de factuur toch als verzonden markeren?"
+    );
+
+    if (!ok) return;
+  }
+
+  if (!updateData || !invoiceId || !ownerId) {
+    alert("Geen factuurgegevens gevonden.");
     return;
   }
 
   const { error } = await supabaseClient
     .from("invoice_drafts")
     .update(updateData)
-    .eq("owner_id", currentUser.id)
-    .eq("id", currentInvoice.id);
+    .eq("owner_id", ownerId)
+    .eq("id", invoiceId);
 
   if (error) {
     alert("Status aanpassen mislukt: " + error.message);
     return;
   }
-
-  if (!window.mailOpened) {
-  const ok = confirm(
-    "U heeft Gmail nog niet geopend.\n\nWilt u de factuur toch als verzonden markeren?"
-  );
-
-  if (!ok) return;
-}
 
   alert("Factuur staat nu bij Wacht op betaling.");
   window.location.href = "facturen.html";
