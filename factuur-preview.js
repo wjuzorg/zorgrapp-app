@@ -845,7 +845,6 @@ Gmail openen
  document.body.appendChild(overlay);
 
 window.pendingMailUpdateData = updateData;
-window.pendingMailtoUrl = mailtoUrl;
 window.mailOpened = false;
 }
 
