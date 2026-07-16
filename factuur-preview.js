@@ -677,7 +677,7 @@ window.pendingInvoiceId = currentInvoice?.id || null;
 window.pendingOwnerId = currentUser?.id || null;
 window.mailOpened = false;
 
-showMailConfirmPopup(updateData);
+showMailConfirmPopup(updateData, mailtoUrl);
 }
 
 async function printAndMarkSent() {
@@ -799,11 +799,23 @@ function closeRecipientSavePopup() {
   if (popup) popup.remove();
 }
 
-function showMailConfirmPopup(updateData) {
+function showMailConfirmPopup(updateData, mailtoUrl) {
   const oldPopup = document.getElementById("mailConfirmPopup");
-  if (oldPopup) oldPopup.remove();
+
+  if (oldPopup) {
+    oldPopup.remove();
+  }
+
+  window.pendingMailUpdateData = updateData;
+  window.pendingMailtoUrl = mailtoUrl;
+  window.mailOpened = false;
+
+  if (mailtoUrl) {
+    sessionStorage.setItem("pendingMailtoUrl", mailtoUrl);
+  }
 
   const overlay = document.createElement("div");
+
   overlay.id = "mailConfirmPopup";
   overlay.className = "no-print";
   overlay.style.position = "fixed";
@@ -816,36 +828,54 @@ function showMailConfirmPopup(updateData) {
   overlay.style.padding = "18px";
 
   overlay.innerHTML = `
-    <div style="background:#fff; border-radius:18px; padding:22px; max-width:420px; width:100%; box-shadow:0 20px 50px rgba(0,0,0,0.25);">
-      <h3 style="margin:0 0 8px;">E-mail controleren</h3>
+    <div style="
+      background:#fff;
+      border-radius:18px;
+      padding:22px;
+      max-width:420px;
+      width:100%;
+      box-shadow:0 20px 50px rgba(0,0,0,0.25);
+    ">
+      <h3 style="margin:0 0 8px;">
+        Factuur verzenden
+      </h3>
+
       <p style="margin:0 0 18px; color:#555; line-height:1.45;">
-        Gmail of uw e-mailprogramma wordt geopend. Verstuur de factuur daar eerst handmatig.
+        Open eerst Gmail en verstuur de factuur. Kom daarna terug naar
+        ZorgRapp en bevestig dat de factuur is verzonden.
       </p>
 
-      <button type="button" class="btn" style="width:100%; margin-bottom:10px;"
-        onclick="confirmMailSent()">
+      <button
+        type="button"
+        id="openMailBtn"
+        class="btn btn-secondary"
+        style="width:100%; margin-bottom:10px;"
+        onclick="openMailApp()"
+      >
+        Gmail openen
+      </button>
+
+      <button
+        type="button"
+        class="btn"
+        style="width:100%; margin-bottom:10px;"
+        onclick="confirmMailSent()"
+      >
         Factuur is verzonden, zet op Wacht op betaling
       </button>
 
       <button
-type="button"
-class="btn btn-secondary"
-style="width:100%; margin-bottom:10px;"
-onclick="openMailApp()">
-Gmail openen
-</button>
-
-      <button type="button" class="btn btn-secondary" style="width:100%;"
-        onclick="closeMailConfirmPopup()">
+        type="button"
+        class="btn btn-secondary"
+        style="width:100%;"
+        onclick="closeMailConfirmPopup()"
+      >
         Annuleren
       </button>
     </div>
   `;
 
- document.body.appendChild(overlay);
-
-window.pendingMailUpdateData = updateData;
-window.mailOpened = false;
+  document.body.appendChild(overlay);
 }
 
 async function confirmMailSent() {
@@ -886,8 +916,12 @@ async function confirmMailSent() {
 }
 
 function openMailApp() {
-  if (!window.pendingMailtoUrl) {
-    alert("Geen e-mail gevonden.");
+  const mailtoUrl =
+    window.pendingMailtoUrl ||
+    sessionStorage.getItem("pendingMailtoUrl");
+
+  if (!mailtoUrl) {
+    alert("Geen e-maillink gevonden. Sluit dit venster en klik opnieuw op Verzenden.");
     return;
   }
 
@@ -901,7 +935,7 @@ function openMailApp() {
     button.style.opacity = "0.7";
   }
 
-  window.location.href = window.pendingMailtoUrl;
+  window.location.href = mailtoUrl;
 }
 
 function closeMailConfirmPopup() {
