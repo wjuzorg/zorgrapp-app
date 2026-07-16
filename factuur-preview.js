@@ -337,52 +337,167 @@ function renderFundingText() {
 
 function renderInvoiceRecipient() {
   const box = document.getElementById("invoiceRecipientBox");
+
   if (!box || !currentInvoice) return;
 
-  const typeLabels = {
-    client: "Cliënt",
-    budgethouder: "Budgethouder / vertegenwoordiger",
-    gemeente: "Gemeente",
-    zorgorganisatie: "Zorgorganisatie",
-    anders: "Anders"
-  };
+  const recipientType =
+    currentInvoice.invoice_contact_type || "client";
 
-  const type = typeLabels[currentInvoice.invoice_contact_type] || "Niet ingesteld";
-  const name = currentInvoice.invoice_contact_name || "-";
-  const email = currentInvoice.invoice_contact_email || "-";
-  const phone = currentInvoice.invoice_contact_phone || "-";
-  
-  const ref = currentInvoice.funding_reference || "-";
-  const org = currentInvoice.funding_organization || "-";
-  const period = currentInvoice.funding_period || "-";
+  const name =
+    currentInvoice.invoice_contact_name || "-";
+
+  const email =
+    currentInvoice.invoice_contact_email || "-";
+
+  const phone =
+    currentInvoice.invoice_contact_phone || "-";
+
+  const ref =
+    currentInvoice.funding_reference || "-";
+
+  const org =
+    currentInvoice.funding_organization || "-";
+
+  const period =
+    currentInvoice.funding_period || "-";
+
+const paymentType =
+    currentInvoice.payment_type ||
+    currentInvoice.funding_type ||
+    "";
+
+const showFundingDetails =
+    paymentType === "pgb" ||
+    paymentType === "wmo";
+
+let fundingTitle = "";
+
+if (paymentType === "pgb") {
+    fundingTitle = "PGB-gegevens";
+}
+
+if (paymentType === "wmo") {
+    fundingTitle = "Wmo-gegevens";
+}
+
+  const fundingBlock = showFundingDetails
+    ? `
+      <div
+        style="
+          margin-top:10px;
+          padding-top:8px;
+          border-top:1px dashed #ccc;
+        "
+      >
+        <strong>${fundingTitle}</strong>
+
+        <p style="margin:4px 0;">
+          <strong>Beschikkingsnummer:</strong>
+          <span id="preview_funding_reference">${ref}</span>
+        </p>
+
+        <p style="margin:4px 0;">
+          <strong>Instantie/Gemeente:</strong>
+          <span id="preview_funding_organization">${org}</span>
+        </p>
+
+        <p style="margin:4px 0;">
+          <strong>Periode:</strong>
+          <span id="preview_funding_period">${period}</span>
+        </p>
+      </div>
+    `
+    : "";
 
   box.innerHTML = `
-    <div class="invoice-check-row" style="display:block; position: relative; padding-bottom: 25px;">
-      <strong> Factuur wordt verzonden naar</strong>
-      <p style="margin:10px 0 4px;">
-  <strong>Type:</strong>
-  <select id="preview_recipient_type" disabled>
-    <option value="client" ${currentInvoice.invoice_contact_type === "client" ? "selected" : ""}>Cliënt</option>
-    <option value="budgethouder" ${currentInvoice.invoice_contact_type === "budgethouder" ? "selected" : ""}>Budgethouder / vertegenwoordiger</option>
-    <option value="gemeente" ${currentInvoice.invoice_contact_type === "gemeente" ? "selected" : ""}>Gemeente</option>
-    <option value="zorgorganisatie" ${currentInvoice.invoice_contact_type === "zorgorganisatie" ? "selected" : ""}>Zorgorganisatie</option>
-    <option value="anders" ${currentInvoice.invoice_contact_type === "anders" ? "selected" : ""}>Anders</option>
-  </select>
-</p>
-      <p style="margin:4px 0;"><strong>Naam:</strong> <span id="preview_recipient_name">${name}</span></p>
-      <p style="margin:4px 0;"><strong>E-mail:</strong> <span id="preview_recipient_email">${email}</span></p>
-      <p style="margin:4px 0;"><strong>Telefoon:</strong> <span id="preview_recipient_phone">${phone}</span></p>
-      
-      <div style="margin-top: 10px; padding-top: 8px; border-top: 1px dashed #ccc;">
-        <strong> Financieringsgegevens</strong>
-        <p style="margin:4px 0;"><strong>Beschikkingsnummer:</strong> <span id="preview_funding_reference">${ref}</span></p>
-        <p style="margin:4px 0;"><strong>Instantie/Gemeente:</strong> <span id="preview_funding_organization">${org}</span></p>
-        <p style="margin:4px 0;"><strong>Periode:</strong> <span id="preview_funding_period">${period}</span></p>
-      </div>
+    <div
+      class="invoice-check-row"
+      style="
+        display:block;
+        position:relative;
+        padding-bottom:25px;
+      "
+    >
+      <strong>Factuur wordt verzonden naar</strong>
 
-      <!-- Lichte letters RECHTSONDERIN het grijze vak -->
-      <div style="position: absolute; bottom: 8px; right: 12px;">
-        <span id="recipientQuickActionBtn" onclick="handleRecipientQuickAction()" style="color: #888; cursor: pointer; font-size: 0.85em; text-decoration: underline;">
+      <p style="margin:10px 0 4px;">
+        <strong>Type:</strong>
+
+        <select
+          id="preview_recipient_type"
+          disabled
+        >
+          <option
+            value="client"
+            ${recipientType === "client" ? "selected" : ""}
+          >
+            Cliënt
+          </option>
+
+          <option
+            value="budgethouder"
+            ${recipientType === "budgethouder" ? "selected" : ""}
+          >
+            Budgethouder / vertegenwoordiger
+          </option>
+
+          <option
+            value="gemeente"
+            ${recipientType === "gemeente" ? "selected" : ""}
+          >
+            Gemeente
+          </option>
+
+          <option
+            value="zorgorganisatie"
+            ${recipientType === "zorgorganisatie" ? "selected" : ""}
+          >
+            Zorgorganisatie
+          </option>
+
+          <option
+            value="anders"
+            ${recipientType === "anders" ? "selected" : ""}
+          >
+            Anders
+          </option>
+        </select>
+      </p>
+
+      <p style="margin:4px 0;">
+        <strong>Naam:</strong>
+        <span id="preview_recipient_name">${name}</span>
+      </p>
+
+      <p style="margin:4px 0;">
+        <strong>E-mail:</strong>
+        <span id="preview_recipient_email">${email}</span>
+      </p>
+
+      <p style="margin:4px 0;">
+        <strong>Telefoon:</strong>
+        <span id="preview_recipient_phone">${phone}</span>
+      </p>
+
+      ${fundingBlock}
+
+      <div
+        style="
+          position:absolute;
+          bottom:8px;
+          right:12px;
+        "
+      >
+        <span
+          id="recipientQuickActionBtn"
+          onclick="handleRecipientQuickAction()"
+          style="
+            color:#888;
+            cursor:pointer;
+            font-size:0.85em;
+            text-decoration:underline;
+          "
+        >
           Wijzigen
         </span>
       </div>
