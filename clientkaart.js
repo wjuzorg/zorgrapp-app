@@ -529,7 +529,11 @@ if (editEmergencyContactPhone) {
 const newAppointmentBtn = document.getElementById("newAppointmentBtn");
 const clientHistoryBtn = document.getElementById("clientHistoryBtn");
 const saveContactNoteBtn = document.getElementById("saveContactNoteBtn");
-
+const invoiceRecipientTypeEl = document.getElementById("invoiceRecipientType");
+const invoiceRecipientNameEl = document.getElementById("invoiceRecipientName");
+const invoiceRecipientEmailEl = document.getElementById("invoiceRecipientEmail");
+const invoiceRecipientPhoneEl = document.getElementById("invoiceRecipientPhone");
+const editInvoiceRecipientBtn = document.getElementById("editInvoiceRecipientBtn");
   clientNameEl.textContent = currentClient.full_name || "Onbekende cliënt";
 
   clientPhoneEl.textContent = currentClient.phone || "-";
@@ -554,6 +558,35 @@ const saveContactNoteBtn = document.getElementById("saveContactNoteBtn");
   }
 
   renderContactNotes(currentClient.contact_note || "");
+
+  if (invoiceRecipientTypeEl) {
+  invoiceRecipientTypeEl.textContent =
+    currentClient.invoice_contact_type || "-";
+}
+
+if (invoiceRecipientNameEl) {
+  invoiceRecipientNameEl.textContent =
+    currentClient.invoice_contact_name || "-";
+}
+
+if (invoiceRecipientEmailEl) {
+  invoiceRecipientEmailEl.textContent =
+    currentClient.invoice_contact_email || "-";
+}
+
+if (invoiceRecipientPhoneEl) {
+  invoiceRecipientPhoneEl.textContent =
+    currentClient.invoice_contact_phone || "-";
+}
+
+if (editInvoiceRecipientBtn) {
+  editInvoiceRecipientBtn.href =
+    `./new-client.html?client_id=${currentClient.id}`;
+}
+
+  if (editInvoiceRecipientBtn) {
+  editInvoiceRecipientBtn.href = `./new-client.html?client_id=${currentClient.id}`;
+}
 
   if (callClientBtn) {
   const cleanPhone = String(currentClient.phone || "").replace(/\s+/g, "");
