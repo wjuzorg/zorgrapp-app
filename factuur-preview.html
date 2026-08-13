@@ -79,14 +79,90 @@
 </tbody>
     </table>
 
-    <div class="invoice-total">
-      <strong>Totaal</strong>
-      <strong id="invoiceTotal">€110,00</strong>
-    </div>
+   <div id="invoiceVatCalculation" style="display:none; margin-top:14px;">
+  <div class="invoice-total">
+    <span>Subtotaal excl. BTW</span>
+    <strong id="invoiceSubtotal">€0,00</strong>
+  </div>
 
-   <p class="invoice-vat" id="invoiceVatText">
+  <div class="invoice-total">
+    <span id="invoiceVatAmountLabel">BTW 21%</span>
+    <strong id="invoiceVatAmount">€0,00</strong>
+  </div>
+</div>
+
+<div class="invoice-total">
+  <strong id="invoiceTotalLabel">Totaal</strong>
+  <strong id="invoiceTotal">€110,00</strong>
+</div>
+
+<p class="invoice-vat" id="invoiceVatText">
   BTW vrijgesteld van omzetbelasting volgens geldende vrijstelling.
 </p>
+
+<div
+  id="invoiceVatEditor"
+  class="no-print"
+  style="
+    margin-top:14px;
+    padding:14px;
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+    background:#fafafa;
+  "
+>
+  <strong>BTW op deze factuur</strong>
+
+  <label class="form-label" style="margin-top:12px;">
+    BTW-instelling
+  </label>
+
+  <select id="previewVatStatus" class="form-input">
+    <option value="vrijgesteld">BTW-vrijgesteld</option>
+    <option value="kor">Kleineondernemersregeling (KOR)</option>
+    <option value="verlegd">BTW verlegd</option>
+    <option value="btw_plichtig">BTW-plichtig</option>
+  </select>
+
+  <div id="previewVatRateWrap" style="display:none;">
+    <label class="form-label">BTW-percentage</label>
+
+    <select id="previewVatRate" class="form-input">
+      <option value="21">21%</option>
+      <option value="9">9%</option>
+      <option value="0">0%</option>
+    </select>
+  </div>
+
+  <div id="previewVatTextWrap">
+    <label class="form-label">BTW-tekst op deze factuur</label>
+
+    <textarea
+      id="previewVatText"
+      class="form-textarea"
+      rows="3"
+    ></textarea>
+  </div>
+
+  <div id="previewVatCustomerWrap" style="display:none;">
+    <label class="form-label">BTW-nummer afnemer</label>
+
+    <input
+      id="previewVatCustomerNumber"
+      class="form-input"
+      type="text"
+    >
+  </div>
+
+  <button
+    type="button"
+    class="btn btn-secondary"
+    id="saveInvoiceVatBtn"
+    style="width:100%; margin-top:10px;"
+  >
+    BTW opslaan voor deze factuur
+  </button>
+</div>
 
 <div class="invoice-funding-text" id="invoiceFundingText"></div>
 

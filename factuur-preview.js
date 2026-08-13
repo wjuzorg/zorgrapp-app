@@ -155,7 +155,6 @@ function getClientName() {
 
 function fillInvoicePreview() {
   const invoiceNumber = currentInvoice.invoice_number;
-  const total = getInvoiceTotal();
 
   setText("companyName", currentProfile?.company_name || "Bedrijfsnaam");
   setText("companyOwner", currentProfile?.owner_name || "");
@@ -203,8 +202,8 @@ function fillInvoicePreview() {
       ""
   );
 
-  setText("invoiceTotal", formatEuro(total));
-  setText("invoiceVatText", getVatText());
+ updateInvoiceVatPreview();
+fillInvoiceVatEditor();
 
   const paymentDays = currentProfile?.payment_term_days || 14;
   setText(
@@ -512,13 +511,21 @@ async function handleRecipientQuickAction() {
   if (btn.textContent.includes("Wijzigen")) {
     enableInvoiceEdit();
 
-    const typeSelect = document.getElementById("preview_recipient_type");
-    if (typeSelect) typeSelect.disabled = false;
+  const typeSelect = document.getElementById("preview_recipient_type");
+const paymentTypeSelect = document.getElementById("preview_payment_type");
 
-    btn.textContent = "Gegevens opslaan";
-    btn.style.color = "#16a34a";
-    btn.style.fontWeight = "bold";
-    return;
+if (typeSelect) {
+  typeSelect.disabled = false;
+}
+
+if (paymentTypeSelect) {
+  paymentTypeSelect.disabled = false;
+}
+
+btn.textContent = "Gegevens opslaan";
+btn.style.color = "#16a34a";
+btn.style.fontWeight = "bold";
+return;
   }
 
   if (!currentUser || !currentInvoice) {
@@ -1145,5 +1152,262 @@ async function saveRecipientChoice(choice) {
     : "Wijziging is opgeslagen in de cliëntenkaart en open administratie."
 );
 }
+
+function getEffectiveVatStatus() {
+  return currentInvoice?.vat_status || currentProfile?.vat_status || "vrijgesteld";
+}
+
+function getEffectiveVatRate() {
+  return Number(
+    currentInvoice?.vat_rate ??
+    currentProfile?.vat_rate ??
+    21
+  );
+}
+
+function getEffectiveVatText() {
+  if (
+    currentInvoice?.vat_text !== null &&
+    currentInvoice?.vat_text !== undefined &&
+    String(currentInvoice.vat_text).trim() !== ""
+  ) {
+    return currentInvoice.vat_text;
+  }
+
+  const status = getEffectiveVatStatus();
+
+  if (status === "vrijgesteld") {
+    return (
+      currentProfile?.vat_text ||
+      "BTW vrijgesteld van omzetbelasting volgens geldende vrijstelling."
+    );
+  }
+
+  if (status === "kor") {
+    return (
+      currentProfile?.vat_text ||
+      "Er wordt geen btw berekend vanwege toepassing van de kleineondernemersregeling (KOR)."
+    );
+  }
+
+  if (status === "verlegd") {
+    return (
+      currentProfile?.vat_text ||
+      "BTW verlegd naar afnemer."
+    );
+  }
+
+  return "";
+}
+
+function getEffectiveVatCustomerNumber() {
+  return (
+    currentInvoice?.vat_customer_number ||
+    currentProfile?.vat_customer_number ||
+    ""
+  );
+}
+
+function updateInvoiceVatPreview() {
+  const status = getEffectiveVatStatus();
+  const rate = getEffectiveVatRate();
+
+  const baseAmount = getInvoiceBaseAmount();
+
+  const calculationBox =
+    document.getElementById("invoiceVatCalculation");
+
+  const subtotalEl =
+    document.getElementById("invoiceSubtotal");
+
+  const vatAmountEl =
+    document.getElementById("invoiceVatAmount");
+
+  const vatLabelEl =
+    document.getElementById("invoiceVatAmountLabel");
+
+  const totalLabelEl =
+    document.getElementById("invoiceTotalLabel");
+
+  const totalEl =
+    document.getElementById("invoiceTotal");
+
+  const vatTextEl =
+    document.getElementById("invoiceVatText");
+
+  if (status === "btw_plichtig") {
+    const vatAmount = baseAmount * (rate / 100);
+    const totalIncludingVat = baseAmount + vatAmount;
+
+    if (calculationBox) calculationBox.style.display = "block";
+    if (subtotalEl) subtotalEl.textContent = formatEuro(baseAmount);
+    if (vatAmountEl) vatAmountEl.textContent = formatEuro(vatAmount);
+
+    if (vatLabelEl) {
+      vatLabelEl.textContent = `BTW ${rate}%`;
+    }
+
+    if (totalLabelEl) {
+      totalLabelEl.textContent = "Totaal incl. BTW";
+    }
+
+    if (totalEl) {
+      totalEl.textContent = formatEuro(totalIncludingVat);
+    }
+
+    if (vatTextEl) {
+      vatTextEl.textContent = "";
+      vatTextEl.style.display = "none";
+    }
+
+    return;
+  }
+
+  if (calculationBox) calculationBox.style.display = "none";
+
+  if (totalLabelEl) {
+    totalLabelEl.textContent = "Totaal";
+  }
+
+  if (totalEl) {
+    totalEl.textContent = formatEuro(baseAmount);
+  }
+
+  if (vatTextEl) {
+    vatTextEl.style.display = "block";
+
+    let text = getEffectiveVatText();
+
+    if (status === "verlegd") {
+      const customerNumber = getEffectiveVatCustomerNumber();
+
+      if (customerNumber) {
+        text = `${text} BTW-nummer afnemer: ${customerNumber}`;
+      }
+    }
+
+    vatTextEl.textContent = text;
+  }
+}
+
+function fillInvoiceVatEditor() {
+  const statusEl = document.getElementById("previewVatStatus");
+  const rateEl = document.getElementById("previewVatRate");
+  const textEl = document.getElementById("previewVatText");
+  const customerEl = document.getElementById("previewVatCustomerNumber");
+
+  if (statusEl) statusEl.value = getEffectiveVatStatus();
+  if (rateEl) rateEl.value = String(getEffectiveVatRate());
+  if (textEl) textEl.value = getEffectiveVatText();
+
+  if (customerEl) {
+    customerEl.value = getEffectiveVatCustomerNumber();
+  }
+
+  updateVatEditorVisibility();
+}
+
+function updateVatEditorVisibility() {
+  const status =
+    document.getElementById("previewVatStatus")?.value || "vrijgesteld";
+
+  const rateWrap = document.getElementById("previewVatRateWrap");
+  const textWrap = document.getElementById("previewVatTextWrap");
+  const customerWrap = document.getElementById("previewVatCustomerWrap");
+
+  if (rateWrap) {
+    rateWrap.style.display =
+      status === "btw_plichtig" ? "block" : "none";
+  }
+
+  if (textWrap) {
+    textWrap.style.display =
+      status === "btw_plichtig" ? "none" : "block";
+  }
+
+  if (customerWrap) {
+    customerWrap.style.display =
+      status === "verlegd" ? "block" : "none";
+  }
+}
+
+function getInvoiceBaseAmount() {
+  const minutes = Number(currentInvoice?.minutes || 0);
+  const hourlyRate = Number(currentInvoice?.hourly_rate || 0);
+
+  const laborAmount = (minutes / 60) * hourlyRate;
+  const kmAmount = Number(currentInvoice?.km_amount || 0);
+  const materialCost = Number(currentInvoice?.material_cost || 0);
+  const parkingCost = Number(currentInvoice?.parking_cost || 0);
+
+  return laborAmount + kmAmount + materialCost + parkingCost;
+}
+
+async function saveInvoiceVat() {
+  if (!currentUser || !currentInvoice) {
+    alert("Geen factuur geladen.");
+    return;
+  }
+
+  const status =
+    document.getElementById("previewVatStatus")?.value || "vrijgesteld";
+
+  const rate =
+    Number(document.getElementById("previewVatRate")?.value || 0);
+
+  const text =
+    document.getElementById("previewVatText")?.value.trim() || "";
+
+  const customerNumber =
+    document.getElementById("previewVatCustomerNumber")?.value.trim() || "";
+
+  const baseAmount = getInvoiceBaseAmount();
+
+  const vatAmount =
+    status === "btw_plichtig"
+      ? baseAmount * (rate / 100)
+      : 0;
+
+  const finalTotal = baseAmount + vatAmount;
+
+  const payload = {
+    vat_status: status,
+    vat_rate: status === "btw_plichtig" ? rate : null,
+    vat_text: status === "btw_plichtig" ? null : text,
+    vat_customer_number:
+      status === "verlegd" ? customerNumber : null,
+    total: finalTotal,
+    updated_at: new Date().toISOString()
+  };
+
+  const { error } = await supabaseClient
+    .from("invoice_drafts")
+    .update(payload)
+    .eq("owner_id", currentUser.id)
+    .eq("id", currentInvoice.id);
+
+  if (error) {
+    alert("BTW opslaan mislukt: " + error.message);
+    return;
+  }
+
+  currentInvoice = {
+    ...currentInvoice,
+    ...payload
+  };
+
+  updateInvoiceVatPreview();
+  fillInvoiceVatEditor();
+
+  alert("BTW-instelling voor deze factuur opgeslagen.");
+}
+
+document
+  .getElementById("previewVatStatus")
+  ?.addEventListener("change", updateVatEditorVisibility);
+
+document
+  .getElementById("saveInvoiceVatBtn")
+  ?.addEventListener("click", saveInvoiceVat);
 
 document.addEventListener("DOMContentLoaded", initInvoicePreview);
