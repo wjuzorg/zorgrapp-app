@@ -1307,6 +1307,37 @@ function fillInvoiceVatEditor() {
   updateVatEditorVisibility();
 }
 
+function getDefaultVatTextForStatus(status) {
+  if (status === "vrijgesteld") {
+    return "BTW vrijgesteld van omzetbelasting volgens geldende vrijstelling.";
+  }
+
+  if (status === "kor") {
+    return "Geen btw in rekening gebracht vanwege toepassing van de kleineondernemersregeling (KOR).";
+  }
+
+  if (status === "verlegd") {
+    return "BTW verlegd naar de afnemer.";
+  }
+
+  return "";
+}
+
+function handlePreviewVatStatusChange() {
+  const status =
+    document.getElementById("previewVatStatus")?.value || "vrijgesteld";
+
+  const textEl = document.getElementById("previewVatText");
+
+  // Eerst juiste velden tonen/verbergen
+  updateVatEditorVisibility();
+
+  // Daarna automatisch de passende standaardtekst invullen
+  if (textEl && status !== "btw_plichtig") {
+    textEl.value = getDefaultVatTextForStatus(status);
+  }
+}
+
 function updateVatEditorVisibility() {
   const status =
     document.getElementById("previewVatStatus")?.value || "vrijgesteld";
@@ -1404,7 +1435,7 @@ async function saveInvoiceVat() {
 
 document
   .getElementById("previewVatStatus")
-  ?.addEventListener("change", updateVatEditorVisibility);
+  ?.addEventListener("change", handlePreviewVatStatusChange);
 
 document
   .getElementById("saveInvoiceVatBtn")
